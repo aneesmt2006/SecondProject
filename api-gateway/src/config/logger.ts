@@ -1,5 +1,6 @@
 
 import winston from "winston";
+import LokiTransport from "winston-loki";
 import { config } from "./env.js";
 
 const logger = winston.createLogger({
@@ -16,6 +17,13 @@ const logger = winston.createLogger({
     new winston.transports.Console(), // logs to terminal
     new winston.transports.File({ filename: "logs/error.log", level: "error" }), // errors → error.log
     new winston.transports.File({ filename: "logs/combined.log" }), // all logs → combined.log
+    // new LokiTransport({
+    //   host: "http://loki:3100",
+    //   labels: { service: config.service || 'api-gateway' },
+    //   json: true,
+    //   replaceTimestamp: true,
+    //   onConnectionError: (err) => console.error(err)
+    // })
   ],
 });
 

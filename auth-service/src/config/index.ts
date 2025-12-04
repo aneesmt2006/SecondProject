@@ -7,7 +7,7 @@ interface Config {
   env: typeof config;
   jwtSecret: Secret;
   jwtExpiresIn: jwtExpiresIn;
-}
+}     
 
 const configs:Config = {
   env: config,

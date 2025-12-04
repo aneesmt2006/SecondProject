@@ -11,8 +11,8 @@ export class ServiceProxy {
       target: config.target,
       changeOrigin: true,
       pathRewrite: config.pathRewrite || {},
-      on: {
-        proxyReq: (proxyReq, req) => {
+      on: {     
+        proxyReq: (proxyReq:any, req:any)=> {
           console.log('🔍 Forwarded path (after rewrite):', proxyReq.path);  // This logs the actual forwarded path
         }
       },

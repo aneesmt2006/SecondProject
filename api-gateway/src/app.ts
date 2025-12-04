@@ -10,12 +10,19 @@ import logger from "./config/logger.js";
 import routes from "./routes/index.js";
 
 import helmet from "helmet";
-import { limiter } from "./middlewares/rateLimiter.js";
+// import { limiter } from "./middlewares/rateLimiter.js";
+import cookieParser from "cookie-parser";
+import { metricsHandler } from "./utils/metrics.js";
 
 const app = express();
-app.use(cors());
+
 app.use(helmet());
-app.use(limiter);
+// app.use(limiter);
+app.use(cors({
+  origin:process.env.FRONT_END_URL,
+  credentials:true,
+}));
+app.use(cookieParser());
 
 const gatewayController = new GatewayController();
 
@@ -26,12 +33,14 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-app.use(express.json());
-app.use("/api/v1",routes);
 
+
+
+
+app.use("/api/v1",routes);
 //non proxied route - for health check
 app.use("/health", (req, res) => gatewayController.healthCheck(req, res));
-
+app.get('/metrics', metricsHandler);
 app.use((req: Request, res: Response) => {
   logger.warn("Resource not Found");
   res.status(404).json({ message: "Resource Not found" });

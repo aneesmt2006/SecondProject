@@ -7,5 +7,6 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction, // underscore = “intentionally unused”
 ) => {
+  console.error("Errot cuaght err middleware ",err)
   res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: err.message });
 };

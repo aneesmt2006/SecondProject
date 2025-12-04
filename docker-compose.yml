@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./api-gateway/.env
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - USERS_MANAGEMENT_SERVICE_URL=http://user-management-service:3002
+      - MEDICAL_SERVICE_URL=http://medical-service:3003
+    depends_on:
+      - auth-service
+      - user-management-service
+      - medical-service
+
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./auth-service/.env
+    environment:
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+
+  redis:
+    image: redis/redis-stack:latest
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+
+  user-management-service:
+    build: ./user-management-service
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./user-management-service/.env
+
+  medical-service:
+    build: ./medical-service
+    ports:
+      - "3003:3003"
+    env_file:
+      - ./medical-service/.env
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  loki:
+    image: grafana/loki:2.9.3
+    user: "0"
+    command: ["-config.file=/etc/loki/local-config.yaml"]
+    volumes:
+      - ./monitoring/loki/local-config.yaml:/etc/loki/local-config.yaml
+      - loki-data:/wal
+    ports:
+      - "3100:3100"
+
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    ports:
+      - "3005:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+      - loki
+volumes:
+  loki-data:
