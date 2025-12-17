@@ -8,7 +8,6 @@ export class ResponseMapper {
     static userMapping(repoData:IUserProfile,currentWeek?:number, dueDate?:string):TUserProfileResponseDTO{
         return {
             userId:repoData.userId,
-            lmp:repoData.lmp!,
             bloodPressure:repoData.bloodPressure!,
             bpReading:repoData.bpReading!,
             familyRelated:repoData.familyRelated!,

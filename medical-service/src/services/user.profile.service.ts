@@ -18,27 +18,15 @@ export class UserProfileService implements IUserProfileService {
     const createProfile = await this._userProfileRepo.update(userId, {...data, userId});
     if(!createProfile) throw new Error(AUTH_RESPONSE_MESSAGES.FETCH_FAILED)
 
-      let currentWeek = calculateCurrentWeek(createProfile.lmp!)
 
-    const mappedUser = ResponseMapper.userMapping(createProfile,currentWeek)
+    const mappedUser = ResponseMapper.userMapping(createProfile)
     return {profile:mappedUser,message:USER_PROFILE_MESSAGES.PROFILE_CREATE_SUCCESS}
   }
 
   async updateProfile(userId: string, data: TUserProfUpdateRequestDTO): Promise<{ profile: TUserProfileResponseDTO; message: string }> {
     const updatedProfile = await this._userProfileRepo.update(userId, { ...data, userId });
     
-    let currentWeek: number | undefined;
-    if (updatedProfile!.lmp) {
-        const lmpDate = new Date(updatedProfile!.lmp);
-        if (!isNaN(lmpDate.getTime())) {
-            const today = new Date();
-            const diffTime = today.getTime() - lmpDate.getTime();
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            currentWeek = Math.floor(diffDays / 7);
-        }
-    }
-
-  const mappedUser = ResponseMapper.userMapping(updatedProfile!,currentWeek)
+  const mappedUser = ResponseMapper.userMapping(updatedProfile!)
     return { profile: mappedUser, message: USER_PROFILE_MESSAGES.PROFILE_UPDATE_SUCCESS };
   }
 
@@ -52,18 +40,9 @@ export class UserProfileService implements IUserProfileService {
         };
     }
 
-    let currentWeek: number | undefined;
-    if (profile.lmp) {
-        const lmpDate = new Date(profile.lmp);
-        if (!isNaN(lmpDate.getTime())) {
-            const today = new Date();
-            const diffTime = today.getTime() - lmpDate.getTime();
-            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            currentWeek = Math.floor(diffDays / 7);
-        }
-    }
+  
 
-     const mappedUser = ResponseMapper.userMapping(profile!,currentWeek)
+     const mappedUser = ResponseMapper.userMapping(profile!)
 
     return { profile:mappedUser, message: USER_PROFILE_MESSAGES.PROFILE_GET_SUCCESS };
   }

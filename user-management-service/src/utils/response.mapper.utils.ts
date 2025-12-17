@@ -1,13 +1,15 @@
-import type { TDoctorProfileResponseDTO } from "../dtos/doctor.dto.js";
-import type { IDoctorProfileDoc, IFetus, ISymptoms, IDoctorSlotDoc } from "./interface.utils.js";
+import type { TDoctorApmntDetDTO, TDoctorProfileResponseDTO } from "../dtos/doctor.dto.js";
+import type { IDoctorProfileDoc, IFetus, ISymptoms } from "./interface.utils.js";
 import type { TfetusResponseDTO } from "../dtos/fetus.dto.js";
 import type { TsymptomsReponseDTO } from "../dtos/symptoms.dto.js";
-import type { TDoctorSlotResponseDTO } from "../dtos/doctor.slot.dto.js";
+
+
 
 
 export class ResponseMapper {
     static doctorMapping(repoData:IDoctorProfileDoc):TDoctorProfileResponseDTO {
         return {
+            specialization:repoData.specialization!,
             address:repoData.address!,
             experience:repoData.experience!,
             registration:repoData.registration!,
@@ -44,15 +46,15 @@ export class ResponseMapper {
         }
     }
 
-    static doctorSlotMapping(repoData: IDoctorSlotDoc): TDoctorSlotResponseDTO {
+
+
+
+    static doctorApmntDetMapping(repoData:IDoctorProfileDoc):TDoctorApmntDetDTO {
         return {
-            id: repoData._id!,
-            doctorId: repoData.doctorId,
-            days: repoData.schedule,
-            slotDuration: repoData.slotDuration,
-            unavailableDates:repoData.unavailableDates,
-            createdAt: repoData.createdAt?.toISOString() || '',
-            updatedAt: repoData.updatedAt?.toISOString() || ''
+            doctorId:repoData.doctorId!,
+            experience:repoData.experience!,
+            online_fee:repoData.online_fee!,
+            profileImageLink:repoData.profileImageLink!,
         }
     }
 }

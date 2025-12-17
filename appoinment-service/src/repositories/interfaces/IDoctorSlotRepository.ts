@@ -4,4 +4,5 @@ export interface IDoctorSlotRepository {
   createOrUpdateSlot(data: IDoctorSlot): Promise<IDoctorSlotDoc>;
   getSlotByDoctorId(doctorId: string): Promise<IDoctorSlotDoc | null>;
   getAllSlots(): Promise<IDoctorSlotDoc[]>;
+  getAllSlotsByDate(weekday:string,selectedDate:Date):Promise<IDoctorSlotDoc[]>
 }

@@ -1,5 +1,5 @@
 import { inject } from "inversify";
-import { controller, httpPost, } from "inversify-express-utils";
+import { controller, httpGet, httpPost, } from "inversify-express-utils";
 import type { interfaces } from "inversify-express-utils";
 import type { IDrAuthService } from "../services/interfaces/IDrAuthService.js";
 import { TYPES } from "../types/index.js";
@@ -10,6 +10,7 @@ import type { TDRloginRequestDTO, TDRregisterRequestDTO } from "../dtos/dr.dto.j
 import { commonResponse } from "../utils/common.reponse.utils.js";
 import { HTTP_STATUS } from "../constants/http-status.constant.js";
 import { config } from "../config/env.config.js";
+import { role } from "../decorators/role.decorator.js";
 
 @controller("/auth/dr")
 export class drAuthController implements interfaces.Controller {
@@ -106,6 +107,18 @@ export class drAuthController implements interfaces.Controller {
         next(error)
     }
 
+  }
+
+  @role(['user','admin'])
+  @httpGet('/drEssential/:id')
+  async getDoctorEssentials(req:Request,res:Response,next:NextFunction){
+      try {
+        const id = req.params.id as string
+        const {doctor,message } = await this._drAuthService.getDoctorEssentials(id)
+        commonResponse.success(res,message,doctor,HTTP_STATUS.OK)
+      } catch (error) {
+        next(error)
+      }    
   }
 
 

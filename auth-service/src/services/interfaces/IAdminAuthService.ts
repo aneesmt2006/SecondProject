@@ -7,5 +7,6 @@ export interface IAdminAuthService {
     getAllDoctors():Promise<{doctors:TDRresponseDTO[],message:string}>
     updateDoctorStatus(id:string,status:string):Promise<{doctor:TDRresponseDTO,message:string}>
     updateUserStatus(id:string,status:boolean):Promise<{user:TuserResponseDTO,message:string}>
+    // getAllDoctorsApmnt():Promise<{doctors:TDRapmntDTO[],message:string}>
 
 }

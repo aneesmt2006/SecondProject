@@ -3,7 +3,7 @@ export const drUpdateSchema = z.object({
   fullName: z.string().min(3, "Full name is required").optional(),
   phone: z.string().min(10, "Enter proper contact number").optional(),
   role: z.enum(["doctor", "admin", "user"]).optional(),
-  specialization: z.string().optional(),
+  specialization: z.string().min(1,"Specialization required"),
   clinicName: z.string().min(1, "Clinic/Hospital name is required").optional(),
   experience: z.string().min(1, "Experience is required").optional(),
   address: z.string().min(1, "Address is required").optional(),

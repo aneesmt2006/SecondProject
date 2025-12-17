@@ -5,6 +5,7 @@ import { TYPES } from "../types/type.js";
 import type { IDoctorSlotService } from "../services/interfaces/IDoctorSlotService.js";
 import { commonResponse } from "../utils/common.reponse.utils.js";
 import { HTTP_STATUS } from "../constants/http-status.constant.js";
+import { role } from "../decorators/role.decorator.js";
 
 @controller("/doctor/slot")
 export class DoctorSlotController {
@@ -36,6 +37,7 @@ export class DoctorSlotController {
     }
   }
 
+  @role(['admin'])
   @httpGet("/getAllSlots")
   async getAllSlots(req: Request, res: Response, next: NextFunction) {
     try {

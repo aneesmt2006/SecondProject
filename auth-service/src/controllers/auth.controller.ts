@@ -3,6 +3,7 @@ import {
   controller,
   httpGet,
   httpPost,
+  httpPut,
 } from "inversify-express-utils";
 import type { interfaces } from "inversify-express-utils";
 import { TYPES } from "../types/index.js";
@@ -12,14 +13,16 @@ import {
   loginSchema,
   otpSchema,
   resendOtpSchema,
+  lmpSchema,
 } from "../utils/schemas-zod.utils.js";
 import type { NextFunction, Request, Response } from "express";
 import type { IAuthService } from "../services/interfaces/IAuthService.js";
 import { AUTH_RESPONSE_MESSAGES } from "../constants/response-messages.constant.js";
 import { HTTP_STATUS } from "../constants/http-status.constant.js";
 import { config } from "../config/env.config.js";
-import type { TloginRequesDTO, TregisterRequestDTO } from "../dtos/user.dto.js";
+import type { TloginRequesDTO } from "../dtos/user.dto.js";
 import { commonResponse } from "../utils/common.reponse.utils.js";
+import { idHandler } from "../middlewares/idHandler.js";
 
 @controller("/auth")
 export class AuthController implements interfaces.Controller {
@@ -33,23 +36,26 @@ export class AuthController implements interfaces.Controller {
   public async register(req: Request, res: Response, next: NextFunction) {
     console.log("Register hit");
     try {
-      const { full_name, email, phone, password, role, dateOfBirth } = req.body;
-      console.log("body", req.body);
-      const registerDTO: TregisterRequestDTO = {
-        full_name,
-        email,
-        phone,
-        password,
-        role,
-        dateOfBirth,
-      };
+      
       const { email: otpSendEmail, message } =
-        await this._authService.register(registerDTO);
+        await this._authService.register(req.body);
       commonResponse.success(res, message, otpSendEmail,HTTP_STATUS.OK);
     } catch (error) {
       next(error);
     }
   }
+
+  @httpPut('/basic-profile',validate(lmpSchema))
+  public async updateLmp(req:Request,res:Response,next:NextFunction){
+    try {
+      const id = idHandler(req,res,next)
+      console.log("Id from middlware-->",id)
+      const {user,message} = await this._authService.lmpUpdate(id,req.body)
+      commonResponse.success(res,message,user,HTTP_STATUS.OK)
+    } catch (error) {
+      next(error)
+    }
+  } 
 
   @httpPost("/login", validate(loginSchema))
   public async login(req: Request, res: Response, next: NextFunction) {
@@ -158,6 +164,18 @@ export class AuthController implements interfaces.Controller {
       commonResponse.success(res, message, user, HTTP_STATUS.OK);
     } catch (error) {
       next(error);
+    }
+  }
+
+
+  @httpGet('/basic-profile')
+  async getBasicProfile(req:Request,res:Response,next:NextFunction){
+    try {
+      const id = idHandler(req,res,next)
+      const {message,user} = await this._authService.getBaseProfile(id)
+      commonResponse.success(res,message,user,HTTP_STATUS.OK)
+    } catch (error) {
+      next(error)
     }
   }
 }

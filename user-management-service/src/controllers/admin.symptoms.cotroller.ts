@@ -13,7 +13,7 @@ export class AdminSymptomsController implements interfaces.Controller {
 
     @httpPost('/create')
     async createSymptoms(req:Request,res:Response,next:NextFunction){
-        console.log("Create hitttt")
+        console.log("Create hitttt",req.body)
        try {
          const {symptoms,message} = await this._symptomsService.create(req.body)
          commonResponse.success(res,message,symptoms,HTTP_STATUS.CREATED)

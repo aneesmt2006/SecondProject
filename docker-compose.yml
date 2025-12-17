@@ -11,6 +11,7 @@ services:
       - AUTH_SERVICE_URL=http://auth-service:3001
       - USERS_MANAGEMENT_SERVICE_URL=http://user-management-service:3002
       - MEDICAL_SERVICE_URL=http://medical-service:3003
+      - PAYMENT_SERVICE_URL=http://payment-service:3002
     depends_on:
       - auth-service
       - user-management-service
@@ -46,6 +47,17 @@ services:
       - "3003:3003"
     env_file:
       - ./medical-service/.env
+
+  payment-service:
+    build: ./payment-service
+    ports:
+      - "3004:3002"
+    env_file:
+      - ./payment-service/.env
+    environment:
+      - PORT=3002
+    depends_on:
+      - auth-service
 
   prometheus:
     image: prom/prometheus:latest

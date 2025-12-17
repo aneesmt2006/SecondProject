@@ -26,8 +26,13 @@ export class AuthRepository implements IAuthRepository {
 
   async update(id: string, user: Partial<IUser>): Promise<IUser | null> {
     //  const doc = await UserModel.findByIdAndUpdate({_id:id},{$set:{profile:user}})
-    const doc = await UserModel.findByIdAndUpdate(id,user)
+    console.log("Updating lmp datass --->",user)
+    const doc = await UserModel.findByIdAndUpdate(id,user,{new:true})
      console.log("FROM REPO",doc)
       return doc
   }
+
+
+
+  
 }

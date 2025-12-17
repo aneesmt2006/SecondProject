@@ -1,10 +1,11 @@
-import type { TDRresponseDTO } from "../dtos/dr.dto.js";
+import type { TDRapmntDTO, TDRresponseDTO } from "../dtos/dr.dto.js";
 import type { TuserResponseDTO } from "../dtos/user.dto.js";
 import type { IDoctor, IUser } from "./interface.utils.js";
 
 export class ResponseMapper {
   static  userResponseMapping(repoData:IUser,token?:string): TuserResponseDTO {
     return {
+      lmp:repoData.lmp||'',
       id: repoData._id!,
       full_name: repoData.full_name,
       email: repoData.email,
@@ -14,7 +15,7 @@ export class ResponseMapper {
       createdAt: repoData.createdAt!,
       updatedAt: repoData.updatedAt!,
       accessToken:token||'',
-      isActive:repoData.isActive!
+      isActive:repoData.isActive!,
     };
   }
 
@@ -29,6 +30,14 @@ export class ResponseMapper {
       updatedAt:repoData.updatedAt!,
       role:repoData.role!,
       accessToken:token||''
+    }
+  }
+
+  static doctorApmntMapping(repoData:IDoctor):TDRapmntDTO{
+    return {
+      id:repoData._id!,
+      fullName:repoData.fullName,
+      specialization:repoData.specialization!,
     }
   }
 

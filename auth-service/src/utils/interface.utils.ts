@@ -11,6 +11,8 @@ export interface IUser {
   createdAt?: Date;
   updatedAt?: Date;
   isActive?:string;
+  lmp?:string;
+  dueDate?:string;
 }
 
 export interface IDoctor {

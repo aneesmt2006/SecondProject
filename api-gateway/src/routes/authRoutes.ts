@@ -37,4 +37,16 @@ router.use(
     serviceName: "medical-service",
   })
 );
+
+router.use("/payment",withAuth,proxyService.createProxy({
+  target:(config.paymentServiceUrl as string) || "http://localhost:3012",
+  pathRewrite:{"/api/v1/payment":""},
+  serviceName:"payment-service"
+}))
+
+router.use("/appoinment",withAuth,proxyService.createProxy({
+  target:(config.appoinmentServiceUrl as string),
+  pathRewrite:{"/api/v1/appoinment":""},
+  serviceName:"appoinment-service"
+}))
 export default router;

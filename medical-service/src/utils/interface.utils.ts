@@ -1,6 +1,5 @@
 export interface IProfile {
   userId?:string,
-  lmp?: string;
   isFirstPregnancy?: boolean;
   bloodGroup?: string;
   height?: string;

@@ -1,6 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 import type { IDoctorSlotDoc } from "../utils/interface.utils.js";
-import { required } from "zod/mini";
 
 const DaySchema = new Schema({
   enabled: { type: Boolean, default: false },

@@ -11,6 +11,7 @@ import { commonResponse } from "../utils/common.reponse.utils.js";
 import { HTTP_STATUS } from "../constants/http-status.constant.js";
 import { role } from "../decorators/role.decorator.js";
 
+
 @controller('/auth/admin')
 export class AdminController implements interfaces.Controller{
     private _adminAuthService : IAdminAuthService
@@ -37,7 +38,7 @@ export class AdminController implements interfaces.Controller{
          next(error)
        }
     }
-    
+
     @role(['admin'])
     @httpGet('/getAllUsers')
     async getAllUsers(req:Request,res:Response,next:NextFunction){
@@ -50,7 +51,6 @@ export class AdminController implements interfaces.Controller{
       }
 
     }
-
 
     @role(['admin'])
     @httpGet('/getAllDoctors')
@@ -68,11 +68,10 @@ export class AdminController implements interfaces.Controller{
     @httpPut('/updateDoctorStatus/:id')
     async updateDoctorStatus(req:Request,res:Response,next:NextFunction){
       try {
-        const {id} = req.params
+        const {id} = req.params;
         const {status} = req.body;
         if(!id || !status) return commonResponse.failure(res,"Id and status is required",400)
         
-          console.log("Id---->",id)
         const {doctor,message} = await this._adminAuthService.updateDoctorStatus(id,status);
         commonResponse.success(res,message,doctor,HTTP_STATUS.OK)
       } catch (error) {
@@ -93,4 +92,16 @@ export class AdminController implements interfaces.Controller{
         next(error)
       }
     }
+
+    // @role(['user','admin'])
+    // @httpGet('/getAllDrApmnt')
+    // async getAllDoctorsForApmnt(req:Request,res:Response,next:NextFunction){
+    //   try {
+    //     const {doctors,message} = await this._adminAuthService.getAllDoctorsApmnt();
+    //     commonResponse.success(res,message,doctors,HTTP_STATUS.OK)
+    //   } catch (error) {
+    //     next(error)
+    //   }
+    // }
+
 }

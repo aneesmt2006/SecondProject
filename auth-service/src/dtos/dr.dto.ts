@@ -24,6 +24,9 @@ export type TDRresponseDTO = {
   accessToken?: string;
 };
 
+export type TDRessentialDTO = Pick<TDRresponseDTO,"fullName"|"clinicName">
+export type TDRapmntDTO = Pick<TDRresponseDTO,"fullName"|"clinicName">
+
 export type TDRgoogleAuthResponse = {
   name: string;
   email: string;

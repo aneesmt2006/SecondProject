@@ -34,17 +34,19 @@ export const USER_RESPONSE_MESSAGES = {
     NOT_FOUND:"User not found",
     UNAUTHORIZED:"Unauthorized access",
     UPDATED:"User updated successfully",
+    NOT_UPDATED:"User updating failed",
     STATUS_UPDATED:"User status updated successfully",
     INVALID_ID:"Invalid user/doctor ID",
     INVALID_UPDATED_DATA:"Invalid updated Data",
     INTERNAL_ERROR:"Intenal server error",
     GET_USER:"User data fetched successfully",
+
     
 } as const
 
 
 export const ADMIN_RESPONSE_MESSAGES = {
-  FETCHED_SUCCESS:"Users data fetched successfully",
+  FETCHED_SUCCESS:" fetched successfully",
   NOT_ACCESS_TO_ADMIN_ROUTE: "Forbidden: Access Denied to ADMIN",
   STATUS_UPDATED: "status updated successfully",
   DB_CHANGE_FAILED:"DB change failed"

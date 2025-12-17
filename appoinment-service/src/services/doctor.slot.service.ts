@@ -14,18 +14,21 @@ export class DoctorSlotService implements IDoctorSlotService {
   ) {}
 
   async createOrUpdateSlot(data: IDoctorSlot): Promise<{ slot: TDoctorSlotResponseDTO; message: string }> {
-    console.log("SErvice hit ---->",data)
+    console.log("Service hit ---->",data)
     const result = await this._doctorSlotRepository.createOrUpdateSlot(data);
+    console.log("result after update slot ---->",result)
     const mappedSlot = ResponseMapper.doctorSlotMapping(result);
     return { slot: mappedSlot, message: DOCTOR_SLOT_MESSAGES.SLOT_UPSERT_SUCCESS };
   }
 
-  async getSlotByDoctorId(doctorId: string): Promise<{ slot: TDoctorSlotResponseDTO; message: string }> {
+  async getSlotByDoctorId(doctorId: string): Promise<{ slot: TDoctorSlotResponseDTO|null; message: string }> {
     const result = await this._doctorSlotRepository.getSlotByDoctorId(doctorId);
     if (!result) {
-      throw new Error(DOCTOR_SLOT_MESSAGES.SLOT_NOT_FOUND);
+       return { slot: null, message: DOCTOR_SLOT_MESSAGES.SLOT_GET_SUCCESS };
     }
     const mappedSlot = ResponseMapper.doctorSlotMapping(result);
+
+    console.log("Dataa slot after mapping",mappedSlot)
     return { slot: mappedSlot, message: DOCTOR_SLOT_MESSAGES.SLOT_GET_SUCCESS };
   }
 

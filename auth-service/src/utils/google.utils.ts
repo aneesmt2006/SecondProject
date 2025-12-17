@@ -1,11 +1,5 @@
-// import { OAuth2Client } from "google-auth-library";
 import { config } from "../config/env.config.js";
 
-// export const oAuth2Client = new OAuth2Client({
-//     client_id:config.goole_client_id as string,
-//     client_secret:config.google_secret_id as string,
-
-// })
 
 import { google } from "googleapis";
 

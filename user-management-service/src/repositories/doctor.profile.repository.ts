@@ -14,10 +14,20 @@ export class DoctorProfileRepository implements IDoctorProfileRepository {
   }
 
   async findByDoctorId(doctorId: string): Promise<IDoctorProfileDoc | null> {
-    return await DoctorProfileModel.findOne({ doctorId });
+    return await DoctorProfileModel.findOne({ doctorId});
+  }
+
+  async findDoctorsByIds(doctorIds: string[]): Promise<IDoctorProfileDoc[]> {
+    return await DoctorProfileModel.find({doctorId:{$in:doctorIds}})
   }
 
   async findAll(): Promise<IDoctorProfileDoc[]> {
     return await DoctorProfileModel.find();
+  }
+
+  async findByCategory(category: Record<string, any>, page: number, limit: number): Promise<{profiles:IDoctorProfileDoc[],pageCounts:number}> {
+    const profiles =  await DoctorProfileModel.find(category).skip((page-1)*limit).limit(limit)
+    const count = await DoctorProfileModel.countDocuments(category)
+    return {profiles,pageCounts:count}
   }
 }

@@ -21,4 +21,8 @@ export class DoctorSlotRepository implements IDoctorSlotRepository {
   async getAllSlots(): Promise<IDoctorSlotDoc[]> {
     return await DoctorSlotModel.find() as IDoctorSlotDoc[];
   }
+
+  async getAllSlotsByDate( weekday: string,selectedDate:Date): Promise<IDoctorSlotDoc[]> {
+    return await DoctorSlotModel.find({[`schedule.${weekday}.enabled`]:true,unavailableDates:{$nin:[selectedDate.toDateString()]}}).lean()
+  }
 }

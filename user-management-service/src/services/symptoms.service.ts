@@ -15,6 +15,8 @@ export class SymptomsService implements ISymptomsService{
         const symptoms = await this._symptomsRepo.create(symptomsData);
         if(!symptoms) throw new Error(ADMIN_RESPONSE_MESSAGES.EMPTY_REPO);
 
+
+        console.log("Service hit respone from repo---->",symptoms)
         const mappedSymtptoms = ResponseMapper.symptomsResponseMapping(symptoms)
 
         return {symptoms:mappedSymtptoms,message:ADMIN_RESPONSE_MESSAGES.CREATE}

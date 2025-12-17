@@ -1,6 +1,5 @@
 import winston from "winston";
 import LokiTransport from "winston-loki";
-import { config } from "../config/env.config.js";
 
 const logger = winston.createLogger({
   level: "info",

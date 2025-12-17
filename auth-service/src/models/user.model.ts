@@ -7,7 +7,7 @@ const schema = new mongoose.Schema<IUser>(
     email: { type: String, required: true },
     phone: { type: String },
     password: { type: String },
-    role: { type: String, enum: ["user", "admin"] },
+    role: { type: String, enum: ["user","admin"] },
     dateOfBirth: { type: String },
     profileImage: { type: String },
     accountMethod: {
@@ -15,7 +15,9 @@ const schema = new mongoose.Schema<IUser>(
       enum: ["normal", "google"],
       default: "normal",
     },
-   isActive:{type:Boolean,required:true,default:true}
+   isActive:{type:Boolean,required:true,default:true},
+   lmp:{type:String},
+   dueDate:{type:String}
   },
   {
     timestamps: true,

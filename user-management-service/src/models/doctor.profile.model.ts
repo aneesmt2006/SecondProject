@@ -1,9 +1,11 @@
 import mongoose, { Schema, Document } from "mongoose";
 import type { IDoctorProfileDoc } from "../utils/interface.utils.js";
+import { required } from "zod/mini";
 
 const DoctorProfileSchema: Schema = new Schema(
   {
     doctorId: { type: String, required: true, unique: true },
+    specialization:{type:String,required:true},
     experience: { type: String },
     address: { type: String },
     profileImageLink: { type: String },

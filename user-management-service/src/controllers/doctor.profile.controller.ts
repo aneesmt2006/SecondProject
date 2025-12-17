@@ -1,5 +1,5 @@
 import { inject } from "inversify";
-import { controller, httpGet, httpPut } from "inversify-express-utils";
+import { controller, httpGet, httpPut, httpPost } from "inversify-express-utils";
 import type { interfaces } from "inversify-express-utils";
 import type { Request, Response, NextFunction } from "express";
 import { TYPES } from "../types/type.js";
@@ -48,4 +48,32 @@ export class DoctorProfileController implements interfaces.Controller {
       next(error)
     }
   }
+
+  @role(['admin'])
+  @httpGet('/allApmntDet')
+  async getAllApmntDet(req:Request,res:Response,next:NextFunction){
+    try {
+      const {doctorsApmnt,message} = await this._doctorProfileService.getAllDoctorsApmntDet()
+      commonResponse.success(res,message,doctorsApmnt,HTTP_STATUS.OK)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  @httpGet("/filter")
+  async getDoctorsByCategory(req: Request, res: Response, next: NextFunction) {
+      try {
+          const { specialization, page, limit } = req.query;
+          const { profiles,pageCounts, message } = await this._doctorProfileService.getDoctorsByCategory(
+              specialization as string || '', 
+              Number(page) || 1, 
+              Number(limit) || 2
+          );
+          commonResponse.success(res, message, {profiles,pageCounts}, HTTP_STATUS.OK);
+      } catch (error) {
+          next(error);
+      }
+  }
+
+
 }

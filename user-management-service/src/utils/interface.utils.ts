@@ -24,6 +24,7 @@ export interface IUserProfile extends IProfile {
 }
 
 export interface IDoctorProfile {
+  specialization?:string,
   experience?: string;
   address?: string;
   profileImageLink?: string;
@@ -60,36 +61,8 @@ export interface ISymptoms {
   updatedAt?:string,
 }
 
-export interface IBreak {
-  start: string;
-  end: string;
-}
 
-export interface IDaySchedule {
-  enabled: boolean;
-  start?: string;
-  end?: string;
-  breaks: IBreak[];
-}
 
-export interface  IDoctorSlot {
-  doctorId: string;
-  schedule: {
-    Monday: IDaySchedule;
-    Tuesday: IDaySchedule;
-    Wednesday: IDaySchedule;
-    Thursday: IDaySchedule;
-    Friday: IDaySchedule;
-    Saturday: IDaySchedule;
-    Sunday: IDaySchedule;
-  };
-  slotDuration: string;
-  unavailableDates:string[],
 
-}
 
-export interface IDoctorSlotDoc extends IDoctorSlot {
-  _id?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+

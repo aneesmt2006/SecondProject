@@ -2,7 +2,7 @@ import { injectable, inject } from "inversify";
 import { TYPES } from "../types/type.js";
 import type { IDoctorProfileRepository } from "../repositories/interfaces/IDoctorProfileRepository.js";
 import type { IDoctorProfileService } from "./interfaces/IDoctorProfileService.js";
-import type { TDoctorProfileUpdateRequestDTO, TDoctorProfileResponseDTO } from "../dtos/doctor.dto.js";
+import type { TDoctorProfileUpdateRequestDTO, TDoctorProfileResponseDTO, TDoctorApmntDetDTO } from "../dtos/doctor.dto.js";
 import { DOCTOR_PROFILE_MESSAGES } from "../constants/response-messages.constants.js";
 import { ResponseMapper } from "../utils/response.mapper.utils.js";
 
@@ -22,10 +22,20 @@ export class DoctorProfileService implements IDoctorProfileService {
   async updateProfile(doctorId: string, data: TDoctorProfileUpdateRequestDTO): Promise<{ profile: TDoctorProfileResponseDTO; message: string }> {
     if(!doctorId) throw new Error(DOCTOR_PROFILE_MESSAGES.DOCTOR_ID_MISSING)
     const updatedProfile = await this._doctorProfileRepo.update(doctorId,{ ...data, doctorId });
-    
    const mappedDoctor = ResponseMapper.doctorMapping(updatedProfile!)
-
+ 
     return { profile: mappedDoctor, message: DOCTOR_PROFILE_MESSAGES.PROFILE_UPDATE_SUCCESS };
+  }
+
+  async getDoctorsByCategory(specialization: string, page: number, limit: number): Promise<{ profiles: TDoctorProfileResponseDTO[];pageCounts:number, message: string }> {
+      const queuery:Record<string, any>= {}
+      if(specialization)queuery.specialization = specialization 
+      const {profiles,pageCounts} = await this._doctorProfileRepo.findByCategory(queuery, page, limit);
+
+     
+      const mappedProfiles = profiles.map(doc => ResponseMapper.doctorMapping(doc));
+    
+      return { profiles:mappedProfiles,pageCounts,message: DOCTOR_PROFILE_MESSAGES.PROFILE_GET_SUCCESS };
   }
 
   /**
@@ -55,4 +65,21 @@ export class DoctorProfileService implements IDoctorProfileService {
     const mappedProfiles = profiles.map(profile => ResponseMapper.doctorMapping(profile));
     return { profiles: mappedProfiles, message: DOCTOR_PROFILE_MESSAGES.PROFILE_GET_SUCCESS };
   }
+
+
+
+
+  async getAllDoctorsApmntDet(): Promise<{ doctorsApmnt: TDoctorApmntDetDTO[]; message: string; }> {
+    const activeDoctorsDoc = await this._doctorProfileRepo.findAll()
+
+    const mappedApmntDet  = activeDoctorsDoc.map((ampnt)=>ResponseMapper.doctorApmntDetMapping(ampnt))
+
+    return {doctorsApmnt:mappedApmntDet,message:DOCTOR_PROFILE_MESSAGES.PROFILE_GET_SUCCESS}
+  }
+
+
+
+
+
+  
 }

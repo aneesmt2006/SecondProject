@@ -6,7 +6,5 @@ export const TYPES = {
     FetusService: Symbol.for("FetusService"),
     FetusRepository: Symbol.for("FetusRepository"),
     SymptomsService:Symbol.for("SymptomsService"),
-    SymptomsRepository:Symbol.for('SymptomsRepository'),
-    DoctorSlotService: Symbol.for("DoctorSlotService"),
-    DoctorSlotRepository: Symbol.for("DoctorSlotRepository"),
+    SymptomsRepository:Symbol.for('SymptomsRepository')
 }

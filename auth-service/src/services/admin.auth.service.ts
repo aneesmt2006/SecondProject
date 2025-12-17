@@ -10,7 +10,7 @@ import bcrypt from "bcryptjs";
 import { _generateTokens } from "../utils/jwt.utils.js";
 import { redisClient } from "../config/redis.config.js";
 import { ResponseMapper } from "../utils/response.utils.js";
-import type { TDRresponseDTO } from "../dtos/dr.dto.js";
+import type {  TDRresponseDTO } from "../dtos/dr.dto.js";
 
 
 @injectable()
@@ -60,7 +60,6 @@ export class AdminAuthService implements IAdminAuthService{
     role: user.role,
     createdAt: user.createdAt!,
     updatedAt: user.updatedAt!,
-    status:user.isActive
   };
 });
 
@@ -77,7 +76,7 @@ export class AdminAuthService implements IAdminAuthService{
 
        if(!doctorsDoc)throw new Error(CONSTANTS.ERRORS.DB_NOT_EXIST)
 
-       const mappedDoctors = doctorsDoc.map((dr) => {
+       const mappedDoctors: TDRresponseDTO[] = doctorsDoc.map((dr) => {
           return {
             id:dr._id!,
             fullName: dr.fullName!,
@@ -95,11 +94,9 @@ export class AdminAuthService implements IAdminAuthService{
 
    async updateDoctorStatus(id: string, status: string): Promise<{ doctor: TDRresponseDTO; message: string; }> {
        const updatedDoctor = await this._adminRepo.updateDoctorStatus(id,status);
-
-       console.log("Update status doc -------->",updatedDoctor);
        if(!updatedDoctor) throw new Error(CONSTANTS.ERRORS.DB_NOT_EXIST)
        
-       const mappedDoctor = {
+       const mappedDoctor:TDRresponseDTO = {
         id:updatedDoctor._id!,
         fullName: updatedDoctor.fullName!,
         email: updatedDoctor.email!,
@@ -112,6 +109,7 @@ export class AdminAuthService implements IAdminAuthService{
        return {doctor:mappedDoctor,message:ADMIN_RESPONSE_MESSAGES.STATUS_UPDATED}
    }
 
+
    async updateUserStatus(id: string, status: boolean): Promise<{ user: TuserResponseDTO; message: string; }> {
      const usersDoc = await this._adminRepo.updateUserStatus(id,status)
 
@@ -121,4 +119,13 @@ export class AdminAuthService implements IAdminAuthService{
 
      return {user:mappedUser,message:ADMIN_RESPONSE_MESSAGES.STATUS_UPDATED}
    }
+
+
+  //  async getAllDoctorsApmnt(): Promise<{ doctors: TDRapmntDTO[]; message: string; }> {
+  //    const doctors = await this._adminRepo.findDoctorsActive()
+
+  //    const mappedDoctors = doctors.map((doctor)=>ResponseMapper.doctorApmntMapping(doctor));
+  //    return {doctors:mappedDoctors,message:ADMIN_RESPONSE_MESSAGES.FETCHED_SUCCESS}
+
+  //  }
 }

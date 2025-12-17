@@ -8,6 +8,8 @@ export const config = {
     usersManagementServiceUrl:process.env.USERS_MANAGEMENT_SERVICE_URL,
     authServiceUrl:process.env.AUTH_SERVICE_URL,
     medicalServiceUrl:process.env.MEDICAL_SERVICE_URL,
+    appoinmentServiceUrl:process.env.APPOINMENT_SERVICE_URL,
+    paymentServiceUrl:process.env.PAYMENT_SERVICE_URL,
     // other urls
     jwtSecret:process.env.JWT_SECRET || "your-secret-key",
     deploy:process.env.DEPLOY

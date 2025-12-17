@@ -3,12 +3,12 @@ import type { IDrAuthService } from "./interfaces/IDrAuthService.js";
 import type { IDrAuthRepository } from "../repositories/interfaces/IDrAuthRepository.js";
 import type { IOtpService } from "./interfaces/IOtpService.js";
 import { TYPES } from "../types/index.js";
-import type { TDRregisterRequestDTO, TDRresponseDTO } from "../dtos/dr.dto.js";
+import type { TDRessentialDTO, TDRregisterRequestDTO, TDRresponseDTO } from "../dtos/dr.dto.js";
 import { CONSTANTS } from "../constants/constants.js";
 import bcrypt from "bcryptjs";
-import { AUTH_RESPONSE_MESSAGES, USER_RESPONSE_MESSAGES } from "../constants/response-messages.constant.js";
+import { AUTH_RESPONSE_MESSAGES } from "../constants/response-messages.constant.js";
 import type { IDoctor } from "../utils/interface.utils.js";
-import { _generateTokens, createAccessToken } from "../utils/jwt.utils.js";
+import { _generateTokens } from "../utils/jwt.utils.js";
 import { ResponseMapper } from "../utils/response.utils.js";
 
 @injectable()
@@ -93,4 +93,15 @@ export class DrAuthService implements IDrAuthService {
 
          return {doctor:mappedDoctor,accessToken,refreshToken,message:AUTH_RESPONSE_MESSAGES.LOGIN_SUCCESS}
    }
-}
+
+   async getDoctorEssentials(doctorId: string): Promise<{ doctor: TDRessentialDTO; message: string; }> {
+       const doctorDoc = await this._drRepo.findById(doctorId)
+       if(!doctorDoc){
+        throw new Error(CONSTANTS.ERRORS.DB_NOT_EXIST)
+       }
+       const  mappedDR = {fullName:doctorDoc.fullName,clinicName:doctorDoc.clinicName!}
+
+       return {doctor:mappedDR,message:AUTH_RESPONSE_MESSAGES.GET_DOCTOR}
+       } 
+      
+   }

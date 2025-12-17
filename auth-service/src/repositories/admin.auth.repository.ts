@@ -35,4 +35,9 @@ export class AdminAuthRepository implements IAdminAuthRepository{
         console.log("RESSSPONSE ---------->",response)
         return response
     }
+
+
+    async findDoctorsActive(): Promise<IDoctor[]> {
+        return await DoctorModel.find({role:"docotr",status:"approved"})
+    }
 }

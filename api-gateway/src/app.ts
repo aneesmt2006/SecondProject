@@ -19,7 +19,10 @@ const app = express();
 app.use(helmet());
 // app.use(limiter);
 app.use(cors({
-  origin:process.env.FRONT_END_URL,
+  origin: [
+    process.env.FRONT_END_URL as string,
+    process.env.FRONT_END_URL2 as string
+  ],
   credentials:true,
 }));
 app.use(cookieParser());
