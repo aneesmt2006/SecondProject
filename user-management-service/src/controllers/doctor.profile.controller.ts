@@ -75,5 +75,14 @@ export class DoctorProfileController implements interfaces.Controller {
       }
   }
 
-
+  @httpPost('/forAppointments')
+  async getProfilesForAppointments(req:Request,res:Response,next:NextFunction){
+    try {
+      const {doctorIds} = req.body;
+      const {profiles,message} = await this._doctorProfileService.getProfilesForAppointments(doctorIds);
+      commonResponse.success(res,message,profiles,HTTP_STATUS.OK)
+    } catch (error) {
+      next(error)
+    }
+  }
 }

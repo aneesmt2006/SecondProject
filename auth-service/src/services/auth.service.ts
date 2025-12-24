@@ -9,13 +9,12 @@ import type { IAuthRepository } from "../repositories/interfaces/IAuthRepository
 import { redisClient } from "../config/redis.config.js";
 import { createAccessToken, createRefreshToken } from "../utils/jwt.utils.js";
 import type { IOtpService } from "./interfaces/IOtpService.js";
-import type { TgoogleAuthResponse, TprofileDTO, TregisterRequestDTO, TuserResponseDTO } from "../dtos/user.dto.js";
+import type { TgoogleAuthResponse, TregisterRequestDTO, TuserResponseDTO } from "../dtos/user.dto.js";
 import { ResponseMapper } from "../utils/response.utils.js";
 import { AUTH_RESPONSE_MESSAGES, USER_RESPONSE_MESSAGES } from "../constants/response-messages.constant.js";
 import { oauth2Client } from "../utils/google.utils.js";
 import axios from "axios";
 import type {  IUser } from "../utils/interface.utils.js";
-import { calculateCurrentWeek, calculateDueDate } from "../utils/calculate.week.utils.js";
 
 
 @injectable()
@@ -201,30 +200,10 @@ export class AuthService implements IAuthService {
   }
 
 
-  async lmpUpdate(id: string, userData: TprofileDTO): Promise<{ user: TuserResponseDTO; message: string; }> {
-    const user = await this._authRepo.findById(id)
-    const updatedDoc = await this._authRepo.update(user?._id as string,{lmp:userData.lmp})
-    console.log("Updating lmp authmodel ----->",updatedDoc)
-    if(!updatedDoc){
-      throw new Error(USER_RESPONSE_MESSAGES.NOT_UPDATED)
-    }
-
-    const mappedUser = ResponseMapper.userResponseMapping(updatedDoc)
-
-    return {user:mappedUser,message:USER_RESPONSE_MESSAGES.UPDATED}
-  }
-
-
   async getBaseProfile(id:string): Promise<{ user: TuserResponseDTO; message: string; }> {
     const user = await this._authRepo.findById(id)
 
     const mappedUser = ResponseMapper.userResponseMapping(user!)
-    if (mappedUser.lmp!) {
-    const lmpDate = new Date(mappedUser.lmp.toString()); 
-
-    mappedUser.dueDate = calculateDueDate(lmpDate);
-    mappedUser.currentWeek = calculateCurrentWeek(lmpDate);
-  }
     return {user:mappedUser,message:USER_RESPONSE_MESSAGES.GET_USER}
   }
 

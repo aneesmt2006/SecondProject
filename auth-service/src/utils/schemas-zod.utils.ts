@@ -7,12 +7,8 @@ export const registerSchema = z.object({
   password: z.string().min(8, "Password must contain at leat 8 characters"),
   dateOfBirth: z.string(),
   role: z.enum(["user", "doctor", "admin"]),
-  lmp:z.string().optional(),
 });
 
-export const lmpSchema = z.object({
-  lmp:z.string().min(1,"Lmp date is required")
-})
 
 export const loginSchema = z.object({
   email: z.string().email("Invalid Email"),

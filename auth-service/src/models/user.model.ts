@@ -16,8 +16,6 @@ const schema = new mongoose.Schema<IUser>(
       default: "normal",
     },
    isActive:{type:Boolean,required:true,default:true},
-   lmp:{type:String},
-   dueDate:{type:String}
   },
   {
     timestamps: true,

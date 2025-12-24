@@ -5,6 +5,8 @@ import { required } from "zod/mini";
 const DoctorProfileSchema: Schema = new Schema(
   {
     doctorId: { type: String, required: true, unique: true },
+    fullName: { type: String },
+    clinicName: { type: String },
     specialization:{type:String,required:true},
     experience: { type: String },
     address: { type: String },

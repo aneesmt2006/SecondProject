@@ -9,6 +9,8 @@ import type { TsymptomsReponseDTO } from "../dtos/symptoms.dto.js";
 export class ResponseMapper {
     static doctorMapping(repoData:IDoctorProfileDoc):TDoctorProfileResponseDTO {
         return {
+            fullName: repoData.fullName!,
+            clinicName: repoData.clinicName!,
             specialization:repoData.specialization!,
             address:repoData.address!,
             experience:repoData.experience!,
@@ -52,6 +54,7 @@ export class ResponseMapper {
     static doctorApmntDetMapping(repoData:IDoctorProfileDoc):TDoctorApmntDetDTO {
         return {
             doctorId:repoData.doctorId!,
+            fullName: repoData.fullName!,
             experience:repoData.experience!,
             online_fee:repoData.online_fee!,
             profileImageLink:repoData.profileImageLink!,

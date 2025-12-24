@@ -8,6 +8,7 @@ export type TDoctorProfileResponseDTO = IDoctorProfile & {
 
 export type TDoctorApmntDetDTO = {
     doctorId:string,
+    fullName?: string;
     experience: string;
     profileImageLink?: string;
     online_fee: string;

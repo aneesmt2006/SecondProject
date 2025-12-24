@@ -77,9 +77,9 @@ export class DoctorProfileService implements IDoctorProfileService {
     return {doctorsApmnt:mappedApmntDet,message:DOCTOR_PROFILE_MESSAGES.PROFILE_GET_SUCCESS}
   }
 
-
-
-
-
-  
+  async getProfilesForAppointments(doctorIds: string[]): Promise<{ profiles: TDoctorProfileResponseDTO[]; message: string; }> {
+    const profiles = await this._doctorProfileRepo.findDoctorsByIds(doctorIds);
+    const mappedProfiles = profiles.map(profile => ResponseMapper.doctorMapping(profile));
+    return { profiles: mappedProfiles, message: DOCTOR_PROFILE_MESSAGES.PROFILE_GET_SUCCESS };
+  }
 }

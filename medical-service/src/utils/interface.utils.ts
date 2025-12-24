@@ -1,5 +1,9 @@
 export interface IProfile {
   userId?:string,
+  fullName?: string;
+  dateOfBirth?: string;
+  lmp?: string;
+  dueDate?: string;
   isFirstPregnancy?: boolean;
   bloodGroup?: string;
   height?: string;

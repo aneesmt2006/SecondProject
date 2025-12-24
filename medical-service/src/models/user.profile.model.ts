@@ -4,6 +4,10 @@ import type { IUserProfile } from "../utils/interface.utils.js";
 const UserProfileSchema: Schema = new Schema(
   {
     userId: { type: String, required: true, unique: true },
+    fullName: { type: String },
+    dateOfBirth: { type: String },
+    lmp: { type: String },
+    dueDate: { type: String },
     isFirstPregnancy: { type: Boolean },
     bloodGroup: { type: String },
     height: { type: String },

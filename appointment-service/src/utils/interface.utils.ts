@@ -1,8 +1,11 @@
 export type TAppointmentStatus =
   | "PENDING"
   | "BOOKED"
+  | "SUCCESS"
+  | "CANCELED"
   | "CANCELLED"
-  | "EXPIRED";
+  | "EXPIRED"
+  | "COMPLETED";
 
 export interface IAppointment {
   _id?: string;
@@ -12,6 +15,9 @@ export interface IAppointment {
   appointmentTime: string;
   amount: number;
   status: TAppointmentStatus;
+  isRecurring?: boolean;
+  consultationStatus?: string;
+  notes?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -49,4 +55,25 @@ export interface IDoctorSlotDoc extends IDoctorSlot {
   updatedAt?: Date;
 }
 
-export type WeekDays = "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+export type WeekDays =
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday"
+  | "Sunday";
+
+export interface AppointmentQuery {
+  doctorId: string;
+  date?: string;
+}
+
+export interface PatientDet {
+  userId:string;
+  fullName: string;
+  age: number;
+  week: number;
+  trimester: string;
+  isFirstPregnancy?: boolean;
+}

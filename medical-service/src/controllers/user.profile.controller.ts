@@ -8,11 +8,13 @@ import { HTTP_STATUS } from "../constants/http-status.constant.js";
 import { validate } from "../middlewares/validate.js";
 import { pregnantProfileSchema } from "../utils/schema-zod.utils.js";
 import { commonResponse } from "../utils/common.reponse.utils.js";
+import { role } from "../decorators/role.decorator.js";
 
 @controller("/patient/profile")
 export class UserProfileController implements interfaces.Controller {
   constructor(@inject(TYPES.UserProfileService) private _userProfileService: IUserProfileService) {}
 
+  @role(['user','admin'])
   @httpPost('/create',validate(pregnantProfileSchema))
   async createProfile(req:Request,res:Response,next:NextFunction){
     try {
@@ -24,6 +26,7 @@ export class UserProfileController implements interfaces.Controller {
     }
   }
 
+  @role(['user','admin'])
   @httpPut("/update", validate(pregnantProfileSchema))
   async updateProfile(req: Request, res: Response, next: NextFunction) {
     try {
@@ -35,6 +38,7 @@ export class UserProfileController implements interfaces.Controller {
     }
   }
 
+  @role(['user','admin'])
   @httpGet("/")
   async getProfile(req: Request, res: Response, next: NextFunction) {
     try {
@@ -43,6 +47,18 @@ export class UserProfileController implements interfaces.Controller {
      commonResponse.success(res,message,profile,HTTP_STATUS.OK)
     } catch (error) {
       next(error);
+    }
+  }
+
+  @role(['doctor','admin'])
+  @httpPost('/forDoctors')
+  async getPatientProfiles(req:Request,res:Response,next:NextFunction){
+    try {
+      console.log("Hitted medical service ----->")
+      const {profiles,message} = await this._userProfileService.getPatientsProfile(req.body)
+      commonResponse.success(res,message,profiles,HTTP_STATUS.OK)
+    } catch (error) {
+      next(error)
     }
   }
 }

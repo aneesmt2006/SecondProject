@@ -24,6 +24,8 @@ export interface IUserProfile extends IProfile {
 }
 
 export interface IDoctorProfile {
+  fullName?: string;
+  clinicName?: string;
   specialization?:string,
   experience?: string;
   address?: string;

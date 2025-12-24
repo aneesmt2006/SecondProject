@@ -16,4 +16,8 @@ export class UserProfileRepository implements IUserProfileRepository {
   async findByUserId(userId: string): Promise<IUserProfile | null> {
     return await UserProfileModel.findOne({ userId });
   }
+
+  async findByIds(userIds: string[]): Promise<IUserProfile[] | null> {
+    return await UserProfileModel.find({userId:{$in:userIds}})
+  }
 }

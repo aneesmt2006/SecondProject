@@ -5,7 +5,6 @@ import type { IDoctor, IUser } from "./interface.utils.js";
 export class ResponseMapper {
   static  userResponseMapping(repoData:IUser,token?:string): TuserResponseDTO {
     return {
-      lmp:repoData.lmp||'',
       id: repoData._id!,
       full_name: repoData.full_name,
       email: repoData.email,

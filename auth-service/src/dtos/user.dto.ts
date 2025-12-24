@@ -9,12 +9,8 @@ export type TregisterRequestDTO = {
   role: Trole;
   password: string;
   dateOfBirth: string;
-  lmp?:string;
 };
 
-export type TprofileDTO = {
-  lmp:string,
-}
 
 export type TloginRequesDTO = {
     email:string,
@@ -23,7 +19,6 @@ export type TloginRequesDTO = {
 
 export type TuserResponseDTO = {
   id: string;
-  lmp?:string;
   full_name: string;
   email: string;
   phone: string;
@@ -31,8 +26,6 @@ export type TuserResponseDTO = {
   dateOfBirth: string;
   accessToken:string,
   isActive?:string,
-  currentWeek?:string,
-  dueDate?:string,
   createdAt: Date;
   updatedAt: Date;
   

@@ -6,5 +6,6 @@ export interface IDoctorProfileService {
   getAllDoctors(): Promise<{ profiles: TDoctorProfileResponseDTO[]; message: string }>;
   getAllDoctorsApmntDet():Promise<{doctorsApmnt:TDoctorApmntDetDTO[],message:string}>
   getDoctorsByCategory(specialization: string, page: number, limit: number): Promise<{ profiles: TDoctorProfileResponseDTO[]; pageCounts:number,message: string }>;
+  getProfilesForAppointments(doctorIds:string[]):Promise<{profiles:TDoctorProfileResponseDTO[],message:string}>
 }
 

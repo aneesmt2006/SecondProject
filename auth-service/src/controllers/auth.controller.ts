@@ -13,7 +13,6 @@ import {
   loginSchema,
   otpSchema,
   resendOtpSchema,
-  lmpSchema,
 } from "../utils/schemas-zod.utils.js";
 import type { NextFunction, Request, Response } from "express";
 import type { IAuthService } from "../services/interfaces/IAuthService.js";
@@ -44,18 +43,6 @@ export class AuthController implements interfaces.Controller {
       next(error);
     }
   }
-
-  @httpPut('/basic-profile',validate(lmpSchema))
-  public async updateLmp(req:Request,res:Response,next:NextFunction){
-    try {
-      const id = idHandler(req,res,next)
-      console.log("Id from middlware-->",id)
-      const {user,message} = await this._authService.lmpUpdate(id,req.body)
-      commonResponse.success(res,message,user,HTTP_STATUS.OK)
-    } catch (error) {
-      next(error)
-    }
-  } 
 
   @httpPost("/login", validate(loginSchema))
   public async login(req: Request, res: Response, next: NextFunction) {

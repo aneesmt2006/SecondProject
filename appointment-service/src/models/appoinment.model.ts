@@ -30,9 +30,22 @@ const schema = new Schema<IAppointment>(
 
     status: {
       type: String,
-      enum: ["PENDING", "BOOKED", "CANCELLED", "EXPIRED"],
+      enum: ["PENDING", "BOOKED", "SUCCESS", "CANCELED", "CANCELLED", "EXPIRED"],
       default: "PENDING",
     },
+    isRecurring:{
+      type:Boolean,
+      default:false
+    },
+    consultationStatus:{
+      type:String,
+      enum: ["PENDING", "COMPLETED", "CANCELED", "EXPIRED"],
+      default:"PENDING"
+    },
+    notes: {
+      type: String,
+      default: ""
+    }
   },
   {
     timestamps: true, // adds createdAt, updatedAt

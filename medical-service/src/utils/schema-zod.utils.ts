@@ -1,5 +1,8 @@
 import {z} from 'zod'
 export const pregnantProfileSchema = z.object({
+  fullName: z.string().min(1, "Full name is required"),
+  dateOfBirth: z.string().min(1, "Date of birth is required"),
+  lmp: z.string().min(1, "LMP date is required"),
   isFirstPregnancy: z.boolean({
     message: "isFirstPregnancy must be true or false",
   }),

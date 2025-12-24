@@ -25,7 +25,7 @@ export type TDRresponseDTO = {
 };
 
 export type TDRessentialDTO = Pick<TDRresponseDTO,"fullName"|"clinicName">
-export type TDRapmntDTO = Pick<TDRresponseDTO,"fullName"|"clinicName">
+export type TDRapmntDTO = Pick<TDRresponseDTO,"id"|"fullName"|"specialization">
 
 export type TDRgoogleAuthResponse = {
   name: string;
