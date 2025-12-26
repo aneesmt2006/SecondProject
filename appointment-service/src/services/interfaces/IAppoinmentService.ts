@@ -1,4 +1,4 @@
-import type { TApmntPatientsDetailsDTO, TCompleteAppointmentDTO, TCreateAppointmentDTO, TCreateAppointmentResponseDTO, TUserVisitHistoryDTO,} from "../../dtos/appoinment.dto.js";
+import type { TApmntPatientsDetailsDTO, TCompleteAppointmentDTO, TCreateAppointmentDTO, TCreateAppointmentResponseDTO, TUserVisitHistoryDTO} from "../../dtos/appoinment.dto.js";
 import type { IAppointment } from "../../utils/interface.utils.js";
 
 export interface IAppoinmentService {

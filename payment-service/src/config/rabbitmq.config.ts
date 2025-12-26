@@ -35,3 +35,12 @@ export const publishEvent= async(routingKey:string,payload:Record<string, any>)=
     console.log(error)
    }
 } 
+
+
+export const getChannel=()=>{
+    if(!channel){
+        throw new Error("Rabbit mq channel not initialized inside function")
+    }
+
+    return channel
+}

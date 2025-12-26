@@ -10,7 +10,15 @@ export class PaymentRepository implements IPaymentRepository {
         return await PaymentOrderModel.create(payment)
     }
 
-    async update(orderCreationId: string, status: string): Promise<IPaymentOrder | null> {
-        return await PaymentOrderModel.findOneAndUpdate({tempOrderId:orderCreationId},{$set:{status:status}},{new:true})
+    async update(orderCreationId: string, status: string, razorpayPaymentId: string): Promise<IPaymentOrder | null> {
+        return await PaymentOrderModel.findOneAndUpdate(
+            { tempOrderId: orderCreationId },
+            { $set: { status: status, razorpayPaymentId: razorpayPaymentId } },
+            { new: true }
+        );
+    }
+
+    async findByAppoinmentId(appoinmentId: string): Promise<IPaymentOrder|null> {
+        return await PaymentOrderModel.findOne({appoinmentId})
     }
 }

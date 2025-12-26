@@ -40,4 +40,31 @@ export class AppoinmentConfirmedConsumer {
       channel.nack(message, false, false);
     }
   }
+
+  @EventPattern('payment.refunded')
+  async handleRefundPayment(
+    @Payload() payload: any,
+    @Ctx() context: RmqContext,
+  ): Promise<void> {
+    console.log(
+      '🐞 DEBUG: Raw payload received in handleRefundPayment:',
+      JSON.stringify(payload),
+    );
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const channel = context.getChannelRef();
+    const message = context.getMessage();
+    try {
+      this.logger.log('payload for refund', payload);
+      await this.appoinmentService.paymentRefund(payload);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      channel.ack(message);
+
+      this.logger.log('Refund notification processed and stored');
+    } catch (error) {
+      this.logger.error('Error handling refund payment notification', error);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      channel.nack(message, false, false);
+    }
+  }
 }

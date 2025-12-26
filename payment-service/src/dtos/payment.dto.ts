@@ -21,3 +21,8 @@ export type TPaymentVerifyDTO = {
   razorpayOrderId: string;        
   razorpaySignature: string;      
 };
+
+export type TPaymentUpdateDTO = {
+  appoinmentId:string,
+  status:string
+}

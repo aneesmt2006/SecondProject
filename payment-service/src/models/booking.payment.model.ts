@@ -14,6 +14,10 @@ const schema = new Schema<IPaymentOrder>(
       required: true,
       unique: true,
     },
+    razorpayPaymentId: {
+      type: String,
+      unique: true,
+    },
 
     userId: {
       type: String,
@@ -37,7 +41,7 @@ const schema = new Schema<IPaymentOrder>(
 
     status: {
       type: String,
-      enum: ["PENDING", "SUCCESS", "FAILED"],
+      enum: ["PENDING", "SUCCESS", "FAILED", "CANCELLED", "REFUNDED"],
       default: "PENDING",
     },
 
@@ -47,7 +51,7 @@ const schema = new Schema<IPaymentOrder>(
     },
   },
   {
-    timestamps: true, 
+    timestamps: true,
   }
 );
 

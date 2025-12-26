@@ -8,7 +8,7 @@ export class ResponseMapper {
         return {
             appointmentId:repoData._id!,
             amount:repoData.amount,
-            status:"PENDING",
+            status:repoData.status,
             appoinmentDate:repoData.appointmentDate||'',
             appoinmentTime:repoData.appointmentTime||'',
             doctorId:repoData.doctorId||'',

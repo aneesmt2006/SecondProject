@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { inject } from "inversify";
-import { controller, httpGet, httpPost } from "inversify-express-utils";
+import { controller, httpGet, httpPost, httpPut } from "inversify-express-utils";
 import { TYPES } from "../types/type.js";
 import type { IAppoinmentService } from "../services/interfaces/IAppoinmentService.js";
 import { commonResponse } from "../utils/common.reponse.utils.js";
@@ -16,6 +16,17 @@ export class AppoinmentController {
         try {
             const { appoinment, message } = await this._appoinmentService.create(req.body);
             return commonResponse.success(res, message, appoinment, HTTP_STATUS.CREATED);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    @httpPut('/cancel')
+       async cancel(req: Request, res: Response, next: NextFunction) {
+        try {
+            const {appointmentId} = req.body 
+            const {appoinment,message} = await this._appoinmentService.update(appointmentId as string,"CANCELLED")
+            commonResponse.success(res,message,appoinment,)
         } catch (error) {
             next(error);
         }

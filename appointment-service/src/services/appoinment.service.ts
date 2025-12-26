@@ -9,6 +9,7 @@ import { COMMON_MESSAGE, ERROR_MESSAGE, SUCCESS_MESSAGE } from "../constants/com
 import { ResponseMapper } from "../utils/response.mapper.utils.js";
 import { config } from "../config/env.config.js";
 import type { ApiResponse } from "../utils/api.response.utils.js";
+import { getChannel } from "../config/rabbitmq.config.js";
 
 
 
@@ -34,6 +35,14 @@ export class AppoinmentService implements IAppoinmentService {
         if(!updatedAppoinment) throw new Error(ERROR_MESSAGE.DB_NOT_EXIST)
 
         const mappedAppoinment = ResponseMapper.appoinmentMapper(updatedAppoinment)
+
+        if(mappedAppoinment.status==='CANCELLED'){
+            console.log("Iam from inside publish event to payment service to initite payment")
+            const channel = getChannel();
+            const payload = {status:'REFUNDED',eventType:'PAYMENT_REFUNDED',appoinmentId:mappedAppoinment.appointmentId,appoinmentDate:mappedAppoinment.appoinmentDate,appoinmentTime:mappedAppoinment.appoinmentTime}
+            const messageBuffer = Buffer.from(JSON.stringify(payload));
+            channel.publish('appoinment.events','appoinment.cancelled',messageBuffer)
+        }
         
         return {appoinment:mappedAppoinment,message:SUCCESS_MESSAGE.APMNT_UPDATED}
     }
@@ -96,11 +105,11 @@ export class AppoinmentService implements IAppoinmentService {
         let response;
         try {
             
-            const baseUrl = config.usersManagementServiceUrl 
+            const baseUrl = config.medicalServiceUrl 
             response = await axios.post<ApiResponse<PatientDet[]>>(`${baseUrl}/patient/profile/forDoctors`, patientIds);
         } catch (error: any) {
-            console.error("users managemnt service Service Error:", error.message);
-            throw new Error("Failed to connect to users managemnt service");
+            console.error("medical  service for patient details connecting Error:", error.message);
+            throw new Error("Failed to connect to medical  service for patient details");
         }
         
         const patientDetails = response.data.data;
@@ -149,7 +158,7 @@ export class AppoinmentService implements IAppoinmentService {
 
         //  Create new appointments for each previewDate now i used loop we can also use insertmany 
         if (previewDates && previewDates.length > 0) {
-            const newAppointments = previewDates.map(date => ({
+            const newAppointments = previewDates.map((date: any) => ({
                 userId,
                 doctorId: existingApmnt.doctorId,
                 appointmentDate: date,
@@ -187,6 +196,7 @@ export class AppoinmentService implements IAppoinmentService {
             const userMgmtUrl = config.usersManagementServiceUrl
             const response = await axios.post<ApiResponse<any[]>>(`${userMgmtUrl}/doctor/profile/forAppointments`, { doctorIds });
             doctorProfiles = response.data.data;
+            console.log("Doctor profiless fetched from user-managemnt-service--->",doctorProfiles)
         } catch (error) {
             console.error("Error fetching doctor profiles:", error);
             
@@ -228,6 +238,8 @@ export class AppoinmentService implements IAppoinmentService {
             } else {
                 status = 'Completed'; // If date is past and not cancelled, assume completed/expired shell
             }
+
+            console.log("DR-------->",dr)
 
             return {
                 appointmentId: apmnt._id!,

@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import type { IPaymentService } from "./interfaces/IPaymentService.js";
 import { TYPES } from "../types/type.js";
 import type { IPaymentRepository } from "../repositories/interfaces/IPaymentCreateRepository.js";
-import type { TPaymentCreateDTO, TPaymentCreateResponseDTO } from "../dtos/payment.dto.js";
+import type { TPaymentCreateDTO, TPaymentCreateResponseDTO, TPaymentUpdateDTO } from "../dtos/payment.dto.js";
 import Razorpay from "razorpay";
 import { config } from "../config/env.config.js";
 import { generateTempOrderId } from "../utils/tempOrderId.utils.js";
@@ -12,6 +12,7 @@ import type { TPaymentVerifyDTO } from "../dtos/payment.dto.js";
 import * as crypto from "crypto";
 import { boolean } from "zod";
 import { publishEvent } from "../config/rabbitmq.config.js";
+import { RazorpayInstance } from "../config/razorpay.instance.config.js";
 
 
 
@@ -22,10 +23,7 @@ export class PaymentService implements IPaymentService {
     constructor(@inject(TYPES.PaymentRespository) private _paymentRepo:IPaymentRepository){}
 
     async create(payment: TPaymentCreateDTO): Promise<{ payment: TPaymentCreateResponseDTO; message: string; }> {
-        const instance = new Razorpay({
-            key_id:config.razorpayKeyId as string,
-            key_secret:config.razorpaySecret as string,
-        })
+        const instance = RazorpayInstance
 
         const tempOrderId = generateTempOrderId()
 
@@ -36,6 +34,7 @@ export class PaymentService implements IPaymentService {
         };
 
         const razorOrder = await instance.orders.create(options)
+        
 
         if(!razorOrder) throw new Error(PAYMENT_ERRORS.FAILED_CREATE_ORDER)
 
@@ -61,7 +60,7 @@ export class PaymentService implements IPaymentService {
             throw new Error(PAYMENT_ERRORS.SIGNATURE_NOT_MATCHING)
         }
 
-        const paymentDoc = await this._paymentRepo.update(orderCreationId,"SUCCESS")
+        const paymentDoc = await this._paymentRepo.update(orderCreationId,"SUCCESS",razorpayPaymentId)
 
         if(!paymentDoc) throw new Error(PAYMENT_ERRORS.FAILED_DB)
 
@@ -70,4 +69,46 @@ export class PaymentService implements IPaymentService {
         return {status:true,message:PAYMENT_SUCCESS.PAYMNET_VERIFICATION_SUCCESS}
 
     }
+
+    async refund(appoinmentId:string,status:string,appoinmentDate:string,appoinmentTime:string): Promise<{ status: boolean; message: string; }> {
+        const appoinment = await this._paymentRepo.findByAppoinmentId(appoinmentId);
+        if(!appoinment) throw new Error(PAYMENT_ERRORS.NOT_CONTAIN)
+        
+        const instance = RazorpayInstance
+        const {amount, razorpayPaymentId, tempOrderId} = appoinment
+
+        if (!razorpayPaymentId) {
+            throw new Error("No successful payment record found for this appointment to refund.");
+        }
+
+        // const refundRazorpay = await instance.payments.refund(razorpayPaymentId, {
+        //     amount: amount * 100 
+        // });
+
+        // if(!refundRazorpay) throw new Error("Error whle refund razorapy")
+
+        const updated = await this._paymentRepo.update(tempOrderId!, status, razorpayPaymentId);
+
+        if(!updated) throw new Error(PAYMENT_ERRORS.FAILED_DB)
+
+        const payload = {
+            pattern: 'payment.refunded',
+            data: {
+                userId: updated.userId,
+                doctorId: updated.doctorId,
+                appoinmentTime: appoinmentTime,
+                appoinmentDate: appoinmentDate,
+                appoinmentId: appoinmentId
+            }
+        };
+
+        console.log("Publishing refund event with payload:", JSON.stringify(payload, null, 2));
+
+        publishEvent('payment.refunded', payload);
+
+        console.log("Now we can inform Notiii kutaaa")
+
+        return {status:true,message:PAYMENT_SUCCESS.REFUND_SUCCESS}
+
+    } 
 }

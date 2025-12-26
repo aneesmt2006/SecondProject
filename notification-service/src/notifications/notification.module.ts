@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Notification, NotificationSchema } from './models/notification.module';
 import { AppoinmentConfirmedConsumer } from './controller/appoinment.consumer';
-import { NotificationService } from './services/notification.sercvice';
+import { NotificationService } from './services/notification.service';
 import { NotificationRepositoryPort } from './repositories/abstraction/notification.repository.abstraction';
 import { NotificationServicePort } from './services/abstraction/service.notification.abstraction';
 import { MongoNotificationRepository } from './repositories/notification.repository';
