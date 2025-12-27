@@ -1,5 +1,5 @@
 {
-  "name": "base-project",
+  "name": "tracking-service",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -16,6 +16,7 @@
   "dependencies": {
     "amqplib": "^0.10.9",
     "body-parser": "^2.2.1",
+    "concurrently": "^9.2.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.21.0",

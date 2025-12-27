@@ -10,6 +10,7 @@ export const config = {
     medicalServiceUrl:process.env.MEDICAL_SERVICE_URL,
     appoinmentServiceUrl:process.env.APPOINMENT_SERVICE_URL,
     paymentServiceUrl:process.env.PAYMENT_SERVICE_URL,
+    trackingServiceurl:process.env.TRACKING_SERVICE_URL,
     // other urls
     jwtSecret:process.env.JWT_SECRET || "your-secret-key",
     deploy:process.env.DEPLOY,

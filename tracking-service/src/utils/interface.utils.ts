@@ -1,29 +1,21 @@
-import winston from "winston";
-import LokiTransport from "winston-loki";
-import { config } from "../config/env.config.js";
 
-const logger = winston.createLogger({
-  level: "info",
-  defaultMeta: { service: "user-management-service" },
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json()
-  ),
-  transports: [
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple()
-      )
-    }),
-    new LokiTransport({
-      host: "http://loki:3100",
-      labels: { service: "user-management-service" },
-      json: true,
-      replaceTimestamp: true,
-      onConnectionError: (err) => console.error(err)
-    })
-  ],
-});
+export interface ISymptoms {
+  _id?:string,
+  week : number,
+  normalSymptomsHTML:string,
+  abnormalSymptomsHTML:string,
+  normalSymptoms: string[],
+  abnormalSymptoms:string[],
+  createdAt?:string,
+  updatedAt?:string,
+}
 
-export default logger;
+export interface IUserSymptoms {
+    _id?: string;
+    userId: string;
+    week: number;
+    selectedNormalSymptoms: string[];
+    selectedAbnormalSymptoms: string[];
+    createdAt?: string;
+    updatedAt?: string;
+}

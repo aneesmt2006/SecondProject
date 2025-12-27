@@ -1,4 +1,4 @@
-import type { IDaySchedule, IDoctorProfile, IDoctorSlot } from "../utils/interface.utils.js";
+import type { IDoctorProfile} from "../utils/interface.utils.js";
 
 export type TDoctorProfileUpdateRequestDTO = IDoctorProfile 
 

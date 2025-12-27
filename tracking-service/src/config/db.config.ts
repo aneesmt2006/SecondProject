@@ -9,7 +9,7 @@ export const connectDB = async () => {
     }
 
     await mongoose.connect(url, {
-      dbName: "Your-service name",
+      dbName: "Tracking-service",
     });
     console.log("Connecting to MongoDB success");
   } catch (error) {

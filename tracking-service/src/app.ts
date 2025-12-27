@@ -7,7 +7,7 @@ import morgan from "morgan"
 import { container } from "./config/inversify.config.js"
 import { config } from "./config/env.config.js"
 import { metricsHandler } from "./utils/metrics.js";
-import logger from "./utils/interface.utils.js"
+import logger from "./utils/logger.js"
 
 connectDB();
 

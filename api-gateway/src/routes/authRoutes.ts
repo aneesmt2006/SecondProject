@@ -49,4 +49,10 @@ router.use("/appoinment",withAuth,proxyService.createProxy({
   pathRewrite:{"/api/v1/appoinment":""},
   serviceName:"appoinment-service"
 }))
+
+router.use('/tracking',withAuth,proxyService.createProxy({
+  target:(config.trackingServiceurl as string),
+  pathRewrite:{'/api/v1/tracking':''},
+  serviceName:'tracking-service'
+}))
 export default router;
