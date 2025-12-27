@@ -14,6 +14,11 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import { metricsHandler } from "./utils/metrics.js";
 
+import { redisClient } from "./config/redis.config.js";
+
+redisClient.connect().then(()=>{
+  console.log("Redis connected at api gatewayy")
+}).catch(()=>console.log("Redis not connected"))
 const app = express();
 
 app.use(helmet());

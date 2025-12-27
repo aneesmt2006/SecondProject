@@ -106,6 +106,12 @@ export class AdminAuthService implements IAdminAuthService{
         role:updatedDoctor.role!,
         status: updatedDoctor.status!
        }
+
+       if(mappedDoctor.status==='rejected'){
+        await redisClient.set(`id:${mappedDoctor.id}`,"1");
+       }else{
+        await redisClient.del(`id:${mappedDoctor.id}`)
+       }
        return {doctor:mappedDoctor,message:ADMIN_RESPONSE_MESSAGES.STATUS_UPDATED}
    }
 
@@ -117,6 +123,11 @@ export class AdminAuthService implements IAdminAuthService{
 
      const mappedUser = ResponseMapper.userResponseMapping(usersDoc)
 
+     if(mappedUser.isActive===false){
+        await redisClient.set(`id:${mappedUser.id}`,"1");
+       }else{
+        await redisClient.del(`id:${mappedUser.id}`)
+       }
      return {user:mappedUser,message:ADMIN_RESPONSE_MESSAGES.STATUS_UPDATED}
    }
 

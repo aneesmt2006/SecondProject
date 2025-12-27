@@ -10,6 +10,7 @@ import { AUTH_RESPONSE_MESSAGES } from "../constants/response-messages.constant.
 import type { IDoctor } from "../utils/interface.utils.js";
 import { _generateTokens } from "../utils/jwt.utils.js";
 import { ResponseMapper } from "../utils/response.utils.js";
+import { UNALLOWED_STATUS } from "../utils/unallowed.status.utils.js";
 
 @injectable()
 export class DrAuthService implements IDrAuthService {
@@ -85,6 +86,11 @@ export class DrAuthService implements IDrAuthService {
 
         if(!isCorrect){
             throw new Error(CONSTANTS.ERRORS.INVALID_CREDENTIALS_SIMPLE)
+        }
+
+
+        if(UNALLOWED_STATUS.includes(doctor.status!)){
+         throw new Error(CONSTANTS.ERRORS.BLOCKED_BY_ADMIN)
         }
 
          const {accessToken,refreshToken} = _generateTokens(doctor._id!,doctor.role,doctor.email)

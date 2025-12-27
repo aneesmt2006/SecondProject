@@ -10,7 +10,7 @@ export interface IUser {
   accountMethod: "normal" | "google";
   createdAt?: Date;
   updatedAt?: Date;
-  isActive?:string;
+  isActive?:boolean;
 }
 
 export interface IDoctor {

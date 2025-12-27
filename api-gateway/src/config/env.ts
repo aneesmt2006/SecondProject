@@ -12,7 +12,8 @@ export const config = {
     paymentServiceUrl:process.env.PAYMENT_SERVICE_URL,
     // other urls
     jwtSecret:process.env.JWT_SECRET || "your-secret-key",
-    deploy:process.env.DEPLOY
+    deploy:process.env.DEPLOY,
+    redisUrl:process.env.REDIS_URL
 
 } 
 

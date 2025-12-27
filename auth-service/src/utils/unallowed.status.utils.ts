@@ -1,0 +1,1 @@
+export const UNALLOWED_STATUS = ["pending", "rejected", "blocked"]

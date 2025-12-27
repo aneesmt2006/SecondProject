@@ -13,6 +13,7 @@ export const DOCTOR_PROFILE_MESSAGES = {
 
 export const AUTH_RESPONSE_MESSAGES = {
   FILE_UPLOAD: "File uploaded successfully",
+  SIGNED_URL_SUCCESS:"Signed url getting success"
 };
 
 export const ADMIN_RESPONSE_MESSAGES = {

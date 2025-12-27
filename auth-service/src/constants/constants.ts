@@ -21,7 +21,8 @@ export const CONSTANTS = {
     TIME_OUT_OTP: "Session Expired . Register again",
     NOT_ADMIN: "You are not ADMIN",
     DOCTER_NOT_FOUND:"Doctor Not Found",
-    DB_NOT_EXIST:"Trying to fetch documents are not found"
+    DB_NOT_EXIST:"Trying to fetch documents are not found",
+    BLOCKED_BY_ADMIN:"Sorry you are blocked by admin. Please contact"
   },
   OTP: {
     LENGTH: 6,

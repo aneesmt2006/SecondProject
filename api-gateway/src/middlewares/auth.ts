@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { config } from "../config/env.js";
 import jwt from "jsonwebtoken";
 import logger from "../config/logger.js";
+import { redisClient } from "../config/redis.config.js";
 
 const PUBLIC_ENDPOINTS = [
   "/api/v1/account/auth/register",
@@ -17,7 +18,7 @@ const PUBLIC_ENDPOINTS = [
 
 ];
 
-export const withAuth = (
+export const withAuth =async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -53,6 +54,10 @@ export const withAuth = (
     req.headers['x-token-role'] = decoded.role
 
     console.log("User id decoded",decoded)
+    // redisClient.set(`id:${mappedDoctor.id}`,"1");
+    if(await redisClient.get(`id:${decoded.id}`)){
+      return res.status(403).json({message:"Blocked By admin  , You are blacklisted"})
+    }
 
     next();
   } catch (error) {

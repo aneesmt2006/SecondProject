@@ -21,18 +21,20 @@ export async function createPresignedPost(urlsArray: IcreatePresignedPost[]) {
 
   const signedUrlsWithFile = await Promise.all(
     urlsArray.map(async(obj) => {
+      const key = `public/${Date.now()}-${obj.fileName}`;
       const command = new PutObjectCommand({
         Bucket: BUCKET_NAME,
-        Key: `public/${obj.fileName}`,
+        Key: key,
         ContentType: obj.fileType,
       });
       console.log("AWS REGION--------------->",config.awsRegion)
-      const fileLink = `https://${BUCKET_NAME}.s3.${config.awsRegion}.amazonaws.com/public/${obj.fileName}`;
+      // const fileLink = `https://${BUCKET_NAME}.s3.${config.awsRegion}.amazonaws.com/public/${obj.fileName}`;
+      // file link dont need it only accessed through GET url api
       const signedUrl = await getSignedUrl(s3, command, {
-        expiresIn: 5 * 60, // 5 min - default is 15 minutes
+        expiresIn:5 * 60// 5 min - default is 15 minutes
       });
 
-      return { fileLink, signedUrl };
+      return { key, signedUrl };
     }),
   );
   return signedUrlsWithFile;

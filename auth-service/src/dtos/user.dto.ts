@@ -25,7 +25,7 @@ export type TuserResponseDTO = {
   role: Trole;
   dateOfBirth: string;
   accessToken:string,
-  isActive?:string,
+  isActive?:boolean,
   createdAt: Date;
   updatedAt: Date;
   

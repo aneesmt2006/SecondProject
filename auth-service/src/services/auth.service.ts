@@ -136,6 +136,10 @@ export class AuthService implements IAuthService {
         throw new Error(CONSTANTS.ERRORS.INVALID_CREDENTIALS);
     }
     }
+
+    if(!user.isActive){
+      throw new Error(CONSTANTS.ERRORS.BLOCKED_BY_ADMIN)
+    }
   
     const {accessToken,refreshToken,redisExpireSeconds} = this._generateTokens(user._id!.toString(),user.role,user.email);
 
