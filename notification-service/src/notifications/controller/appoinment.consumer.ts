@@ -4,8 +4,8 @@ import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { AppoinmentConfirmedDTO } from '../dtos/appoinment.confirm.dto';
 
 @Controller()
-export class AppoinmentConfirmedConsumer {
-  private readonly logger = new Logger(AppoinmentConfirmedConsumer.name);
+export class NotificationConsumer {
+  private readonly logger = new Logger(NotificationConsumer.name);
   constructor(private readonly appoinmentService: NotificationServicePort) {}
 
   @EventPattern('appoinment.confirmed')
@@ -28,7 +28,7 @@ export class AppoinmentConfirmedConsumer {
       this.logger.log(
         `Recieved message from Appoinment Id -->${payload.appoinmentId}`,
       );
-      await this.appoinmentService.create(payload);
+      await this.appoinmentService.appointmentSuccess(payload);
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       channel.ack(message);
@@ -47,7 +47,7 @@ export class AppoinmentConfirmedConsumer {
     @Ctx() context: RmqContext,
   ): Promise<void> {
     console.log(
-      '🐞 DEBUG: Raw payload received in handleRefundPayment:',
+      'raw payload received in handleRefundPayment:',
       JSON.stringify(payload),
     );
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -65,6 +65,32 @@ export class AppoinmentConfirmedConsumer {
       this.logger.error('Error handling refund payment notification', error);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       channel.nack(message, false, false);
+    }
+  }
+
+  @EventPattern('tracking.abnormality')
+  async handleAbnormalityMismatch(
+    @Payload() payload: any,
+    @Ctx() context: RmqContext,
+  ): Promise<void> {
+    console.log('the dat in evetn is', JSON.stringify(payload));
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const channel = context.getChannelRef();
+    const message = context.getMessage();
+
+    try {
+      this.logger.log('payload for tracking annormaltiy', payload);
+      await this.appoinmentService.abnormalityTriggering(payload);
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      channel.ack(message);
+    } catch (error) {
+      this.logger.log(
+        'Error happened in tracking abnormality event notification service',
+        error,
+      );
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      channel.nack(channel, false, false);
     }
   }
 }

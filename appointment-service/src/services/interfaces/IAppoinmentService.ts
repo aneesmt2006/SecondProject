@@ -7,4 +7,5 @@ export interface IAppoinmentService {
     findAllDrappointments(doctorId:string,date?:string):Promise<{patients:TApmntPatientsDetailsDTO[],message:string}>
     complete(data:TCompleteAppointmentDTO):Promise<{message:string}>
     getUserVisitHistory(userId:string):Promise<{history:TUserVisitHistoryDTO,message:string}>
+    findMainDoctor(userId:string):Promise<{doctorId:string,message:string}>
 }

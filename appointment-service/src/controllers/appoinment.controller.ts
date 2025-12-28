@@ -66,4 +66,15 @@ export class AppoinmentController {
             next(error)
         }
     }
+
+    @httpGet('/user/main-doctor')
+    async findUserMainDoctor(req:Request,res:Response,next:NextFunction){
+        try {
+            const userId = req.headers['x-token-id'] as string
+            const {doctorId,message} = await this._appoinmentService.findMainDoctor(userId)
+            commonResponse.success(res,message,doctorId,HTTP_STATUS.OK)
+        } catch (error) {
+            next(error)
+        }
+    }
 }

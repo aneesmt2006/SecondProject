@@ -281,4 +281,14 @@ export class AppoinmentService implements IAppoinmentService {
             message: COMMON_MESSAGE.FETCH_SUCCESS
         };
     }
+
+
+
+    async findMainDoctor(userId: string): Promise<{ doctorId: string; message: string; }> {
+        const mainDoctor = await this._appoinmentRepo.findByUserId(userId)
+
+        const doctorId = mainDoctor[0]?.doctorId
+
+      return {doctorId:doctorId!,message:COMMON_MESSAGE.FETCH_SUCCESS}
+    }
 }

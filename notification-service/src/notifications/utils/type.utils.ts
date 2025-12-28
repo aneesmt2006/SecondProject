@@ -1,15 +1,18 @@
-export type CreateNotificationModel = {
-  userId: string;
-  doctorId?: string;
-  appoinmentId: string;
+export interface ICreateNotificationModel {
+  receiverId: string;
+  role?: string;
   type: NotificationType;
+  title: string;
   message: string;
-};
+  payload: Record<string, any>;
+  isRead: boolean;
+}
 
 export enum NotificationType {
-  SUCCESS = 'SUCCESS',
-  FAILURE = 'FAILURE',
-  INFO = 'INFO',
+  APPOINTMENT = 'APPOINTMENT',
+  ALERT = 'ALERT',
+  INFO = 'PAYMENT',
+  GENERAL = 'GENERAL',
 }
 
 export interface WebSocketPayload {
@@ -17,4 +20,5 @@ export interface WebSocketPayload {
   type: NotificationType;
   title: string;
   isRead: boolean;
+  data?: Record<string, any>;
 }

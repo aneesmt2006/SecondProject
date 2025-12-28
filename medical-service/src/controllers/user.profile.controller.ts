@@ -50,7 +50,7 @@ export class UserProfileController implements interfaces.Controller {
     }
   }
 
-  @role(['doctor','admin'])
+  @role(['doctor','admin','user'])
   @httpPost('/forDoctors')
   async getPatientProfiles(req:Request,res:Response,next:NextFunction){
     try {

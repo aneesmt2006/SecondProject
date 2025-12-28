@@ -9,5 +9,6 @@ export interface IAppointentRepository {
     updateAppointment(id:string, data:Partial<IAppointment>):Promise<IAppointment|null>
     getAllAppointmentsForDoctor(query:any):Promise<IAppointment[]>
     findByUserId(userId:string):Promise<IAppointment[]>
+    findMainDoctor(userId:string):Promise<{ doctorId: string, count: number }[]>
 
 }

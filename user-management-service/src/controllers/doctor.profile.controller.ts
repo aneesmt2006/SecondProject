@@ -67,7 +67,7 @@ export class DoctorProfileController implements interfaces.Controller {
           const { profiles,pageCounts, message } = await this._doctorProfileService.getDoctorsByCategory(
               specialization as string || '', 
               Number(page) || 1, 
-              Number(limit) || 2
+              Number(limit) || 4
           );
           commonResponse.success(res, message, {profiles,pageCounts}, HTTP_STATUS.OK);
       } catch (error) {

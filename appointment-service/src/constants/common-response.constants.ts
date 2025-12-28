@@ -12,5 +12,6 @@ export const ERROR_MESSAGE = {
 export const SUCCESS_MESSAGE  = {
     APMNT_CREATED:"Appoinment created sucess",
     APMNT_UPDATED:"Appointment updated success"
+    
 }
 

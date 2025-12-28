@@ -3,7 +3,11 @@ import { TYPES } from "../types/type.js";
 import type { IUserSymptomsService } from "./interfaces/IUserSymptomsService.js";
 import type { IUserSymptomsRepository } from "../repositories/interfaces/IUserSymptomsRepository.js";
 import type { ISymptomsRepository } from "../repositories/interfaces/ISymptomsRepository.js";
-import type { IUserSymptoms } from "../utils/interface.utils.js";
+import type { IUserDet, IUserSymptoms } from "../utils/interface.utils.js";
+import { publishEvent } from "../config/rabbitmq.config.js";
+import axios from "axios";
+import { config } from "../config/env.config.js";
+import type { ApiResponse } from "../utils/api.response.utils.js";
 
 @injectable()
 export class UserSymptomsService implements IUserSymptomsService {
@@ -14,6 +18,8 @@ export class UserSymptomsService implements IUserSymptomsService {
 
     async logSymptoms(data: { week: number, selectedNormalSymptoms: string[], selectedAbnormalSymptoms: string[], userId: string }): Promise<{ message: string, data: IUserSymptoms }> {
         const { week, selectedNormalSymptoms, selectedAbnormalSymptoms, userId } = data;
+
+        console.log("From service what happened to me--->")
 
         // 1. Fetch master symptoms for the week
         const masterSymptoms = await this._symptomsRepo.findByWeek(week);
@@ -33,6 +39,40 @@ export class UserSymptomsService implements IUserSymptomsService {
             throw new Error(`Invalid abnormal symptoms selected: ${invalidAbnormal.join(", ")}`);
         }
 
+
+       const abnormal = selectedAbnormalSymptoms.filter((sympt)=>masterSymptoms.abnormalSymptoms.includes(sympt))
+       let userDetResposne;
+       let mainDoctorResponse
+       console.log(`${config.medicalServiceUrl}/patient/profile/forDoctors`)
+       console.log(`${config.usersManagementServiceUrl}/booking/user/main-doctor`)
+       try {
+         userDetResposne =  await axios.post<ApiResponse<IUserDet>>(`${config.medicalServiceUrl}/patient/profile/forDoctors`,[userId])
+        mainDoctorResponse = await axios.get<ApiResponse<string>>(`${config.usersManagementServiceUrl}/booking/user/main-doctor`)
+       } catch (error) {
+         console.log("Error while communicate to service-service medical / user-management",error)
+         throw new Error("Some issue found")
+       }
+       const doctorId = mainDoctorResponse.data.data
+       const userDet = userDetResposne.data.data
+       console.log("DOctor id from tracking-->",doctorId)
+       console.log("User detials from tracking-->",userDet)
+
+       if(abnormal){
+            publishEvent('tracking.abnormality',{
+                pattern:'tracking.abnormality',
+                data:{
+                    userId:userDet.userId,
+                    fullName:userDet.fullName,
+                    age:userDet.age,
+                    week:userDet.week,
+                    trimester:userDet.trimester,
+                    isFirstPregnancy:userDet.isFirstPregnancy,
+                    abnormalSymptoms:abnormal,
+                    doctorId:doctorId
+                }
+            })
+        }
+
         // 4. Check if user already logged for this week (Upsert logic)
         // Check existing
         let existing = await this._userSymptomsRepo.findByUserAndWeek(userId, week);
@@ -46,7 +86,7 @@ export class UserSymptomsService implements IUserSymptomsService {
         };
 
 
-        if()
+         
 
         if (existing) {
             // Update

@@ -8,8 +8,8 @@ export type TsymptomsCreateDTO = {
 export type TsymptomsReponseDTO = {
   id: string;
   week: number;
-  normalSymptoms: string;
-  abnormalSymptoms: string;
+  normalSymptoms: string[];
+  abnormalSymptoms: string[];
   updatedAt: string;
   createdAt: string;
 };

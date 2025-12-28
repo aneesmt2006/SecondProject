@@ -15,6 +15,7 @@
   "description": "",
   "dependencies": {
     "amqplib": "^0.10.9",
+    "axios": "^1.13.2",
     "body-parser": "^2.2.1",
     "concurrently": "^9.2.1",
     "cors": "^2.8.5",
@@ -31,6 +32,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.10.8",
     "@types/express": "^5.0.5",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.9.2",
