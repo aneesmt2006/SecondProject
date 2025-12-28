@@ -8,9 +8,10 @@ import { container } from "./config/inversify.config.js"
 import { config } from "./config/env.config.js"
 import { metricsHandler } from "./utils/metrics.js";
 import logger from "./utils/logger.js"
+import { connectRabbitMQ } from "./config/rabbitmq.config.js"
 
 connectDB();
-
+connectRabbitMQ();
 
 const server = new InversifyExpressServer(container)
 

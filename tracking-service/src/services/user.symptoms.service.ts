@@ -44,10 +44,14 @@ export class UserSymptomsService implements IUserSymptomsService {
        let userDetResposne;
        let mainDoctorResponse
        console.log(`${config.medicalServiceUrl}/patient/profile/forDoctors`)
-       console.log(`${config.usersManagementServiceUrl}/booking/user/main-doctor`)
+       console.log(`${config.appointmentServiceUrl}/booking/user/main-doctor`)
        try {
-         userDetResposne =  await axios.post<ApiResponse<IUserDet>>(`${config.medicalServiceUrl}/patient/profile/forDoctors`,[userId])
-        mainDoctorResponse = await axios.get<ApiResponse<string>>(`${config.usersManagementServiceUrl}/booking/user/main-doctor`)
+         userDetResposne =  await axios.post<ApiResponse<IUserDet[]>>(`${config.medicalServiceUrl}/patient/profile/forDoctors`,[userId])
+        mainDoctorResponse = await axios.get<ApiResponse<string>>(`${config.appointmentServiceUrl}/booking/user/main-doctor`,{
+            headers:{
+                'x-token-id': userId
+            }
+        })
        } catch (error) {
          console.log("Error while communicate to service-service medical / user-management",error)
          throw new Error("Some issue found")
@@ -61,12 +65,12 @@ export class UserSymptomsService implements IUserSymptomsService {
             publishEvent('tracking.abnormality',{
                 pattern:'tracking.abnormality',
                 data:{
-                    userId:userDet.userId,
-                    fullName:userDet.fullName,
-                    age:userDet.age,
-                    week:userDet.week,
-                    trimester:userDet.trimester,
-                    isFirstPregnancy:userDet.isFirstPregnancy,
+                    userId:userDet[0]?.userId,
+                    fullName:userDet[0]?.fullName,
+                    age:userDet[0]?.age,
+                    week:userDet[0]?.week,
+                    trimester:userDet[0]?.trimester,
+                    isFirstPregnancy:userDet[0]?.isFirstPregnancy,
                     abnormalSymptoms:abnormal,
                     doctorId:doctorId
                 }

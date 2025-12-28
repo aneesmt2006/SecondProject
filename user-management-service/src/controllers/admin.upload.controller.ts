@@ -7,7 +7,7 @@ import { uploadToCloudinary } from '../config/cloudinary.config.js';
 import { ADMIN_RESPONSE_MESSAGES } from "../constants/response-messages.constants.js";
 import { role } from "../decorators/role.decorator.js";
 
-@role(['admin'])
+@role(['admin','doctor'])
 @controller('/super-admin/upload')
 export class AdminUploadController implements interfaces.Controller {
 

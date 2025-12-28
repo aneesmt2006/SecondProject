@@ -12,6 +12,11 @@ import { extractSymptoms } from "../utils/htmlcode.extractor.utils.js";
 export class SymptomsService implements ISymptomsService{
     constructor(@inject(TYPES.SymptomsRepository) private _symptomsRepo:ISymptomsRepository){}
 
+    /**
+     * 
+     * @param symptomsData 
+     * @returns 
+     */
     async create(symptomsData: TsymptomsCreateDTO): Promise<{ symptoms: TsymptomsReponseDTO; message: string; }> {
 
         const normalArr = extractSymptoms(symptomsData.normalSymptoms);
@@ -38,10 +43,14 @@ export class SymptomsService implements ISymptomsService{
         const symptoms = await this._symptomsRepo.findByWeek(symptomsData.week)
         if(!symptoms) throw new Error(ADMIN_RESPONSE_MESSAGES.WEEK_NOT_EXIST)
         
+        const normalArr = extractSymptoms(symptomsData.normalSymptoms);
+        const abnormalArr = extractSymptoms(symptomsData.abnormalSymptoms);
         const updatePayload: ISymptoms = {
             week: symptoms.week,
-            normalSymptoms: symptomsData.normalSymptoms,
-            abnormalSymptoms: symptomsData.abnormalSymptoms
+            normalSymptomsHTML: symptomsData.normalSymptoms,
+            abnormalSymptomsHTML: symptomsData.abnormalSymptoms,
+            normalSymptoms: normalArr,
+            abnormalSymptoms: abnormalArr, 
         }
 
         const symptomsDoc = await this._symptomsRepo.update(symptoms._id!, updatePayload)

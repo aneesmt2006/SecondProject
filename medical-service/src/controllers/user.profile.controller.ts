@@ -61,4 +61,18 @@ export class UserProfileController implements interfaces.Controller {
       next(error)
     }
   }
+
+  @role(['doctor', 'admin', 'user'])
+  @httpGet('/medical-record')
+  async getMedicalRecord(req: Request, res: Response, next: NextFunction) {
+    try {
+      const authUserId = req.headers['x-token-id'] as string;
+      const targetUserId = (req.query.userId as string) || authUserId;
+
+      const { medicalRecord, message } = await this._userProfileService.getPatientMedicalRecord(targetUserId);
+      commonResponse.success(res, message, medicalRecord, HTTP_STATUS.OK);
+    } catch (error) {
+      next(error);
+    }
+  }
 }

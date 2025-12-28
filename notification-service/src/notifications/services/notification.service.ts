@@ -118,7 +118,7 @@ Please review and take necessary action.
       receiverId: data.doctorId,
       role: 'DOCTOR',
       type: NotificationType.ALERT,
-      title: '⚠ Abnormal Pregnancy Warning',
+      title: '👩🏼‍🦰🚨 Abnormal Pregnancy Warning 🚨',
       message: doctorMsg,
       payload: {
         patientId: data.userId,
@@ -135,8 +135,8 @@ Please review and take necessary action.
 
     if (doctorNoti) {
       this.webSocketGateway.SendToDoctor(data.doctorId, {
-        title: '⚠ Abnormal Pregnancy Warning',
-        message: `${data.fullName} reported critical symptoms`,
+        title: '👩🏼‍🦰🚨 Abnormal Pregnancy Warning 🚨',
+        message: `${data.fullName} reported critical symptoms | Age: ${data.age} | Week:${data.week} | ${symptomsList} `,
         type: NotificationType.ALERT,
         isRead: doctorNoti.isRead,
         data: {

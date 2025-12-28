@@ -10,6 +10,7 @@ import { ResponseMapper } from "../utils/response.mapper.utils.js";
 import { config } from "../config/env.config.js";
 import type { ApiResponse } from "../utils/api.response.utils.js";
 import { getChannel } from "../config/rabbitmq.config.js";
+import { parseDate } from "../utils/date.utils.js";
 
 
 
@@ -64,21 +65,7 @@ export class AppoinmentService implements IAppoinmentService {
         const now = new Date();
         
        
-        const parseToDate = (dStr: string, tStr: string) => {
-            try {
-                const [m, d, y] = dStr.split('/').map(Number);
-                let time = tStr.trim();
-                const [timePart, modifier] = time.split(' ');
-                let [hours, mins] = timePart!.split(':').map(Number);
-                
-                if (modifier === 'PM' && hours! < 12) hours! += 12;
-                if (modifier === 'AM' && hours === 12) hours = 0;
-                
-                return new Date(y!, m! - 1, d, hours, mins);
-            } catch (e) {
-                return new Date(0);
-            }
-        };
+
 
         let filtered = appointments;
 
@@ -87,13 +74,14 @@ export class AppoinmentService implements IAppoinmentService {
             filtered = appointments.filter(a => a.appointmentDate === date);
         } else {
             // "Coming" appointmentssss Filter for now or future
-            filtered = appointments.filter(a => parseToDate(a.appointmentDate, a.appointmentTime) >= now);
+            filtered = appointments.filter(a => parseDate(a.appointmentDate, a.appointmentTime) >= now);
         }
 
-        
+        // parseDate function is Helper to parse "MM/DD/YYYY" and " 3:30 PM" 
+
         filtered.sort((a, b) => 
-            parseToDate(a.appointmentDate, a.appointmentTime).getTime() - 
-            parseToDate(b.appointmentDate, b.appointmentTime).getTime()
+            parseDate(a.appointmentDate, a.appointmentTime).getTime() - 
+            parseDate(b.appointmentDate, b.appointmentTime).getTime()
         );
 
         if (filtered.length === 0) {
@@ -209,20 +197,7 @@ export class AppoinmentService implements IAppoinmentService {
 
         const now = new Date();
 
-        // Helper to parse "MM/DD/YYYY" and " 3:30 PM"
-        const parseDate = (dStr: string, tStr: string) => {
-            try {
-                const [m, d, y] = dStr.split('/').map(Number);
-                let time = tStr.trim();
-                const [timePart, modifier] = time.split(' ');
-                let [hours, mins] = timePart!.split(':').map(Number);
-                if (modifier === 'PM' && hours! < 12) hours! += 12;
-                if (modifier === 'AM' && hours === 12) hours = 0;
-                return new Date(y!, m! - 1, d, hours, mins);
-            } catch (e) {
-                return new Date(0);
-            }
-        };
+
 
         const mappedAppointments = appointments.map(apmnt => {
             const dr = doctorMap.get(apmnt.doctorId);
@@ -255,22 +230,17 @@ export class AppoinmentService implements IAppoinmentService {
             } as any;
         });
 
-        // Sort all by date descending (newest first)
+        // Sort all by date descending 
         mappedAppointments.sort((a, b) => {
             return parseDate(b.appoinmentDate, b.appoinmentTime).getTime() - parseDate(a.appoinmentDate, a.appoinmentTime).getTime();
         });
 
-        // Separate Upcoming vs History
-        // Upcoming: The closest future appointment
         const upcomingList = mappedAppointments
             .filter(a => a.status === 'Upcoming')
             .sort((a, b) => parseDate(a.appoinmentDate, a.appoinmentTime).getTime() - parseDate(b.appoinmentDate, b.appoinmentTime).getTime());
         
         const upcoming = upcomingList.length > 0 ? upcomingList[0] : null;
         
-        // History: Everything else (Past appointments, cancelled, or future ones that aren't the 'closest' if we only want one)
-        // User asked for "upcoming: UserAppointment | null" so only one upcoming.
-        // History: excluding that one upcoming.
         const history = mappedAppointments.filter(a => a !== upcoming);
 
         return {
