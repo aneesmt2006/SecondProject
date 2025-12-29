@@ -10,6 +10,10 @@ import { calculateCurrentWeek, calculateDueDate } from "../utils/currentweek.cal
 @injectable()
 export class AdminService implements IAdminService {
     constructor(@inject(TYPES.AdminRepository)private _adminRepo:IAdminRepository){}
+    /**
+     * Retrieves all user profiles
+     * @returns List of user profiles + success message
+     */
     async findAllUserProfile(): Promise<{ profiles: TUserProfileResponseDTO[]; message: string; }> {
         const usersProfile = await this._adminRepo.find()
 

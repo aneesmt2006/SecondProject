@@ -15,7 +15,12 @@ export class UserProfileService implements IUserProfileService {
   constructor(
     @inject(TYPES.UserProfileRepository) private _userProfileRepo: IUserProfileRepository
   ) {}
-   // I think it is not used 
+  /**
+   * Creates or updates a user profile
+   * @param userId - User ID
+   * @param data - Profile update data
+   * @returns Created/Updated profile + success message
+   */
   async createProfile(userId: string, data: TUserProfUpdateRequestDTO): Promise<{ profile: TUserProfileResponseDTO; message: string; }> {
     if(!userId) throw new Error(USER_PROFILE_MESSAGES.PROFILE_ID_NOT_FOUND)
     
@@ -31,6 +36,12 @@ export class UserProfileService implements IUserProfileService {
     return {profile:mappedUser,message:USER_PROFILE_MESSAGES.PROFILE_CREATE_SUCCESS}
   }
 
+  /**
+   * Updates an existing user profile
+   * @param userId - User ID
+   * @param data - Profile update data
+   * @returns Updated profile + success message
+   */
   async updateProfile(userId: string, data: TUserProfUpdateRequestDTO): Promise<{ profile: TUserProfileResponseDTO; message: string }> {
     if (data.lmp) {
       data.dueDate = calculateDueDate(data.lmp);
@@ -43,6 +54,11 @@ export class UserProfileService implements IUserProfileService {
     return { profile: mappedUser, message: USER_PROFILE_MESSAGES.PROFILE_UPDATE_SUCCESS };
   }
 
+  /**
+   * Retrieves a user profile details
+   * @param userId - User ID
+   * @returns User profile + success message
+   */
   async getProfile(userId: string): Promise<{ profile: TUserProfileResponseDTO; message: string }> {
     const profile = await this._userProfileRepo.findByUserId(userId);
     if (!profile) {
@@ -59,6 +75,11 @@ export class UserProfileService implements IUserProfileService {
     return { profile:mappedUser, message: USER_PROFILE_MESSAGES.PROFILE_GET_SUCCESS };
   }
 
+  /**
+   * Retrieves profiles for multiple patients
+   * @param userIds - DTO with list of user IDs
+   * @returns List of patient profiles + success message
+   */
   async  getPatientsProfile(userIds:TUserIdsDTO):Promise<{profiles:TUsersDetDTO[],message:string}> {
     const patientsDoc = await this._userProfileRepo.findByIds(userIds)
     if(!patientsDoc){
@@ -79,6 +100,11 @@ export class UserProfileService implements IUserProfileService {
 
 
 
+  /**
+   * Retrieves comprehensive medical record for a patient
+   * @param userId - Patient User ID
+   * @returns Medical record DTO + success message
+   */
   async getPatientMedicalRecord(userId: string): Promise<{ medicalRecord: PatientDTO; message: string; }> {
     const patientData = await this._userProfileRepo.findByUserId(userId);
     if (!patientData) {

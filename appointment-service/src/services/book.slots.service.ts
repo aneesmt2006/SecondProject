@@ -14,6 +14,12 @@ import type { IAppointentRepository } from "../repositories/interfaces/IAppoinme
 export class BookSlotsService implements IBookSlotsService {
     constructor(@inject(TYPES.DoctorSlotRepository) private _doctorSlotRepo:IDoctorSlotRepository,@inject(TYPES.AppoinmentRepository)private _appoinmentRepo:IAppointentRepository){}
 
+    /**
+     * Retrieves available slots for a doctor on a specific date
+     * @param doctorId - Doctor's ID
+     * @param date - Date string to check availability
+     * @returns Doctor slot info + success message
+     */
     async getDoctorSlots(doctorId: string, date: string): Promise<{ doctorSlots: TDoctorSlotInfoDTO | null, message: string }> {
 
         const selectedDate = new Date(date)

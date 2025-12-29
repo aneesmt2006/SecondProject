@@ -22,6 +22,11 @@ import { RazorpayInstance } from "../config/razorpay.instance.config.js";
 export class PaymentService implements IPaymentService {
     constructor(@inject(TYPES.PaymentRespository) private _paymentRepo:IPaymentRepository){}
 
+    /**
+     * Creates a new payment order via Razorpay
+     * @param payment - Payment creation details
+     * @returns Payment DTO + success message
+     */
     async create(payment: TPaymentCreateDTO): Promise<{ payment: TPaymentCreateResponseDTO; message: string; }> {
         const instance = RazorpayInstance
 
@@ -48,6 +53,11 @@ export class PaymentService implements IPaymentService {
     }
 
 
+    /**
+     * Verifies Razorpay payment signature
+     * @param payment - Verification DTO with signature details
+     * @returns Verification status + success message
+     */
     async verify(payment: TPaymentVerifyDTO): Promise<{ status: boolean; message: string; }> {
         const {orderCreationId,razorpayOrderId,razorpayPaymentId,razorpaySignature} = payment
 
@@ -70,6 +80,14 @@ export class PaymentService implements IPaymentService {
 
     }
 
+    /**
+     * Processes a refund for an appointment
+     * @param appoinmentId - Appointment ID
+     * @param status - Status to update to (e.g., REFUNDED)
+     * @param appoinmentDate - Date of appointment
+     * @param appoinmentTime - Time of appointment
+     * @returns Refund status + success message
+     */
     async refund(appoinmentId:string,status:string,appoinmentDate:string,appoinmentTime:string): Promise<{ status: boolean; message: string; }> {
         const appoinment = await this._paymentRepo.findByAppoinmentId(appoinmentId);
         if(!appoinment) throw new Error(PAYMENT_ERRORS.NOT_CONTAIN)

@@ -20,6 +20,12 @@ export class AdminAuthService implements IAdminAuthService{
   constructor(@inject(TYPES.AdminAuthRepository)adminRepo:IAdminAuthRepository){
       this._adminRepo = adminRepo
   }
+  /**
+   * Admin login
+   * @param email - Admin email
+   * @param password - Admin password
+   * @returns Admin data, tokens, and success message
+   */
   async login(email: string, password: string): Promise<{admin:TuserResponseDTO,accessToken:string,refreshToken:string,message:string}> {
        const exist =  await this._adminRepo.findByEmail(email);
 
@@ -39,6 +45,10 @@ export class AdminAuthService implements IAdminAuthService{
        return {admin:mappedAdmin,accessToken,refreshToken,message:AUTH_RESPONSE_MESSAGES.LOGIN_SUCCESS}
    }
 
+   /**
+    * Retrieves all users
+    * @returns List of users + success message
+    */
    async getAllUsers(): Promise<{ users: TGetuserResponseDTO[]; message: string; }> {
        const usersDoc = await this._adminRepo.findUsers();
 
@@ -71,6 +81,10 @@ export class AdminAuthService implements IAdminAuthService{
 
    }
 
+   /**
+    * Retrieves all doctors
+    * @returns List of doctors + success message
+    */
    async getAllDoctors(): Promise<{ doctors: TDRresponseDTO[]; message: string; }> {
        const doctorsDoc = await this._adminRepo.findDoctors();
 
@@ -92,6 +106,12 @@ export class AdminAuthService implements IAdminAuthService{
         return {doctors:mappedDoctors,message:AUTH_RESPONSE_MESSAGES.GET_DOCTOR}
    }
 
+   /**
+    * Updates doctor approval status
+    * @param id - Doctor ID
+    * @param status - New status
+    * @returns Updated doctor DTO + success message
+    */
    async updateDoctorStatus(id: string, status: string): Promise<{ doctor: TDRresponseDTO; message: string; }> {
        const updatedDoctor = await this._adminRepo.updateDoctorStatus(id,status);
        if(!updatedDoctor) throw new Error(CONSTANTS.ERRORS.DB_NOT_EXIST)
@@ -116,6 +136,12 @@ export class AdminAuthService implements IAdminAuthService{
    }
 
 
+   /**
+    * Updates user active status
+    * @param id - User ID
+    * @param status - Boolean status (true/false)
+    * @returns Updated user DTO + success message
+    */
    async updateUserStatus(id: string, status: boolean): Promise<{ user: TuserResponseDTO; message: string; }> {
      const usersDoc = await this._adminRepo.updateUserStatus(id,status)
 

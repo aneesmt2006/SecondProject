@@ -13,6 +13,11 @@ export class DoctorSlotService implements IDoctorSlotService {
     @inject(TYPES.DoctorSlotRepository) private _doctorSlotRepository: IDoctorSlotRepository
   ) {}
 
+  /**
+   * Creates or updates a doctor's slot configuration
+   * @param data - Slot configuration data as IDoctorSlot
+   * @returns Created/Updated slot DTO + success message
+   */
   async createOrUpdateSlot(data: IDoctorSlot): Promise<{ slot: TDoctorSlotResponseDTO; message: string }> {
     console.log("Service hit ---->",data)
     const result = await this._doctorSlotRepository.createOrUpdateSlot(data);
@@ -21,6 +26,11 @@ export class DoctorSlotService implements IDoctorSlotService {
     return { slot: mappedSlot, message: DOCTOR_SLOT_MESSAGES.SLOT_UPSERT_SUCCESS };
   }
 
+  /**
+   * Retrieves slot configuration by doctor ID
+   * @param doctorId - Doctor's ID
+   * @returns Slot DTO or null + success message
+   */
   async getSlotByDoctorId(doctorId: string): Promise<{ slot: TDoctorSlotResponseDTO|null; message: string }> {
     const result = await this._doctorSlotRepository.getSlotByDoctorId(doctorId);
     if (!result) {
@@ -32,6 +42,10 @@ export class DoctorSlotService implements IDoctorSlotService {
     return { slot: mappedSlot, message: DOCTOR_SLOT_MESSAGES.SLOT_GET_SUCCESS };
   }
 
+  /**
+   * Retrieves all doctor slot configurations
+   * @returns Array of slot DTOs + success message
+   */
   async getAllSlots(): Promise<{ slots: TDoctorSlotResponseDTO[]; message: string }> {
     const result = await this._doctorSlotRepository.getAllSlots();
     const mappedSlots = result.map(slot => ResponseMapper.doctorSlotMapping(slot));

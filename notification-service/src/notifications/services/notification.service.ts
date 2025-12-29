@@ -14,6 +14,10 @@ export class NotificationService implements NotificationServicePort {
     private readonly webSocketGateway: WebSocketGatewayPort,
   ) {}
 
+  /**
+   * Handles notification for successful appointment confirmation
+   * @param data - Appointment confirmation details
+   */
   async appointmentSuccess(data: AppoinmentConfirmedDTO) {
     const userMsg = `Your appoinment is confirmed on ${data.appoinmentTime} at ${data.appoinmentDate}`;
 
@@ -69,6 +73,10 @@ export class NotificationService implements NotificationServicePort {
     }
   }
 
+  /**
+   * Handles notification for payment refund (cancellation)
+   * @param data - Refund details
+   */
   async paymentRefund(data: refundPaymentDTO) {
     const msg = `Your appoinment is cancelled Date: ${data.appoinmentDate}, Time: ${data.appoinmentTime} , the payment for the appointment has been refunded. `;
 
@@ -96,6 +104,10 @@ export class NotificationService implements NotificationServicePort {
     });
   }
 
+  /**
+   * Triggers alert for abnormal symptoms reported by patient
+   * @param data - Abnormality details DTO
+   */
   async abnormalityTriggering(data: AbnormalityDTO): Promise<void> {
     const symptomsList = data.abnormalSymptoms
       .map((sym) => `• ${sym}`)

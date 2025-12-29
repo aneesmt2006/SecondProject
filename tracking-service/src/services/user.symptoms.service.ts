@@ -16,6 +16,11 @@ export class UserSymptomsService implements IUserSymptomsService {
         @inject(TYPES.SymptomsRepository) private _symptomsRepo: ISymptomsRepository
     ) {}
 
+    /**
+     * Logs symptoms for a user for a specific week and handles abnormality events
+     * @param data - Object containing week, selected symptoms, and userId
+     * @returns Logged symptoms data + success message
+     */
     async logSymptoms(data: { week: number, selectedNormalSymptoms: string[], selectedAbnormalSymptoms: string[], userId: string }): Promise<{ message: string, data: IUserSymptoms }> {
         const { week, selectedNormalSymptoms, selectedAbnormalSymptoms, userId } = data;
 

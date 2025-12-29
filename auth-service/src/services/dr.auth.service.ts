@@ -21,6 +21,11 @@ export class DrAuthService implements IDrAuthService {
     this._otpService = OTPservice;
    }
 
+  /**
+   * Registers a new doctor (initial step, sends OTP)
+   * @param doctorData - Doctor registration data
+   * @returns Success message + email
+   */
   async register(doctorData: TDRregisterRequestDTO): Promise<{ message: string; email: string; }> {
     const {email,password} = doctorData
     const existing =  await this._drRepo.findByEmail(email)
@@ -35,6 +40,12 @@ export class DrAuthService implements IDrAuthService {
     
    }
 
+   /**
+    * Verifies OTP and creates doctor account
+    * @param otp - OTP string
+    * @param email - Doctor email
+    * @returns Doctor DTO, tokens, and success message
+    */
    async verifyOtp(otp: string, email: string): Promise<{doctor: TDRresponseDTO; accessToken: string; refreshToken: string; message: string; }> {
        const storedOTP = await this._otpService.getOTP(email)
 
@@ -59,6 +70,11 @@ export class DrAuthService implements IDrAuthService {
    }
 
 
+   /**
+    * Resends OTP for doctor registration
+    * @param email - Doctor email
+    * @returns Success message
+    */
    async resendOtp(email: string): Promise<{ message: string; }> {
        const tempDoctor = await this._otpService.getTempUser(email)
        if(!tempDoctor){
@@ -71,6 +87,12 @@ export class DrAuthService implements IDrAuthService {
         return {message:AUTH_RESPONSE_MESSAGES.RESEND_OTP_SUCCESS}
    }
 
+   /**
+    * Logs in a doctor
+    * @param email - Doctor email
+    * @param password - Doctor password
+    * @returns Doctor DTO, tokens, and success message
+    */
    async login(email: string, password: string): Promise<{ doctor: TDRresponseDTO; accessToken: string; refreshToken: string; message: string; }> {
        const doctor = await this._drRepo.findByEmail(email)
        if(!doctor){
@@ -100,6 +122,11 @@ export class DrAuthService implements IDrAuthService {
          return {doctor:mappedDoctor,accessToken,refreshToken,message:AUTH_RESPONSE_MESSAGES.LOGIN_SUCCESS}
    }
 
+   /**
+    * Retrieves essential doctor details
+    * @param doctorId - Doctor ID
+    * @returns Doctor essential DTO + success message
+    */
    async getDoctorEssentials(doctorId: string): Promise<{ doctor: TDRessentialDTO; message: string; }> {
        const doctorDoc = await this._drRepo.findById(doctorId)
        if(!doctorDoc){

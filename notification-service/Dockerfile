@@ -20,6 +20,6 @@ RUN npm install --only=production
 
 COPY --from=builder /app/dist ./dist
 
-EXPOSE 3000
+EXPOSE 3015
 
 CMD ["npm", "start"]

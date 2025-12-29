@@ -13,9 +13,9 @@ export class SymptomsService implements ISymptomsService{
     constructor(@inject(TYPES.SymptomsRepository) private _symptomsRepo:ISymptomsRepository){}
 
     /**
-     * 
-     * @param symptomsData 
-     * @returns 
+     * Creates new symptom configuration for a week
+     * @param symptomsData - Symptoms creation DTO
+     * @returns Created symptoms data + success message
      */
     async create(symptomsData: TsymptomsCreateDTO): Promise<{ symptoms: TsymptomsReponseDTO; message: string; }> {
 
@@ -39,6 +39,11 @@ export class SymptomsService implements ISymptomsService{
         return {symptoms:mappedSymtptoms,message:ADMIN_RESPONSE_MESSAGES.CREATE}
     }
 
+    /**
+     * Updates symptom configuration for a week
+     * @param symptomsData - Symptoms updata DTO
+     * @returns Updated symptoms data + success message
+     */
     async update(symptomsData: TsymptomsCreateDTO): Promise<{ symptoms: TsymptomsReponseDTO; message: string; }> {
         const symptoms = await this._symptomsRepo.findByWeek(symptomsData.week)
         if(!symptoms) throw new Error(ADMIN_RESPONSE_MESSAGES.WEEK_NOT_EXIST)
@@ -59,6 +64,10 @@ export class SymptomsService implements ISymptomsService{
         return {symptoms: mappedSymptoms, message: ADMIN_RESPONSE_MESSAGES.UPDATE_SYMPTOMS}
     }
 
+    /**
+     * Retrieves all symptom configurations
+     * @returns List of symptom data + success message
+     */
     async findAll(): Promise<{ symptomsDatas: TsymptomsReponseDTO[]; message: string; }> {
         const allDoc = await this._symptomsRepo.find()
         if(!allDoc) throw new Error(ADMIN_RESPONSE_MESSAGES.EMPTY_REPO)
@@ -67,6 +76,11 @@ export class SymptomsService implements ISymptomsService{
         return {symptomsDatas: mappedDoc, message: ADMIN_RESPONSE_MESSAGES.FETCH_SUCCESS}
     }
 
+    /**
+     * Retrieves symptom configuration for a specific week
+     * @param week - Week number
+     * @returns Symptom data for the week + success message
+     */
     async findWeekData(week: number): Promise<{ symptomsData: TsymptomsReponseDTO; message: string; }> {
         const weekDoc = await this._symptomsRepo.findByWeek(week)
         if(!weekDoc) throw new Error(ADMIN_RESPONSE_MESSAGES.WEEK_NOT_EXIST)

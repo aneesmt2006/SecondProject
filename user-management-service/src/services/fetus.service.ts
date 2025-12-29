@@ -15,6 +15,11 @@ export class FetusService implements IFetusService{
         this._fetusRepo = fetusRepo
     }
 
+    /**
+     * Creates new fetus development data for a week
+     * @param fetusData - Fetus creation DTO
+     * @returns Created fetus data + success message
+     */
     async create(fetusData: TfetusCreateDTO): Promise<{fetus:TfetusResponseDTO, message: string; }> {
         console.log("<------------------------>fetus service Hit",fetusData)
         const weekExist = await this._fetusRepo.findByweek(fetusData.week)
@@ -26,6 +31,11 @@ export class FetusService implements IFetusService{
         return {fetus:mappedFetus,message:ADMIN_RESPONSE_MESSAGES.CREATE}
     }
 
+    /**
+     * Updates fetus development data for a week
+     * @param fetusData - Fetus update DTO
+     * @returns Updated fetus data + success message
+     */
     async update(fetusData: TfetusCreateDTO): Promise<{fetus:TfetusResponseDTO, message: string; }> {
         const fetus = await this._fetusRepo.findByweek(fetusData.week!)
         if(!fetus)throw new Error(ADMIN_RESPONSE_MESSAGES.WEEK_NOT_EXIST)
@@ -47,6 +57,10 @@ export class FetusService implements IFetusService{
         return {fetus:mappedFetus,message:ADMIN_RESPONSE_MESSAGES.UPDATE_FETUS}
     }
 
+    /**
+     * Retrieves all fetus development records
+     * @returns List of fetus data + success message
+     */
     async findAll(): Promise<{ fetusDatas: TfetusResponseDTO[]; message: string; }> {
         const allDoc = await this._fetusRepo.find()
         if(!allDoc) throw new Error(ADMIN_RESPONSE_MESSAGES.EMPTY_REPO)
@@ -55,6 +69,11 @@ export class FetusService implements IFetusService{
         return {fetusDatas:mappedDoc,message:ADMIN_RESPONSE_MESSAGES.FETCH_SUCCESS}
     }
 
+    /**
+     * Retrieves fetus development data for a specific week
+     * @param week - Week number
+     * @returns Fetus data for the week + success message
+     */
     async findWeekData(week: number): Promise<{ fetusData: TfetusCreateDTO; message: string; }> {
         const weekDoc = await this._fetusRepo.findByweek(week)
         if(!weekDoc) throw new Error(ADMIN_RESPONSE_MESSAGES.WEEK_NOT_EXIST)

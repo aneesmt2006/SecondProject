@@ -57,6 +57,11 @@ export class AuthService implements IAuthService {
     return parseInt(value as string) * (timeUnits[unit!.toLowerCase()] || 1);
   }
 
+  /**
+   * Registers a new user (initial step, sends OTP)
+   * @param userData - User registration data
+   * @returns Success message + email
+   */
   async register(
     userData: TregisterRequestDTO,
   ): Promise<{message:string,email:string}> {
@@ -73,6 +78,12 @@ export class AuthService implements IAuthService {
   
   }
 
+  /**
+   * Verifies OTP and creates user account
+   * @param otp - OTP string
+   * @param email - User email
+   * @returns Created user data, tokens, and success message
+   */
   async verifyOtp(otp:string,email:string): Promise<{ user: TuserResponseDTO; accessToken: string; refreshToken: string;message:string }> {
      
     console.log("OTP verify email from service:",email)
@@ -109,6 +120,11 @@ export class AuthService implements IAuthService {
 
   }
 
+  /**
+   * Resends OTP for registration
+   * @param email - User email
+   * @returns Success message
+   */
   async resendOtp(email: string): Promise<{ message: string; }> {
     const tempUser = await this._otpService.getTempUser(email);
     if (!tempUser) {
@@ -120,6 +136,12 @@ export class AuthService implements IAuthService {
 
 
 
+  /**
+   * Logs in a user
+   * @param email - User email
+   * @param password - User password
+   * @returns User data, tokens, and success message
+   */
   async login(email: string, password: string):  Promise<{ user:TuserResponseDTO; accessToken: string; refreshToken: string;message:string }> {
     console.log("eamil",email)
     const user = await this._authRepo.findByEmail(email);
@@ -154,6 +176,11 @@ export class AuthService implements IAuthService {
 
 
 
+  /**
+   * Refreshes access token using refresh token
+   * @param refreshToken - Current refresh token
+   * @returns New tokens + success message
+   */
   async refresh(refreshToken:string): Promise<{ accessToken: string; refreshToken: string;message:string }> {
     
       const decoded = jwt.verify(refreshToken,config.jwtRefreshSecret as Secret) as {id:string}
@@ -173,6 +200,11 @@ export class AuthService implements IAuthService {
    
   }
 
+  /**
+   * Handles Google OAuth login/registration
+   * @param code - Google auth code
+   * @returns User data, tokens, and success message
+   */
   async google(code:string): Promise<{ user: TgoogleAuthResponse; accessToken: string; refreshToken: string; message: string; }> {
    const googleRes =   await oauth2Client.getToken(code);
 
@@ -204,6 +236,11 @@ export class AuthService implements IAuthService {
   }
 
 
+  /**
+   * Gets user profile by ID
+   * @param id - User ID
+   * @returns User profile DTO + success message
+   */
   async getBaseProfile(id:string): Promise<{ user: TuserResponseDTO; message: string; }> {
     const user = await this._authRepo.findById(id)
 

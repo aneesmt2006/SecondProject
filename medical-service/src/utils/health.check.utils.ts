@@ -10,8 +10,8 @@ export const getBloodPressureStatus = (bp: string | undefined): 'Normal' | 'Abno
   // Simple check logic, e.g., 120/80
   const parts = bp.split('/');
   if (parts.length !== 2) return 'Normal';
-  const systolic = parseInt(parts[0]);
-  const diastolic = parseInt(parts[1]);
+  const systolic = parseInt(parts[0]!);
+  const diastolic = parseInt(parts[1]!);
 
   if (systolic > 140 || diastolic > 90) return 'Abnormal';
   if (systolic < 90 || diastolic < 60) return 'Abnormal';
