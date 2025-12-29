@@ -2,6 +2,7 @@ import { injectable } from "inversify";
 import DoctorSlotModel from "../models/doctor.slot.model.js";
 import type { IDoctorSlot, IDoctorSlotDoc } from "../utils/interface.utils.js";
 import type { IDoctorSlotRepository } from "./interfaces/IDoctorSlotRepository.js";
+import { AppointmentModel } from "../models/appoinment.model.js";
 
 @injectable()
 export class DoctorSlotRepository implements IDoctorSlotRepository {
@@ -24,5 +25,9 @@ export class DoctorSlotRepository implements IDoctorSlotRepository {
 
   async getAllSlotsByDate( weekday: string,selectedDate:Date): Promise<IDoctorSlotDoc[]> {
     return await DoctorSlotModel.find({[`schedule.${weekday}.enabled`]:true,unavailableDates:{$nin:[selectedDate.toDateString()]}}).lean()
+  }
+
+  async checkIsitBooked(date:Date,doctorId:string){
+    return await AppointmentModel.findOne({appointmentDate:date,doctorId:doctorId})
   }
 }

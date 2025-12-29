@@ -10,7 +10,7 @@ import { config } from "./config/env.config.js"
 import { metricsHandler } from "./utils/metrics.js";
 import logger from "./utils/logger.js";
 
-connectDB();
+// connectDB(); // Moved to server.ts
 
 const server = new InversifyExpressServer(container)
 

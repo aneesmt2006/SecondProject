@@ -10,8 +10,8 @@ import { metricsHandler } from "./utils/metrics.js";
 import logger from "./utils/logger.js"
 import { connectRabbitMQ } from "./config/rabbitmq.config.js"
 
-connectDB();
-connectRabbitMQ();
+// connectDB(); // Moved to server.ts
+// connectRabbitMQ(); // Moved to server.ts
 
 const server = new InversifyExpressServer(container)
 

@@ -9,3 +9,8 @@ export const config = {
   usersManagementServiceUrl:process.env.USERS_MANAGEMENT_SERVICE_URL,
   appointmentServiceUrl:process.env.APPOINMENT_SERVICE_URL
 };
+
+console.log("Environment Config Loaded (Tracking Service):", {
+    mongoUrlPresent: !!config.mongoUrl,
+    mongoUrlStart: config.mongoUrl ? config.mongoUrl.substring(0, 15) + '...' : 'undefined'
+});
