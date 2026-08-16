@@ -1,14 +1,25 @@
-import type { NextFunction, Request, Response } from "express";
-import type { IErrorResponse } from "../utils/interface.js";
-import logger from "../config/logger.js";
+import type { NextFunction, Request, Response } from 'express';
+import logger from '../config/logger.js';
+import { AppError } from '../utils/AppError.js';
 
-export const handleError = async(err:Error,req:Request,res:Response,next:NextFunction)=>{
-    logger.error(`Global error: ${err.message} - Path: ${req.path}`); 
-    const response : IErrorResponse = {
-        message:err.message || "Internal server Error",
-        number:500
-    }
+export const handleError = (
+  err: Error,
+  req: Request,
+  res: Response,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _next: NextFunction
+): void => {
+  // Operational errors — return their specific status code
+  if (err instanceof AppError) {
+    logger.warn(`[${err.statusCode}] ${err.message} — ${req.method} ${req.path}`);
+    res.status(err.statusCode).json({ status: 'error', message: err.message });
+    return;
+  }
 
-   res.status(response.number).json(response);
+  // Unexpected errors — always 500, never leak internal details
+  logger.error(`Unhandled error: ${err.message} — ${req.method} ${req.path}`, {
+    stack: err.stack,
+    requestId: req.headers['x-request-id'],
+  });
+  res.status(500).json({ status: 'error', message: 'Internal Server Error' });
 };
-

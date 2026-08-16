@@ -10,6 +10,9 @@ export const consumeAppointmentEvents = async () => {
   const EXCHANGE = 'appoinment.events';
   const QUEUE = 'appoinment.payment.refund';
   const ROUTING_KEY = 'appoinment.cancelled';
+  
+
+  await channel.assertExchange(EXCHANGE, 'topic', { durable: true });
 
   await channel.assertQueue(QUEUE, { durable: true });
 
@@ -22,17 +25,21 @@ export const consumeAppointmentEvents = async () => {
       const event = JSON.parse(msg.content.toString());
       console.log("Received cancel event:", event);
         
-      const {status,eventType,appoinmentId,appoinmentDate,appoinmentTime} = event
+      try {
+        const {status,eventType,appoinmentId,appoinmentDate,appoinmentTime} = event
 
       if(eventType==='PAYMENT_REFUNDED'){
         console.log("Nan listened cheythittund---->😇😇")
         const paymentService =  container.get<IPaymentService>(TYPES.PaymentService);
         await paymentService.refund(appoinmentId,status,appoinmentDate,appoinmentTime)
       }
-        // now call your refund method here 👇
-      // await paymentService.refund(data.appoinmentId, data.status, data.appoinmentTime,data.appoinmentDate);
+      
 
       channel.ack(msg);
+      } catch (error) {
+        console.log("Refund consumer error ",error)
+        channel.nack(msg,false,false)
+      }
     }
   });
 };

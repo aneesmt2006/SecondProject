@@ -57,6 +57,8 @@ export class UserSymptomsService implements IUserSymptomsService {
                 'x-token-id': userId
             }
         })
+
+        console.log("<-----Print userDetResposne---->",userDetResposne);
        } catch (error) {
          console.log("Error while communicate to service-service medical / user-management",error)
          throw new Error("Some issue found")
@@ -98,13 +100,12 @@ export class UserSymptomsService implements IUserSymptomsService {
          
 
         if (existing) {
-            // Update
-             // @ts-ignore - _id presence is guaranteed
+            
             const updated = await this._userSymptomsRepo.update(existing._id!, symptomsData);
             if(!updated) throw new Error("Failed to update symptoms");
             return { message: "Symptoms updated successfully", data: updated };
         } else {
-            // Create
+            
             const created = await this._userSymptomsRepo.create(symptomsData);
             if(!created) throw new Error("Failed to log symptoms");
             return { message: "Symptoms logged successfully", data: created };

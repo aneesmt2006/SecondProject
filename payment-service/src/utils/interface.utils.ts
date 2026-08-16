@@ -7,7 +7,7 @@ export interface IPaymentOrder {
   doctorId: string;           
   amount: number; 
   appoinmentId:string,         
-  status?: "PENDING" | "SUCCESS" | "FAILED"|"CANCELLED";  
+  status: "PENDING" | "SUCCESS" | "FAILED"|"CANCELLED"|"REFUNDED";  
   attemptCount?: number;       
   createdAt?: Date;           
   updatedAt?: Date;    

@@ -6,11 +6,16 @@ import { TYPES } from "../types/type.js";
 import { ResponseMapper } from "../utils/response.mapper.utils.js";
 import { DOCTOR_SLOT_MESSAGES } from "../constants/response-messages.constants.js";
 import type { TDoctorSlotResponseDTO } from "../dtos/doctor.slot.dto.js";
+import type { IAppointentRepository } from "../repositories/interfaces/IAppointmentRepository.js";
+import { getChannel, APPOINTMENT_EXCHANGE } from "../config/rabbitmq.config.js";
+import logger from "../utils/logger.js";
+
 
 @injectable()
 export class DoctorSlotService implements IDoctorSlotService {
   constructor(
-    @inject(TYPES.DoctorSlotRepository) private _doctorSlotRepository: IDoctorSlotRepository
+    @inject(TYPES.DoctorSlotRepository) private _doctorSlotRepository: IDoctorSlotRepository,
+    @inject(TYPES.AppointmentRepository) private _appointmentRepo : IAppointentRepository
   ) {}
 
   /**
@@ -19,9 +24,32 @@ export class DoctorSlotService implements IDoctorSlotService {
    * @returns Created/Updated slot DTO + success message
    */
   async createOrUpdateSlot(data: IDoctorSlot): Promise<{ slot: TDoctorSlotResponseDTO; message: string }> {
-    console.log("Service hit ---->",data)
+    logger.info("DoctorSlotService.createOrUpdateSlot hit", { doctorId: data.doctorId });
+
     const result = await this._doctorSlotRepository.createOrUpdateSlot(data);
-    console.log("result after update slot ---->",result)
+    logger.info("Doctor slot updated successfully", { doctorId: result.doctorId });
+
+    const formattedUnAvailableDates = result.unavailableDates.map((date) => new Date(date).toLocaleDateString("en-US"));
+    const checkIsAppointInUnAvailable = await this._appointmentRepo.findConfirmAppointmentsByDate(data.doctorId, ['SUCCESS', 'BOOKED'], formattedUnAvailableDates);
+    
+    if (checkIsAppointInUnAvailable?.length) {
+      const ids = checkIsAppointInUnAvailable.map((app) => String(app._id));
+      await this._appointmentRepo.updateMany(ids, 'CANCELLED');
+      
+      const channel = getChannel();
+      for (const app of checkIsAppointInUnAvailable) {
+        const payload = {
+            status: 'REFUNDED',
+            eventType: 'PAYMENT_REFUNDED',
+            appointmentId: app._id,
+            appointmentDate: app.appointmentDate,
+            appointmentTime: app.appointmentTime
+        };
+        channel.publish(APPOINTMENT_EXCHANGE, 'appointment.cancelled', Buffer.from(JSON.stringify(payload)));
+      }
+      logger.warn("Cancelled appointments that fell on newly unavailable dates", { cancelledCount: ids.length });
+    }
+
     const mappedSlot = ResponseMapper.doctorSlotMapping(result);
     return { slot: mappedSlot, message: DOCTOR_SLOT_MESSAGES.SLOT_UPSERT_SUCCESS };
   }
@@ -38,7 +66,6 @@ export class DoctorSlotService implements IDoctorSlotService {
     }
     const mappedSlot = ResponseMapper.doctorSlotMapping(result);
 
-    console.log("Dataa slot after mapping",mappedSlot)
     return { slot: mappedSlot, message: DOCTOR_SLOT_MESSAGES.SLOT_GET_SUCCESS };
   }
 

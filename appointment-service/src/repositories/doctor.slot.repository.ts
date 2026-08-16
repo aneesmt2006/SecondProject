@@ -2,7 +2,7 @@ import { injectable } from "inversify";
 import DoctorSlotModel from "../models/doctor.slot.model.js";
 import type { IDoctorSlot, IDoctorSlotDoc } from "../utils/interface.utils.js";
 import type { IDoctorSlotRepository } from "./interfaces/IDoctorSlotRepository.js";
-import { AppointmentModel } from "../models/appoinment.model.js";
+import { AppointmentModel } from "../models/appointment.model.js";
 
 @injectable()
 export class DoctorSlotRepository implements IDoctorSlotRepository {

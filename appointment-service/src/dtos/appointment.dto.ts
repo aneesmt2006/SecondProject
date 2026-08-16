@@ -14,8 +14,8 @@ export type TCreateAppointmentResponseDTO = {
   amount: number;
   userId?: string;
   doctorId?: string;
-  appoinmentDate?: string;
-  appoinmentTime?: string;
+  appointmentDate?: string;
+  appointmentTime?: string;
 };
 
 export type TApmntPatientsDetailsDTO = {
@@ -26,9 +26,9 @@ export type TApmntPatientsDetailsDTO = {
   age: number;
   isFirstPregnancy?: boolean;
   trimester: string;
-  consultationStatus:string;
-  appoinmentDate?: string;
-  appoinmentTime?: string;
+  consultationStatus: string;
+  appointmentDate?: string;
+  appointmentTime?: string;
 };
 
 export type TCompleteAppointmentDTO = {
@@ -41,19 +41,31 @@ export type TCompleteAppointmentDTO = {
 };
 
 export type TUserAppointmentDTO = {
-    appointmentId: string;
-    doctorName: string;
-    specialization: string;
-    appoinmentDate: string;
-    appoinmentTime: string;
-    reason: string;
-    notes?: string;
-    status: 'Completed' | 'Upcoming' | 'Cancelled' | 'Scheduled';
-    doctorImage?: string;
-    hospitalName?: string;
+  appointmentId: string;
+  doctorName: string;
+  specialization: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  reason: string;
+  notes?: string;
+  status: "Completed" | "Upcoming" | "Cancelled" | "Scheduled";
+  doctorImage?: string;
+  hospitalName?: string;
 };
 
 export type TUserVisitHistoryDTO = {
-    upcoming: TUserAppointmentDTO | null;
-    history: TUserAppointmentDTO[];
+  upcoming: TUserAppointmentDTO | null;
+  history: TUserAppointmentDTO[];
+};
+
+export type TBookedDoctors = {
+  id: string;
+  name: string;
+  specialty: string;
+  avatarUrl: string;
+};
+
+export type TBookedPatients = {
+  id: string;
+  name: string;
 };

@@ -1,5 +1,7 @@
+import type { Document } from "mongoose";
+
 export interface IProfile {
-  userId?:string,
+  userId?: string;
   fullName?: string;
   dateOfBirth?: string;
   lmp?: string;
@@ -18,6 +20,7 @@ export interface IProfile {
   knownAllergies?: string;
   familyRelated?: string;
   otherHealthIssues?: string;
+  primaryDoctor?: string;
 }
 
 export interface IUserProfile extends IProfile {
@@ -27,3 +30,37 @@ export interface IUserProfile extends IProfile {
   updatedAt?: Date;
 }
 
+export interface IRagChunk extends Document {
+  text: string;
+  embedding: number[];
+  source: string;
+  chunkIndex: number;
+  documentHash: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ICreateRagChunkInput {
+  text: string;
+  embedding: number[];
+  source: string;
+  chunkIndex: number;
+  documentHash: string;
+}
+
+export interface IRagSearchResult {
+  text: string;
+  source: string;
+  chunkIndex: number;
+  score: number;
+}
+
+export interface GenerateAnswerInput { 
+  systemInstruction:string,
+  prompt:string,
+}
+export type TDoctor = {
+  fullName: string;
+  clinicName: string;
+  doctorId: string;
+};

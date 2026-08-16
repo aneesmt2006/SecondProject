@@ -9,6 +9,7 @@ import { validate } from "../middlewares/validate.js";
 import { pregnantProfileSchema } from "../utils/schema-zod.utils.js";
 import { commonResponse } from "../utils/common.reponse.utils.js";
 import { role } from "../decorators/role.decorator.js";
+import userProfileModel from "../models/user.profile.model.js";
 
 @controller("/patient/profile")
 export class UserProfileController implements interfaces.Controller {
@@ -54,8 +55,9 @@ export class UserProfileController implements interfaces.Controller {
   @httpPost('/forDoctors')
   async getPatientProfiles(req:Request,res:Response,next:NextFunction){
     try {
-      console.log("Hitted medical service ----->")
-      const {profiles,message} = await this._userProfileService.getPatientsProfile(req.body)
+      console.log("Hitted medical service ----->",req.body)
+      const patientIds = req.body.patientIds || req.body;
+      const {profiles,message} = await this._userProfileService.getPatientsProfile(patientIds)
       commonResponse.success(res,message,profiles,HTTP_STATUS.OK)
     } catch (error) {
       next(error)
@@ -73,6 +75,32 @@ export class UserProfileController implements interfaces.Controller {
       commonResponse.success(res, message, medicalRecord, HTTP_STATUS.OK);
     } catch (error) {
       next(error);
+    }
+  }
+
+  @role(['user'])
+  @httpPut('/primaryDoctor')
+  async setPrimaryDoctor(req:Request,res:Response,next:NextFunction){
+    try {
+      const {doctorId} = req.body
+      const authUserId = req.headers['x-token-id'] as string
+      const {profile,message} = await this._userProfileService.setPrimaryDoctor(doctorId,authUserId)
+      commonResponse.success(res,message,profile,HTTP_STATUS.OK)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  @role(['user'])
+  @httpGet('/primaryDoctor')
+  async getPrimaryDoctor(req:Request,res:Response,next:NextFunction){
+    try {
+      
+      const authUserId = req.headers['x-token-id'] as string
+      const {drProfile,message} = await this._userProfileService.getPrimaryDoctor(authUserId)
+      commonResponse.success(res,message,drProfile,HTTP_STATUS.OK)
+    } catch (error) {
+      next(error)
     }
   }
 }

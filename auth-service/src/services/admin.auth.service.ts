@@ -29,6 +29,7 @@ export class AdminAuthService implements IAdminAuthService{
   async login(email: string, password: string): Promise<{admin:TuserResponseDTO,accessToken:string,refreshToken:string,message:string}> {
        const exist =  await this._adminRepo.findByEmail(email);
 
+       console.log(" checking 1",exist)
        if(!exist) throw new Error(CONSTANTS.ERRORS.USER_NOT_FOUND);
        if(exist.role!=='admin' && exist.accountMethod==='normal') throw new Error(CONSTANTS.ERRORS.NOT_ADMIN)
 

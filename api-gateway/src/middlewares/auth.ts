@@ -1,67 +1,98 @@
-import type { NextFunction, Request, Response } from "express";
-import { config } from "../config/env.js";
-import jwt from "jsonwebtoken";
-import logger from "../config/logger.js";
-import { redisClient } from "../config/redis.config.js";
+import type { NextFunction, Request, Response } from 'express';
+import { config } from '../config/env.js';
+import jwt from 'jsonwebtoken';
+import logger from '../config/logger.js';
+import { redisClient } from '../config/redis.config.js';
 
-const PUBLIC_ENDPOINTS = [
-  "/api/v1/account/auth/register",
-  "/api/v1/account/auth/login",
-  "/api/v1/account/auth/refresh",
-  "/api/v1/account/auth/google",
-  "/api/v1/account/auth/verify-otp",
-  "/api/v1/account/auth/dr/register",
-  "/api/v1/account/auth/dr/verify-otp",
-  "/api/v1/account/auth/dr/login",
-  "/api/v1/account/auth/admin/login",
-  "/api/v1/account/auth/admin/getAllUsers"
+// Endpoints that bypass JWT validation
+const PUBLIC_PREFIXES: ReadonlySet<string> = new Set([
+  '/api/v1/account/auth/register',
+  '/api/v1/account/auth/login',
+  '/api/v1/account/auth/refresh',
+  '/api/v1/account/auth/google',
+  '/api/v1/account/auth/verify-otp',
+  '/api/v1/account/auth/dr/register',
+  '/api/v1/account/auth/dr/verify-otp',
+  '/api/v1/account/auth/dr/login',
+  '/api/v1/account/auth/admin/login',
+]);
 
-];
+// Anchored prefix match — prevents auth bypass via embedded path segments
+function isPublicEndpoint(url: string): boolean {
+  const urlWithoutQuery = url.split('?')[0]!;
+  for (const prefix of PUBLIC_PREFIXES) {
+    if (
+      urlWithoutQuery === prefix ||
+      urlWithoutQuery.startsWith(prefix + '/') ||
+      url.startsWith(prefix + '?')
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
 
-export const withAuth =async (
+export const withAuth = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
-    // Allow public routes
-    if (PUBLIC_ENDPOINTS.some((path) => req.originalUrl.includes(path))) {
-      return next();
+    if (isPublicEndpoint(req.originalUrl)) return next();
+
+    const authHeader = req.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      logger.warn('Unauthorized — missing or malformed Authorization header', {
+        path: req.originalUrl,
+        requestId: req.headers['x-request-id'],
+      });
+      res.status(401).json({ status: 'error', message: 'Unauthorized' });
+      return;
     }
 
-    const authHeader = req.headers["authorization"];
-    console.log(req.headers)
-    if (!authHeader) {
-      logger.warn("Unauthorized - Missing Authorization Header");
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    console.log("Tokennn auth header ",authHeader)
-    const token = authHeader.split(" ")[1];
+    const token = authHeader.split(' ')[1];
     if (!token) {
-      logger.warn("Unauthorized - Bearer Token Missing");
-      return res.status(401).json({ message: "Unauthorized" });
+      res.status(401).json({ status: 'error', message: 'Unauthorized' });
+      return;
     }
-   
-    const decoded = jwt.verify(token, config.jwtSecret) as {
+
+    const decoded = (jwt.verify(token, config.jwtSecret as string) as unknown) as {
       id: string;
       role: string;
     };
 
-    // Attach user to request
-    
-    req.headers['x-token-id'] = decoded.id
-    req.headers['x-token-role'] = decoded.role
+    // Pass identity to downstream services via internal headers
+    req.headers['x-token-id'] = decoded.id;
+    req.headers['x-token-role'] = decoded.role;
 
-    console.log("User id decoded",decoded)
-    // redisClient.set(`id:${mappedDoctor.id}`,"1");
-    if(await redisClient.get(`id:${decoded.id}`)){
-      return res.status(403).json({message:"Blocked By admin  , You are blacklisted"})
+    // Fail open on Redis outage — blacklist unavailable is better than locking all users out
+    try {
+      const blocked = await redisClient.get(`id:${decoded.id}`);
+      if (blocked) {
+        logger.warn(`Blocked user attempted access: ${decoded.id}`, {
+          requestId: req.headers['x-request-id'],
+        });
+        res.status(403).json({ status: 'error', message: 'Your account has been suspended.' });
+        return;
+      }
+    } catch (redisErr) {
+      logger.error('Redis blacklist check failed — failing open', {
+        error: (redisErr as Error).message,
+        userId: decoded.id,
+        requestId: req.headers['x-request-id'],
+      });
     }
 
     next();
   } catch (error) {
-    console.error("Error verifying token:", error);
-    return res.status(403).json({ message: "Invalid or Expired Token" });
+    if (error instanceof jwt.JsonWebTokenError || error instanceof jwt.TokenExpiredError) {
+      logger.warn(`Invalid or expired token: ${(error as Error).message}`, {
+        path: req.originalUrl,
+        requestId: req.headers['x-request-id'],
+      });
+      res.status(401).json({ status: 'error', message: 'Invalid or expired token.' });
+      return;
+    }
+    next(error);
   }
 };

@@ -45,6 +45,10 @@ const schema = new Schema<IAppointment>(
     notes: {
       type: String,
       default: ""
+    },
+    lockToken:{
+      type:String,
+      default:""
     }
   },
   {

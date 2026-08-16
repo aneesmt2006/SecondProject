@@ -10,7 +10,6 @@ import { PAYMENT_ERRORS, PAYMENT_SUCCESS } from "../constants/common-response.co
 import { ResponseMapper } from "../utils/response.mapper.utils.js";
 import type { TPaymentVerifyDTO } from "../dtos/payment.dto.js";
 import * as crypto from "crypto";
-import { boolean } from "zod";
 import { publishEvent } from "../config/rabbitmq.config.js";
 import { RazorpayInstance } from "../config/razorpay.instance.config.js";
 
@@ -61,6 +60,7 @@ export class PaymentService implements IPaymentService {
     async verify(payment: TPaymentVerifyDTO): Promise<{ status: boolean; message: string; }> {
         const {orderCreationId,razorpayOrderId,razorpayPaymentId,razorpaySignature} = payment
 
+        console.log("From verify payment ????")
 
         const shasum = crypto.createHmac("sha256",config.razorpaySecret!).update(`${razorpayOrderId}|${razorpayPaymentId}`)
         const digest = shasum.digest("hex")
@@ -92,6 +92,10 @@ export class PaymentService implements IPaymentService {
         const appoinment = await this._paymentRepo.findByAppoinmentId(appoinmentId);
         if(!appoinment) throw new Error(PAYMENT_ERRORS.NOT_CONTAIN)
         
+        if(appoinment.status==='REFUNDED'){
+            console.log(`Refund already processed for this appointment ${appoinment.appoinmentId}`)
+            return {status:true,message:'Already refunded'}
+        }
         const instance = RazorpayInstance
         const {amount, razorpayPaymentId, tempOrderId} = appoinment
 

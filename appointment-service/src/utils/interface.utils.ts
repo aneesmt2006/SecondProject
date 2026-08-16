@@ -15,6 +15,7 @@ export interface IAppointment {
   appointmentTime: string;
   amount: number;
   status: TAppointmentStatus;
+  lockToken:string;
   isRecurring?: boolean;
   consultationStatus?: string;
   notes?: string;
@@ -70,10 +71,21 @@ export interface AppointmentQuery {
 }
 
 export interface PatientDet {
-  userId:string;
+  userId: string;
   fullName: string;
   age: number;
   week: number;
   trimester: string;
   isFirstPregnancy?: boolean;
+}
+
+export interface DoctorsProfile {
+  fullName: string
+  specialization: string
+  profileImageLink:string
+  doctorId: string;
+}
+
+export interface PatientProfile {
+  
 }

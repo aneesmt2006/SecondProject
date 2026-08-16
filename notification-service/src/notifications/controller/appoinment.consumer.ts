@@ -90,7 +90,7 @@ export class NotificationConsumer {
         error,
       );
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      channel.nack(channel, false, false);
+      channel.nack(message, false, false);
     }
   }
 }

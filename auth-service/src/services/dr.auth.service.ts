@@ -95,6 +95,7 @@ export class DrAuthService implements IDrAuthService {
     */
    async login(email: string, password: string): Promise<{ doctor: TDRresponseDTO; accessToken: string; refreshToken: string; message: string; }> {
        const doctor = await this._drRepo.findByEmail(email)
+       
        if(!doctor){
         throw new Error(CONSTANTS.ERRORS.USER_NOT_FOUND)
        }
@@ -109,6 +110,8 @@ export class DrAuthService implements IDrAuthService {
         if(!isCorrect){
             throw new Error(CONSTANTS.ERRORS.INVALID_CREDENTIALS_SIMPLE)
         }
+
+        console.log(" db doctor data",doctor,'status--->',doctor.status)
 
 
         if(UNALLOWED_STATUS.includes(doctor.status!)){
@@ -132,7 +135,7 @@ export class DrAuthService implements IDrAuthService {
        if(!doctorDoc){
         throw new Error(CONSTANTS.ERRORS.DB_NOT_EXIST)
        }
-       const  mappedDR = {fullName:doctorDoc.fullName,clinicName:doctorDoc.clinicName!}
+       const  mappedDR = {fullName:doctorDoc.fullName,clinicName:doctorDoc.clinicName!,doctorId}
 
        return {doctor:mappedDR,message:AUTH_RESPONSE_MESSAGES.GET_DOCTOR}
        } 

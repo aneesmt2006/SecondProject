@@ -36,7 +36,6 @@ export class NotificationGateway
   }
 
   handleDisconnect(client: Socket) {
-    client.disconnect();
     for (const [userId, sockets] of this.userSockets) {
       if (sockets.has(client.id)) {
         sockets.delete(client.id);
@@ -57,7 +56,7 @@ export class NotificationGateway
     }
 
     for (const id of socketsIds) {
-      this.server.to(id).emit(`user:${userId}`, payload);
+      this.server.to(id).emit(`user:${userId}`, payload); // here i done using manual method , we can do with by creating room (so in that case we dont want to emit to all socket ids)
     }
   }
 
@@ -66,12 +65,12 @@ export class NotificationGateway
     const socketsIds = this.userSockets.get(userId);
 
     if (!socketsIds || socketsIds.size === 0) {
-      this.logger.warn(`User ${userId} is offline`);
+      this.logger.warn(`doctor ${userId} is offline`);
       return;
     }
 
     for (const id of socketsIds) {
-      this.server.to(id).emit(`doctor:${userId}`, payload);
+      this.server.to(id).emit(`doctor:${userId}`, payload); // " here i done using ..."
     }
   }
 }

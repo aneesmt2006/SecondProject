@@ -3,12 +3,17 @@ import { TYPES } from "../types/type.js";
 import type { IUserProfileRepository } from "../repositories/interfaces/IUserProfileRepository.js";
 import type { IUserProfileService } from "./interfaces/IUserProfileService.js";
 import type { PatientDTO, TUserIdsDTO, TUserProfUpdateRequestDTO, TUserProfileResponseDTO, TUsersDetDTO } from "../dtos/user.dto.js";
-import { AUTH_RESPONSE_MESSAGES, USER_PROFILE_MESSAGES } from "../constants/response-messages.constants.js";
+import { AUTH_RESPONSE_MESSAGES, COMMON_RESPONSE_MESSAGES, ERROR_RESPONSE_MESSAGES, USER_PROFILE_MESSAGES } from "../constants/response-messages.constants.js";
 import { ResponseMapper } from "../utils/response.mapper.utils.js";
 import { calculateCurrentWeek, calculateDueDate } from "../utils/currentweek.calculation.utils.js";
 import { calculateAge } from "../utils/age.calculator.utils.js";
 import { getTrimesterByWeek } from "../utils/trimester.calculator.utils.js";
 import { calculatePregnancyProgress, getBloodPressureStatus, getBloodSugarStatus } from "../utils/health.check.utils.js";
+import axios from "axios";
+import { config } from "../config/env.config.js";
+import type { ApiResponse } from "../utils/api.response.utils.js";
+import type { TprimaryDoctor } from "../dtos/doctor.dto.js";
+import type { TDoctor } from "../utils/interface.utils.js";
 
 @injectable()
 export class UserProfileService implements IUserProfileService {
@@ -82,6 +87,7 @@ export class UserProfileService implements IUserProfileService {
    */
   async  getPatientsProfile(userIds:TUserIdsDTO):Promise<{profiles:TUsersDetDTO[],message:string}> {
     const patientsDoc = await this._userProfileRepo.findByIds(userIds)
+    console.log("Patinet profiles from DB -->",patientsDoc)
     if(!patientsDoc){
       throw new Error(AUTH_RESPONSE_MESSAGES.FETCH_FAILED)
     }
@@ -192,5 +198,35 @@ export class UserProfileService implements IUserProfileService {
 
     return { medicalRecord, message: USER_PROFILE_MESSAGES.PROFILE_GET_SUCCESS };
 
+  }
+
+  async setPrimaryDoctor(doctorId: string, userId: string): Promise<{ profile: TUserProfileResponseDTO; message: string; }> {
+    const updatedProfile = await this._userProfileRepo.update(userId, { primaryDoctor: doctorId })
+
+    if (!updatedProfile) {
+      throw new Error(USER_PROFILE_MESSAGES.PROFILE_NOT_FOUND)
+    }
+    const currentWeek = updatedProfile.lmp ? calculateCurrentWeek(updatedProfile.lmp) : 0;
+    const mappedUser = ResponseMapper.userMapping(updatedProfile, currentWeek, updatedProfile.dueDate)
+    return { profile: mappedUser, message: USER_PROFILE_MESSAGES.PROFILE_UPDATE_SUCCESS }
+  }
+
+  async getPrimaryDoctor(userId: string): Promise<{ drProfile: TprimaryDoctor; message: string; }> {
+    const userProfile = await this._userProfileRepo.findByUserId(userId);
+    if(!userProfile){
+      throw new Error(USER_PROFILE_MESSAGES.PROFILE_ID_NOT_FOUND);
+    }
+    let authServiceResponse
+    let data
+    try {
+      authServiceResponse =  await axios.get<ApiResponse<TDoctor>>(`${config.authServiceUrl}/auth/dr/drEssential/${userProfile.primaryDoctor}`)
+      console.log("Auth service Response---->",authServiceResponse.data);
+      const {fullName:doctorName,doctorId,clinicName} = authServiceResponse.data.data
+       data = {doctorName,doctorId,clinicName}
+    } catch (error) {
+      throw new Error(ERROR_RESPONSE_MESSAGES.CONNECTING_OTHER_SERVICE)
+    }
+    console.log("data to send to frond--->",data)
+    return {drProfile:data,message:COMMON_RESPONSE_MESSAGES.SUCCESS}
   }
 }

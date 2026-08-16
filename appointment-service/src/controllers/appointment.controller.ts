@@ -2,20 +2,20 @@ import type { NextFunction, Request, Response } from "express";
 import { inject } from "inversify";
 import { controller, httpGet, httpPost, httpPut } from "inversify-express-utils";
 import { TYPES } from "../types/type.js";
-import type { IAppoinmentService } from "../services/interfaces/IAppoinmentService.js";
+import type { IAppointmentService } from "../services/interfaces/IAppointmentService.js";
 import { commonResponse } from "../utils/common.reponse.utils.js";
 import { HTTP_STATUS } from "../constants/http-status.constant.js";
 import { role } from "../decorators/role.decorator.js";
 
 @controller("/booking")
-export class AppoinmentController {
-    constructor(@inject(TYPES.AppoinmentService) private _appoinmentService: IAppoinmentService) {}
+export class AppointmentController {
+    constructor(@inject(TYPES.AppointmentService) private _appointmentService: IAppointmentService) {}
 
     @httpPost("/create")
     async create(req: Request, res: Response, next: NextFunction) {
         try {
-            const { appoinment, message } = await this._appoinmentService.create(req.body);
-            return commonResponse.success(res, message, appoinment, HTTP_STATUS.CREATED);
+            const { appointment, message } = await this._appointmentService.create(req.body);
+            return commonResponse.success(res, message, appointment, HTTP_STATUS.CREATED);
         } catch (error) {
             next(error);
         }
@@ -25,8 +25,8 @@ export class AppoinmentController {
        async cancel(req: Request, res: Response, next: NextFunction) {
         try {
             const {appointmentId} = req.body 
-            const {appoinment,message} = await this._appoinmentService.update(appointmentId as string,"CANCELLED")
-            commonResponse.success(res,message,appoinment,)
+            const {appointment,message} = await this._appointmentService.update(appointmentId as string,"CANCELLED")
+            commonResponse.success(res,message,appointment,)
         } catch (error) {
             next(error);
         }
@@ -39,7 +39,7 @@ export class AppoinmentController {
             const doctorId = req.headers['x-token-id'] as string
             const { date } = req.query as { date?: string };
             console.log("date",date,"doctorId",doctorId)
-            const {patients,message} = await this._appoinmentService.findAllDrappointments(doctorId,date)
+            const {patients,message} = await this._appointmentService.findAllDrappointments(doctorId,date)
             commonResponse.success(res,message,patients,HTTP_STATUS.OK)
         } catch (error) {
             next(error)
@@ -49,7 +49,7 @@ export class AppoinmentController {
     @httpPost('/complete')
     async complete(req:Request,res:Response,next:NextFunction){
         try {
-            const {message} = await this._appoinmentService.complete(req.body)
+            const {message} = await this._appointmentService.complete(req.body)
             commonResponse.success(res,message,{},HTTP_STATUS.OK)
         } catch (error) {
             next(error)
@@ -60,7 +60,7 @@ export class AppoinmentController {
     async getUserVisitHistory(req:Request,res:Response,next:NextFunction){
         try {
             const userId = req.headers['x-token-id'] as string;
-            const {history,message} = await this._appoinmentService.getUserVisitHistory(userId);
+            const {history,message} = await this._appointmentService.getUserVisitHistory(userId);
             commonResponse.success(res,message,history,HTTP_STATUS.OK)
         } catch (error) {
             next(error)
@@ -71,7 +71,7 @@ export class AppoinmentController {
     async findUserMainDoctor(req:Request,res:Response,next:NextFunction){
         try {
             const userId = req.headers['x-token-id'] as string
-            const {doctorId,message} = await this._appoinmentService.findMainDoctor(userId)
+            const {doctorId,message} = await this._appointmentService.findMainDoctor(userId)
             commonResponse.success(res,message,doctorId,HTTP_STATUS.OK)
         } catch (error) {
             next(error)

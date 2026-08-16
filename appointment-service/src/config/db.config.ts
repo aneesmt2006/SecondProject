@@ -1,19 +1,13 @@
 import mongoose from "mongoose";
 import { config } from "./env.config.js";
+import logger from "../utils/logger.js";
 
-export const connectDB = async () => {
-  const url = config.mongoUrl;
-  try {
-    if (!url) {
-      throw new Error("DB url is Missing");
-    }
+// Top-level await: Stops app startup until MongoDB connects.
+await mongoose.connect(config.mongoUrl, {
+  dbName: "Appointment-Service",
+});
+logger.info("MongoDB connected successfully (appointment-service)");
 
-    await mongoose.connect(url, {
-      dbName: "Appoinment-Service",
-    });
-    console.log("Connecting to MongoDB success");
-  } catch (error) {
-    console.error("Failed to connect DB", error);
-    process.exit(1);
-  }
-};
+mongoose.connection.on('error', (err) => {
+  logger.error('MongoDB connection error', { error: err.message });
+});

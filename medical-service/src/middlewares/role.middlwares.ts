@@ -6,6 +6,7 @@ import { HTTP_STATUS } from "../constants/http-status.constant.js";
 export const authorize = (allowedRoles:string[]) => 
 
     (req:Request,res:Response,next:NextFunction)=>{
+        console.log("It is working --->")
         const role = req.headers['x-token-role'] as string
         if(!role || !allowedRoles.includes(role))  return commonResponse.failure(res,ADMIN_MESSAGES.NOT_ACCESS_TO_ADMIN_ROUTE,HTTP_STATUS.FORBIDDEN)
  

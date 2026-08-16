@@ -5,4 +5,5 @@ export interface IUserProfileRepository {
   update(userId: string, data: Partial<IUserProfile>): Promise<IUserProfile | null>;
   findByUserId(userId: string): Promise<IUserProfile | null>;
   findByIds(userIds:string[]):Promise<IUserProfile[]|null>
+  
 }

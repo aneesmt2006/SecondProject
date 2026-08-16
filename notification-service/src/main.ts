@@ -21,6 +21,7 @@ async function bootstrap() {
     options: {
       urls: [config.rabbitmqUrl!], //replac manual amqp.connect , channel.consume
       queue: 'notifications.payments.refunded',
+      exchangeType: 'topic',
       exchange: 'payment.events',
       routingKey: 'payment.refunded',
       queueOptions: { durable: true },

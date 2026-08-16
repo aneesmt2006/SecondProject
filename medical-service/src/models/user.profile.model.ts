@@ -22,6 +22,7 @@ const UserProfileSchema: Schema = new Schema(
     knownAllergies: { type: String },
     familyRelated: { type: String },
     otherHealthIssues: { type: String },
+    primaryDoctor : {type:String}
   },
   {
     timestamps: true,

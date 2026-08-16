@@ -1,82 +1,61 @@
+import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
+import LokiTransport from 'winston-loki';
+import { config } from './env.js';
 
-import winston from "winston";
-import LokiTransport from "winston-loki";
-import { config } from "./env.js";
+const { combine, timestamp, printf, json, errors } = winston.format;
+
+// Console only — colorize must not reach file or Loki transports
+const consoleFormat = combine(
+  winston.format.colorize({ all: true }),
+  timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+  printf(({ level, message, timestamp, service, requestId }) => {
+    const rid = requestId ? ` [${requestId}]` : '';
+    return `[${timestamp}]${rid} [${level}] [${service}]: ${message}`;
+  })
+);
+
+// Structured JSON for file and Loki transports
+const fileFormat = combine(
+  timestamp(),
+  errors({ stack: true }),
+  json()
+);
 
 const logger = winston.createLogger({
-  level: config.logLevel|| "debug",
+  level: config.logLevel || 'info',
   defaultMeta: { service: config.service },
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.colorize(),
-    winston.format.printf(({ level, message, timestamp, service }) => {
-      return `[${timestamp}] [${level}] [${service}]: ${message}`;
-    })
-  ),
   transports: [
-    new winston.transports.Console(), // logs to terminal
-    new winston.transports.File({ filename: "logs/error.log", level: "error" }), // errors → error.log
-    new winston.transports.File({ filename: "logs/combined.log" }), // all logs → combined.log
+    new winston.transports.Console({ format: consoleFormat }),
+
+    new DailyRotateFile({
+      filename: 'logs/error-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      level: 'error',
+      format: fileFormat,
+      maxSize: '20m',
+      maxFiles: '14d',
+      zippedArchive: true,
+    }),
+
+    new DailyRotateFile({
+      filename: 'logs/combined-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      format: fileFormat,
+      maxSize: '20m',
+      maxFiles: '14d',
+      zippedArchive: true,
+    }),
+
     new LokiTransport({
-      host: "http://loki:3100",
+      host: 'http://loki:3100',
       labels: { service: config.service || 'api-gateway' },
       json: true,
+      format: fileFormat,
       replaceTimestamp: true,
-      onConnectionError: (err) => console.error(err)
-    })
+      onConnectionError: (err) => console.error('[Loki transport error]', err),
+    }),
   ],
 });
 
-
-export default logger
-
-
-
-
-
-
-
-
-// import winston from "winston";
-// import dotenv from "dotenv";
-
-// import fs from 'fs'
-
-
-
-
-// const logDir = '/logs';
-
-// export const logger = winston.createLogger({
-//   level: config.logLevel || "debug",
-//   defaultMeta: { service: config.service },
-//   format: winston.format.combine(
-//     winston.format.timestamp(),
-//     winston.format.colorize(),
-//     winston.format.printf(({ level, message, timestamp, service }) => {
-//       return `logger  - [${timestamp}] [${level}] [${service}]: ${message}`;
-//     })
-//   ),
-//   transports:[
-//    new winston.transports.Console({
-//         format:winston.format.combine(
-//             winston.format.timestamp({format: 'MMM-DD-YYYY HH:mm:ss'}),
-//             winston.format.align(),
-//             winston.format.printf(info => `${info.level}: ${[info.timestamp]}: ${info.message}`),
-//         )}),
-//   ]
-// });
-
-// if ( fs.existsSync( logDir ) ) {
-//   logger.add(
-//     new winston.transports.File({
-//       filename: '/logs/server.log',
-//       format:winston.format.combine(
-//           winston.format.timestamp({format: 'MMM-DD-YYYY HH:mm:ss'}),
-//           winston.format.align(),
-//           winston.format.printf(info => `${info.level}: ${[info.timestamp]}: ${info.message}`),
-//       )}),
-//   ) 
-// }
-
-// export default logger
+export default logger;

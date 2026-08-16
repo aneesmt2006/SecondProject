@@ -1,31 +1,42 @@
-import "reflect-metadata"
-import { InversifyExpressServer } from "inversify-express-utils"
-import { errorHandler } from "./middlewares/errorHandler.js"
-import { connectDB } from "./config/db.config.js"
-import bodyParser from "body-parser"
-import morgan from "morgan"
-import { container } from "./config/inversify.config.js"
-import { config } from "./config/env.config.js"
+import "reflect-metadata";
+import { InversifyExpressServer } from "inversify-express-utils";
+import { errorHandler } from "./middlewares/errorHandler.js";
+import "./config/db.config.js";
+import bodyParser from "body-parser";
+import { container } from "./config/inversify.config.js";
 import { metricsHandler } from "./utils/metrics.js";
-import logger from "./utils/logger.js"
+import logger from "./utils/logger.js";
+import { randomUUID } from "crypto";
+import helmet from "helmet";
 
-connectDB();
+// Note: MongoDB is connected at top-level in db.config.ts.
 
-
-const server = new InversifyExpressServer(container)
+const server = new InversifyExpressServer(container);
 
 server.setConfig((app) => {
-    // app.use(cors({
-    //     origin: config.clientUrl,
-    //     credentials: true
-    // }));
-    app.use(bodyParser.json({limit:'50mb'}));
-    app.use(bodyParser.urlencoded({ extended: false ,limit:'50mb' }));
-    app.use(morgan("dev"));
+    app.use(helmet());
+
+    // 1MB limit for security
+    app.use(bodyParser.json({ limit: '1mb' }));
+    app.use(bodyParser.urlencoded({ extended: false, limit: '1mb' }));
+
+    // Extract x-request-id from gateway and propagate it
     app.use((req, res, next) => {
-        logger.info(`${req.method} ${req.url}`,req.body);
+        const requestId = (req.headers['x-request-id'] as string | undefined) ?? randomUUID();
+        req.headers['x-request-id'] = requestId;
+        res.setHeader('X-Request-ID', requestId);
         next();
     });
+
+    // Structured logging for every request
+    app.use((req, res, next) => {
+        logger.info(`${req.method} ${req.url}`, {
+            requestId: req.headers['x-request-id'],
+            ip: req.ip,
+        });
+        next();
+    });
+
     app.get('/metrics', metricsHandler);
 });
 

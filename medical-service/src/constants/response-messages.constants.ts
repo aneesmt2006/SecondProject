@@ -13,7 +13,17 @@ export const ADMIN_MESSAGES = {
 
 };
 
+export const ERROR_RESPONSE_MESSAGES = {
+  CONNECTING_OTHER_SERVICE:"Connecting other service Failed"
+};
+
+
 export const AUTH_RESPONSE_MESSAGES = {
   FILE_UPLOAD: "File uploaded successfully",
   FETCH_FAILED:"Fetching failed from DB"
+};
+
+export const COMMON_RESPONSE_MESSAGES = {
+  SUCCESS: " success",
+  FAILED:" failed"
 };

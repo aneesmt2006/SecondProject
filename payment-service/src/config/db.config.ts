@@ -3,6 +3,7 @@ import { config } from "./env.config.js";
 
 export const connectDB = async () => {
   const url = config.mongoUrl;
+  console.log("MOngod url ",url)
   try {
     if (!url) {
       throw new Error("DB url is Missing");

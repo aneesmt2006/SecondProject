@@ -110,6 +110,7 @@ export class OTPservice implements IOtpService {
      */
     async validateAndSendOtp(email:string,userData:IUser){
         const OTP = this.generateOTP();
+        console.log("Sended OTP is ",OTP)
         await this.storeOTP(email,OTP);
         await this.storeTempUser(email,userData)
         await this.sendOTP(email,OTP);

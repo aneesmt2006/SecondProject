@@ -89,6 +89,7 @@ export class drAuthController implements interfaces.Controller {
   @httpPost('/login',validate(loginSchema))
   async login(req:Request,res:Response,next:NextFunction){
     const {email,password} = req.body
+    console.log("Req body",req.body)
     try {
         const loginDTO:TDRloginRequestDTO = {email,password}
     const {doctor,refreshToken,message} = await this._drAuthService.login(loginDTO.email,loginDTO.password)

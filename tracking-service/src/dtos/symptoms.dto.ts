@@ -2,8 +2,8 @@ import type { ISymptoms } from "../utils/interface.utils.js";
 
 export type TsymptomsCreateDTO = {
    week: number;
-  normalSymptoms: string;
-  abnormalSymptoms: string;
+  normalSymptoms: string | string[];
+  abnormalSymptoms: string | string[];
 }
 export type TsymptomsReponseDTO = {
   id: string;

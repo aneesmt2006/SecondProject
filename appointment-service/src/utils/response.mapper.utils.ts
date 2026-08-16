@@ -1,16 +1,16 @@
-import type { TCreateAppointmentResponseDTO } from "../dtos/appoinment.dto.js";
-import type { IAppointment, TAppointmentStatus } from "./interface.utils.js";
+import type { TBookedDoctors, TCreateAppointmentResponseDTO } from "../dtos/appointment.dto.js";
+import type { DoctorsProfile, IAppointment, TAppointmentStatus } from "./interface.utils.js";
 import type { TDoctorSlotResponseDTO } from "../dtos/doctor.slot.dto.js";
 
 
 export class ResponseMapper {
-    static appoinmentMapper(repoData:IAppointment):TCreateAppointmentResponseDTO{
+    static appointmentMapper(repoData:IAppointment):TCreateAppointmentResponseDTO{
         return {
             appointmentId:repoData._id!,
             amount:repoData.amount,
             status:repoData.status,
-            appoinmentDate:repoData.appointmentDate||'',
-            appoinmentTime:repoData.appointmentTime||'',
+            appointmentDate:repoData.appointmentDate||'',
+            appointmentTime:repoData.appointmentTime||'',
             doctorId:repoData.doctorId||'',
             userId:repoData.userId||'',
         }
@@ -25,6 +25,16 @@ export class ResponseMapper {
             unavailableDates:repoData.unavailableDates,
             createdAt: repoData.createdAt?.toISOString() || '',
             updatedAt: repoData.updatedAt?.toISOString() || ''
+        }
+    }
+
+    static doctorProfileForUserChatMapping(repoData:DoctorsProfile):TBookedDoctors{
+        return {
+            id:repoData.doctorId,
+            name:repoData.fullName,
+            specialty:repoData.specialization,
+            avatarUrl:repoData.profileImageLink
+
         }
     }
 }

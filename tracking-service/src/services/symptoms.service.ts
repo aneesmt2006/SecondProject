@@ -19,14 +19,34 @@ export class SymptomsService implements ISymptomsService{
      */
     async create(symptomsData: TsymptomsCreateDTO): Promise<{ symptoms: TsymptomsReponseDTO; message: string; }> {
 
-        const normalArr = extractSymptoms(symptomsData.normalSymptoms);
-        const abnormalArr = extractSymptoms(symptomsData.abnormalSymptoms);
+
+        let normalArr: string[];
+        let normalHTML: string;
+
+        if(Array.isArray(symptomsData.normalSymptoms)){
+            normalArr = symptomsData.normalSymptoms;
+            normalHTML = "";
+        } else {
+            normalArr = extractSymptoms(symptomsData.normalSymptoms);
+            normalHTML = symptomsData.normalSymptoms;
+        }
+
+        let abnormalArr: string[];
+        let abnormalHTML: string;
+
+        if(Array.isArray(symptomsData.abnormalSymptoms)){
+            abnormalArr = symptomsData.abnormalSymptoms;
+            abnormalHTML = "";
+        } else {
+            abnormalArr = extractSymptoms(symptomsData.abnormalSymptoms);
+            abnormalHTML = symptomsData.abnormalSymptoms;
+        }
 
 
         const symptoms = await this._symptomsRepo.create({
             week: symptomsData.week,
-            normalSymptomsHTML: symptomsData.normalSymptoms,
-            abnormalSymptomsHTML: symptomsData.abnormalSymptoms,
+            normalSymptomsHTML: normalHTML,
+            abnormalSymptomsHTML: abnormalHTML,
             normalSymptoms: normalArr,
             abnormalSymptoms: abnormalArr, 
         });
@@ -48,12 +68,33 @@ export class SymptomsService implements ISymptomsService{
         const symptoms = await this._symptomsRepo.findByWeek(symptomsData.week)
         if(!symptoms) throw new Error(ADMIN_RESPONSE_MESSAGES.WEEK_NOT_EXIST)
         
-        const normalArr = extractSymptoms(symptomsData.normalSymptoms);
-        const abnormalArr = extractSymptoms(symptomsData.abnormalSymptoms);
+        
+        let normalArr: string[];
+        let normalHTML: string;
+
+        if(Array.isArray(symptomsData.normalSymptoms)){
+            normalArr = symptomsData.normalSymptoms;
+            normalHTML = "";
+        } else {
+            normalArr = extractSymptoms(symptomsData.normalSymptoms);
+            normalHTML = symptomsData.normalSymptoms;
+        }
+
+        let abnormalArr: string[];
+        let abnormalHTML: string;
+
+        if(Array.isArray(symptomsData.abnormalSymptoms)){
+            abnormalArr = symptomsData.abnormalSymptoms;
+            abnormalHTML = "";
+        } else {
+            abnormalArr = extractSymptoms(symptomsData.abnormalSymptoms);
+            abnormalHTML = symptomsData.abnormalSymptoms;
+        }
+
         const updatePayload: ISymptoms = {
             week: symptoms.week,
-            normalSymptomsHTML: symptomsData.normalSymptoms,
-            abnormalSymptomsHTML: symptomsData.abnormalSymptoms,
+            normalSymptomsHTML: normalHTML,
+            abnormalSymptomsHTML: abnormalHTML,
             normalSymptoms: normalArr,
             abnormalSymptoms: abnormalArr, 
         }

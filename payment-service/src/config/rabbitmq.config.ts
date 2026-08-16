@@ -6,14 +6,18 @@ let channel : amqp.Channel
 let connection :ChannelModel
 
 
-const EXCHANGE_NAME='payment.events'
+const EXCHANGE_NAME='payment.events'   
 const EXCHANGE_TYPE='topic'
+
+
+
 
 export const connectRabbitMQ = async()=>{
    try {
       connection = await amqp.connect(config.rabbitmqUrl as string)
      channel = await connection.createChannel()
-     await channel.assertExchange(EXCHANGE_NAME,EXCHANGE_TYPE,{durable:true})
+     await channel.assertExchange(EXCHANGE_NAME,EXCHANGE_TYPE,{durable:true});
+     
      console.log("Rabbitmq connected sucess🟠🟠🟠")
    } catch (error) {
     console.log(error)
