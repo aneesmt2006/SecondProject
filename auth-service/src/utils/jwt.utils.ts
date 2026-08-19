@@ -12,14 +12,14 @@ const configAll: Config = {
   expiresIn: config.jwtExpiresIn as SignOptions['expiresIn'],
 };
 
-export const createAccessToken =  (userId: string, role: string,email:string) => {
+export const createAccessToken =  (_id: string, role: string,email:string) => {
   const options: SignOptions = {};
   if (configAll.expiresIn) {
     options.expiresIn = configAll.expiresIn;
   }
 
   return jwt.sign(
-    { id: userId, role:role,email:email },
+    { id: _id, role:role,email:email },
     configAll.secretKey,
     options
   );
@@ -28,22 +28,22 @@ export const createAccessToken =  (userId: string, role: string,email:string) =>
 
 
 
-export const createRefreshToken = (payload: string) => {
+export const createRefreshToken = (_id: string,role:string) => {
   const options: SignOptions = {};
 
   if (config.jwtRefreshExpiresIn !== undefined) {
     options.expiresIn = config.jwtRefreshExpiresIn as NonNullable<SignOptions['expiresIn']>;
   }
 
-  return jwt.sign({payload}, config.jwtRefreshSecret as Secret, options);
+  return jwt.sign({id:_id,role}, config.jwtRefreshSecret as Secret, options);
 };
 
 
 
 
-export function _generateTokens(userId: string, role: string,email:string) {
-     const accessToken  =  createAccessToken(userId,role,email)
-     const refreshToken = createRefreshToken(userId)
+export function _generateTokens(_id: string, role: string,email:string) {
+     const accessToken  =  createAccessToken(_id,role,email)
+     const refreshToken = createRefreshToken(_id,role)
 
     // calculation of redis EX seconds
     const redisExpireSeconds = parseExpiresToSeconds(

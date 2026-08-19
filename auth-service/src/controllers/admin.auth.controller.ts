@@ -44,7 +44,6 @@ export class AdminController implements interfaces.Controller{
     async getAllUsers(req:Request,res:Response,next:NextFunction){
       try {
         const {users,message} = await this._adminAuthService.getAllUsers();
-        console.log("users---------->",users)
         commonResponse.success(res,message,users,HTTP_STATUS.OK)
       } catch (error) {
         next(error)
@@ -57,7 +56,6 @@ export class AdminController implements interfaces.Controller{
     async getAllDoctors(req:Request,res:Response,next:NextFunction){
       try {
         const {doctors,message} = await this._adminAuthService.getAllDoctors();
-        console.log("doctors---------->",doctors)
         commonResponse.success(res,message,doctors,HTTP_STATUS.OK)
       } catch (error) {
         next(error)

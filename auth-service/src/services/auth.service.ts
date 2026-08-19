@@ -16,7 +16,6 @@ import { oauth2Client } from "../utils/google.utils.js";
 import axios from "axios";
 import type {  IUser } from "../utils/interface.utils.js";
 
-
 @injectable()
 export class AuthService implements IAuthService {
   private _authRepo: IAuthRepository;
@@ -26,9 +25,9 @@ export class AuthService implements IAuthService {
     this._otpService = otpService
   }
 
-  private _generateTokens(userId: string, role: string,email:string) {
-     const accessToken  =  createAccessToken(userId,role,email)
-     const refreshToken = createRefreshToken(userId)
+  private _generateTokens(_id: string, role: string,email:string) {
+     const accessToken  =  createAccessToken(_id,role,email)
+     const refreshToken = createRefreshToken(_id,role)
 
     // calculation of redis EX seconds
     const redisExpireSeconds = this._parseExpiresToSeconds(
@@ -38,12 +37,6 @@ export class AuthService implements IAuthService {
     return { accessToken, refreshToken, redisExpireSeconds };
   }
   
-  /**
-   * 
-   * @param expiresIn 
-   * @returns 
-   */
-
   private _parseExpiresToSeconds(expiresIn: string) {
     const timeUnits: { [key: string]: number } = {
       s: 1,
@@ -57,11 +50,6 @@ export class AuthService implements IAuthService {
     return parseInt(value as string) * (timeUnits[unit!.toLowerCase()] || 1);
   }
 
-  /**
-   * Registers a new user (initial step, sends OTP)
-   * @param userData - User registration data
-   * @returns Success message + email
-   */
   async register(
     userData: TregisterRequestDTO,
   ): Promise<{message:string,email:string}> {
@@ -73,19 +61,11 @@ export class AuthService implements IAuthService {
 
      userData.password = await bcrypt.hash(password,10)
      console.log("/register------------>",userData)
-     this._otpService.validateAndSendOtp(email,userData); 
+     await this._otpService.validateAndSendOtp(email,userData); 
      return {message:AUTH_RESPONSE_MESSAGES.OTP_SEND_SUCCESS,email:userData.email}
-  
   }
 
-  /**
-   * Verifies OTP and creates user account
-   * @param otp - OTP string
-   * @param email - User email
-   * @returns Created user data, tokens, and success message
-   */
   async verifyOtp(otp:string,email:string): Promise<{ user: TuserResponseDTO; accessToken: string; refreshToken: string;message:string }> {
-     
     console.log("OTP verify email from service:",email)
     
     const storedOTP = await this._otpService.getOTP(email) 
@@ -106,25 +86,16 @@ export class AuthService implements IAuthService {
     await this._otpService.deleteOTP(email);
     await this._otpService.deleteTempUser(email);
    
-
-    // generate tokens
     const { accessToken, refreshToken, redisExpireSeconds } = this._generateTokens(savedDoc._id!.toString(), savedDoc.role,savedDoc.email);
     await redisClient.set(`refresh:${savedDoc._id}`, refreshToken, {
       EX: redisExpireSeconds,
     });
-
     
-     const mappedUser = ResponseMapper.userResponseMapping(savedDoc,accessToken)
+    const mappedUser = ResponseMapper.userResponseMapping(savedDoc,accessToken)
     
     return {user:mappedUser,accessToken,refreshToken,message:AUTH_RESPONSE_MESSAGES.VERIFY_ACCOUNT_SUUCESS}
-
   }
 
-  /**
-   * Resends OTP for registration
-   * @param email - User email
-   * @returns Success message
-   */
   async resendOtp(email: string): Promise<{ message: string; }> {
     const tempUser = await this._otpService.getTempUser(email);
     if (!tempUser) {
@@ -134,18 +105,9 @@ export class AuthService implements IAuthService {
     return {message:AUTH_RESPONSE_MESSAGES.RESEND_OTP_SUCCESS}
   }
 
-
-
-  /**
-   * Logs in a user
-   * @param email - User email
-   * @param password - User password
-   * @returns User data, tokens, and success message
-   */
   async login(email: string, password: string):  Promise<{ user:TuserResponseDTO; accessToken: string; refreshToken: string;message:string }> {
     console.log("eamil",email)
     const user = await this._authRepo.findByEmail(email);
-    
     
     console.log("user",user)
     if(!(user?.password)){
@@ -156,7 +118,7 @@ export class AuthService implements IAuthService {
     if(user?.accountMethod==='normal'){
       if(!user || !isCorrect){
         throw new Error(CONSTANTS.ERRORS.INVALID_CREDENTIALS);
-    }
+      }
     }
 
     if(!user.isActive){
@@ -164,7 +126,6 @@ export class AuthService implements IAuthService {
     }
   
     const {accessToken,refreshToken,redisExpireSeconds} = this._generateTokens(user._id!.toString(),user.role,user.email);
-
     
     await redisClient.set(`refresh:${user._id}`,refreshToken,{EX:redisExpireSeconds});
 
@@ -173,38 +134,6 @@ export class AuthService implements IAuthService {
     return {user:mappedUser,accessToken,refreshToken,message:AUTH_RESPONSE_MESSAGES.LOGIN_SUCCESS};
   }
 
-
-
-
-  /**
-   * Refreshes access token using refresh token
-   * @param refreshToken - Current refresh token
-   * @returns New tokens + success message
-   */
-  async refresh(refreshToken:string): Promise<{ accessToken: string; refreshToken: string;message:string }> {
-    
-      const decoded = jwt.verify(refreshToken,config.jwtRefreshSecret as Secret) as {id:string}
-    
-    const storedToken = await redisClient.get(`refresh:${decoded.id}`);
-
-    if(storedToken!==refreshToken){
-      throw new Error(CONSTANTS.ERRORS.INVALID_REFRESH_TOKEN);
-    } 
-
-    const user = await this._authRepo.findById(decoded.id);
-    if(!user) throw new Error(CONSTANTS.ERRORS.USER_NOT_FOUND);
-
-    const {accessToken,refreshToken:newRefreshToken,redisExpireSeconds} = this._generateTokens(user._id!.toString(),user.role,user.email);
-    await redisClient.set(`refresh:${user._id}`,newRefreshToken,{EX:redisExpireSeconds});
-    return {accessToken,refreshToken,message:AUTH_RESPONSE_MESSAGES.REFRESH_TOKEN_SUCCCESS}
-   
-  }
-
-  /**
-   * Handles Google OAuth login/registration
-   * @param code - Google auth code
-   * @returns User data, tokens, and success message
-   */
   async google(code:string): Promise<{ user: TgoogleAuthResponse; accessToken: string; refreshToken: string; message: string; }> {
    const googleRes =   await oauth2Client.getToken(code);
 
@@ -224,28 +153,19 @@ export class AuthService implements IAuthService {
     isExistGoogleUser = await this._authRepo.create(extractData);
    }
 
-   const mappedUser = ResponseMapper.userResponseMapping(isExistGoogleUser!); // may be the token is undefined or not
-
+   const mappedUser = ResponseMapper.userResponseMapping(isExistGoogleUser!); 
 
    const {accessToken,refreshToken,redisExpireSeconds} = this._generateTokens(isExistGoogleUser!._id as string,"user",isExistGoogleUser!.email) 
    await redisClient.set(`refresh:${isExistGoogleUser!._id}`,refreshToken,{EX:redisExpireSeconds})
    mappedUser.accessToken = accessToken
 
    return {user:mappedUser,accessToken,refreshToken,message:AUTH_RESPONSE_MESSAGES.GOOGLE_REGISTER_SUCCESS}
-
   }
 
-
-  /**
-   * Gets user profile by ID
-   * @param id - User ID
-   * @returns User profile DTO + success message
-   */
   async getBaseProfile(id:string): Promise<{ user: TuserResponseDTO; message: string; }> {
     const user = await this._authRepo.findById(id)
 
     const mappedUser = ResponseMapper.userResponseMapping(user!)
     return {user:mappedUser,message:USER_RESPONSE_MESSAGES.GET_USER}
   }
-
 }

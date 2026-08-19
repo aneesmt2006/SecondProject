@@ -7,6 +7,8 @@ import { DrAuthService } from "../services/dr.auth.service.js";
 import { DrAuthRepository } from "../repositories/dr.auth.repository.js";
 import { AdminAuthService } from "../services/admin.auth.service.js";
 import { AdminAuthRepository } from "../repositories/admin.auth.repository.js";
+import { TokenService } from "../services/token.service.js";
+import { TokenRepository } from "../repositories/token.repository.js";
 import type { IAuthRepository } from "../repositories/interfaces/IAuthRepository.js";
 import type { IAuthService } from "../services/interfaces/IAuthService.js";
 import type { IOtpService } from "../services/interfaces/IOtpService.js";
@@ -14,6 +16,8 @@ import type { IDrAuthRepository } from "../repositories/interfaces/IDrAuthReposi
 import type { IDrAuthService } from "../services/interfaces/IDrAuthService.js";
 import type { IAdminAuthService } from "../services/interfaces/IAdminAuthService.js";
 import type { IAdminAuthRepository } from "../repositories/interfaces/IAdminRepository.js";
+import type { ITokenService } from "../services/interfaces/ITokenService.js";
+import type { ITokenRepository } from "../repositories/interfaces/ITokenRepository.js";
 
 const container = new Container();
 
@@ -24,5 +28,7 @@ container.bind<IDrAuthRepository>(TYPES.DrAuthRepository).to(DrAuthRepository)
 container.bind<IDrAuthService>(TYPES.DrAuthService).to(DrAuthService)
 container.bind<IAdminAuthService>(TYPES.AdminAuthService).to(AdminAuthService)
 container.bind<IAdminAuthRepository>(TYPES.AdminAuthRepository).to(AdminAuthRepository)
+container.bind<ITokenService>(TYPES.TokenService).to(TokenService);
+container.bind<ITokenRepository>(TYPES.TokenRepository).to(TokenRepository);
 
 export default container;

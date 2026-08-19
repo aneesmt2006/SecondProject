@@ -5,5 +5,7 @@ export const TYPES = {
   DrAuthRepository: Symbol.for("DrAuthRepository"),
   DrAuthService: Symbol.for("DrAuthService"),
   AdminAuthService:Symbol.for("AdminAuthService"),
-  AdminAuthRepository:Symbol.for("AdminAuthRepository")
+  AdminAuthRepository:Symbol.for("AdminAuthRepository"),
+  TokenService: Symbol.for("TokenService"),
+  TokenRepository: Symbol.for("TokenRepository")
 };

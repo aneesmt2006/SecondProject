@@ -1,4 +1,4 @@
-import { createProxyMiddleware, type Options } from 'http-proxy-middleware';
+import { createProxyMiddleware, fixRequestBody, type Options } from 'http-proxy-middleware';
 import type { IProxyConfig } from '../utils/interface.js';
 import type { Request, Response } from 'express';
 import logger from '../config/logger.js';
@@ -13,12 +13,15 @@ export class ServiceProxy {
       proxyTimeout: 10_000,
       timeout: 10_000,
       on: {
-        proxyReq: (proxyReq: ClientRequest, req: IncomingMessage) => {
+        proxyReq: (proxyReq: ClientRequest, req: IncomingMessage, res: Response) => {
           const expressReq = req as Request;
           const requestId = expressReq.headers['x-request-id'];
 
           // Forward trace ID so downstream services can correlate logs
           if (requestId) proxyReq.setHeader('x-request-id', requestId);
+
+          // Fix body parsing issue where express.json() consumes the stream before the proxy
+          fixRequestBody(proxyReq, req);
 
           logger.debug(`Proxying ${expressReq.method} ${expressReq.originalUrl} → ${config.target}${proxyReq.path}`, {
             service: config.serviceName,

@@ -3,6 +3,7 @@
   dotenv.config();
 
   export const config = {
+    service: process.env.SERVICE_NAME || 'auth-service',
     port: process.env.PORT || 3001,
     mongoUrl: process.env.MONGO_URL,
     nodeEnv: process.env.NODE_ENV,

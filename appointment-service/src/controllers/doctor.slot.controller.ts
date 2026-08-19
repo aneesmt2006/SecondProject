@@ -3,7 +3,7 @@ import { controller, httpGet, httpPost } from "inversify-express-utils";
 import { inject } from "inversify";
 import { TYPES } from "../types/type.js";
 import type { IDoctorSlotService } from "../services/interfaces/IDoctorSlotService.js";
-import { commonResponse } from "../utils/common.reponse.utils.js";
+import { commonResponse } from "../utils/common.response.utils.js";
 import { HTTP_STATUS } from "../constants/http-status.constant.js";
 import { role } from "../decorators/role.decorator.js";
 

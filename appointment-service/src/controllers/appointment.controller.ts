@@ -3,7 +3,7 @@ import { inject } from "inversify";
 import { controller, httpGet, httpPost, httpPut } from "inversify-express-utils";
 import { TYPES } from "../types/type.js";
 import type { IAppointmentService } from "../services/interfaces/IAppointmentService.js";
-import { commonResponse } from "../utils/common.reponse.utils.js";
+import { commonResponse } from "../utils/common.response.utils.js";
 import { HTTP_STATUS } from "../constants/http-status.constant.js";
 import { role } from "../decorators/role.decorator.js";
 

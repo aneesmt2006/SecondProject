@@ -1,11 +1,11 @@
 import { Container } from "inversify";
 import { TYPES } from "../types/type.js";
-import { AppointmentRepository } from "../repositories/appointment.service.js";
+import { AppointmentRepository } from "../repositories/appointment.repository.js";
 import { AppointmentService } from "../services/appointment.service.js";
 import "../controllers/appointment.controller.js"; 
 import "../controllers/doctor.slot.controller.js";
 import "../controllers/appointment.slot.controller.js";
-import "../controllers/appointments.chatting.controller.js";
+import "../controllers/appointment.chatting.controller.js";
 
 import type { IAppointentRepository } from "../repositories/interfaces/IAppointmentRepository.js";
 import type { IAppointmentService } from "../services/interfaces/IAppointmentService.js";

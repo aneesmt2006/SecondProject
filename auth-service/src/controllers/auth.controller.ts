@@ -33,7 +33,6 @@ export class AuthController implements interfaces.Controller {
 
   @httpPost("/register", validate(registerSchema))
   public async register(req: Request, res: Response, next: NextFunction) {
-    console.log("Register hit");
     try {
       
       const { email: otpSendEmail, message } =
@@ -46,7 +45,6 @@ export class AuthController implements interfaces.Controller {
 
   @httpPost("/login", validate(loginSchema))
   public async login(req: Request, res: Response, next: NextFunction) {
-    console.log("Login hit");
     try {
       const { email, password } = req.body;
       const loginDTO: TloginRequesDTO = { email, password };
@@ -66,39 +64,10 @@ export class AuthController implements interfaces.Controller {
     }
   }
 
-  @httpPost("/refresh")
-  public async refresh(req: Request, res: Response, next: NextFunction) {
-    console.log("Refresh Hit");
-    try {
-      const refreshToken = req.cookies?.refreshToken;
-      if (!refreshToken) {
-        commonResponse.failure(
-          res,
-          AUTH_RESPONSE_MESSAGES.REFRESH_TOKEN_MISSING,
-          400,
-        );
-      }
-
-      const {
-        accessToken,
-        refreshToken: newRefreshToken,
-        message,
-      } = await this._authService.refresh(refreshToken);
-      commonResponse.success(
-        res,
-        message,
-        { accessToken, newRefreshToken },
-        HTTP_STATUS.OK,
-      );
-    } catch (error) {
-      next(error);
-    }
-  }
 
   @httpPost("/verify-otp", validate(otpSchema))
   public async verifyOtp(req: Request, res: Response, next: NextFunction) {
     const { otp, email } = req.body;
-    console.log("Verify OTP hit", otp, email);
     try {
       const {refreshToken, user, message } =
         await this._authService.verifyOtp(otp, email);
@@ -122,7 +91,6 @@ export class AuthController implements interfaces.Controller {
 
   @httpPost("/resend-otp", validate(resendOtpSchema))
   public async resendOtp(req: Request, res: Response, next: NextFunction) {
-    console.log("Resend OTP hit");
     try {
       const { message } = await this._authService.resendOtp(req.body.email);
       commonResponse.success(res, message, "data null", HTTP_STATUS.OK);

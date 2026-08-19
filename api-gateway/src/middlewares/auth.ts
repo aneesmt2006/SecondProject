@@ -8,7 +8,7 @@ import { redisClient } from '../config/redis.config.js';
 const PUBLIC_PREFIXES: ReadonlySet<string> = new Set([
   '/api/v1/account/auth/register',
   '/api/v1/account/auth/login',
-  '/api/v1/account/auth/refresh',
+  '/api/v1/account/auth/common/refresh',
   '/api/v1/account/auth/google',
   '/api/v1/account/auth/verify-otp',
   '/api/v1/account/auth/dr/register',

@@ -8,3 +8,11 @@ if (!config.redisUrl) {
 export const redisClient = createClient({
   url: config.redisUrl,
 });
+
+await redisClient.connect();
+import logger from "../utils/logger.js";
+logger.info("Redis connected successfully (auth-service)");
+
+redisClient.on('error', (err) => {
+  logger.error('Redis connection error', { error: err.message });
+});

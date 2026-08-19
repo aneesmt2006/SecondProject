@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { commonResponse } from "../utils/common.reponse.utils.js";
+import { commonResponse } from "../utils/common.response.utils.js";
 import { HTTP_STATUS } from "../constants/http-status.constant.js";
 import { COMMON_MESSAGE } from "../constants/common-response.constants.js";
 

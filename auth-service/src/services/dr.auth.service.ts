@@ -11,6 +11,7 @@ import type { IDoctor } from "../utils/interface.utils.js";
 import { _generateTokens } from "../utils/jwt.utils.js";
 import { ResponseMapper } from "../utils/response.utils.js";
 import { UNALLOWED_STATUS } from "../utils/unallowed.status.utils.js";
+import { redisClient } from "../config/redis.config.js";
 
 @injectable()
 export class DrAuthService implements IDrAuthService {
@@ -118,8 +119,9 @@ export class DrAuthService implements IDrAuthService {
          throw new Error(CONSTANTS.ERRORS.BLOCKED_BY_ADMIN)
         }
 
-         const {accessToken,refreshToken} = _generateTokens(doctor._id!,doctor.role,doctor.email)
+         const {accessToken,refreshToken,redisExpireSeconds} = _generateTokens(doctor._id!,doctor.role,doctor.email)
 
+        await redisClient.set(`refresh:${doctor._id}`,refreshToken,{EX:redisExpireSeconds})
          const mappedDoctor = ResponseMapper.doctorResponseMapping(doctor,accessToken)
 
          return {doctor:mappedDoctor,accessToken,refreshToken,message:AUTH_RESPONSE_MESSAGES.LOGIN_SUCCESS}

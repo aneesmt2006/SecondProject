@@ -3,21 +3,16 @@ import { InversifyExpressServer } from "inversify-express-utils";
 import container from "./config/inversify.config.js";
 import { redisClient } from "./config/redis.config.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
-import { connectDB } from "./config/db.config.js";
+import "./config/db.config.js";
 import bodyParser from "body-parser";
 import "./controllers/auth.controller.js";
-import "./controllers/dr.auth.contrller.js"
+import "./controllers/dr.auth.controller.js"
 import "./controllers/admin.auth.controller.js"
+import "./controllers/token.controller.js"
 import cookieParser from 'cookie-parser'
 import logger from "./utils/logger.js";
 
-connectDB();
-redisClient
-  .connect()
-  .then(() => {
-    console.log("Connected to Redis...🔴🔴🔴");
-  })
-  .catch((err) => console.log(err));
+
 
 const server = new InversifyExpressServer(container);
 

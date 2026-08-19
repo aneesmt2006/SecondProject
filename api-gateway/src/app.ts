@@ -27,9 +27,7 @@ app.use(cors({
   credentials: true,
 }));
 
-// 1MB limit on all incoming request bodies
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+
 
 app.use(cookieParser());
 

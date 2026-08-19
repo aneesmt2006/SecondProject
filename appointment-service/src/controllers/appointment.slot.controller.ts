@@ -3,7 +3,7 @@ import { inject, injectable } from "inversify";
 import { controller, httpGet, type interfaces } from "inversify-express-utils";
 import { TYPES } from "../types/type.js";
 import type { IBookSlotsService } from "../services/interfaces/IBookSlotsService.js";
-import { commonResponse } from "../utils/common.reponse.utils.js";
+import { commonResponse } from "../utils/common.response.utils.js";
 import { HTTP_STATUS } from "../constants/http-status.constant.js";
 import { role } from "../decorators/role.decorator.js";
 

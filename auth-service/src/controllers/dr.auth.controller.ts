@@ -22,7 +22,6 @@ export class drAuthController implements interfaces.Controller {
 
   @httpPost("/register", validate(drRegisterSchema))
   public async register(req: Request, res: Response, next: NextFunction) {
-    console.log("Doctor data hit:----->", req.body);
     try {
       const {
         fullName,
@@ -76,7 +75,6 @@ export class drAuthController implements interfaces.Controller {
 
   @httpPost('/resend-otp',validate(resendOtpSchema))
   async resendOtp(req:Request,res:Response,next:NextFunction){
-    console.log("Dr otp hit ")
     try {
         const {message}  =  await this._drAuthService.resendOtp(req.body.email);
         commonResponse.success(res,message,'data null',200)
@@ -89,7 +87,6 @@ export class drAuthController implements interfaces.Controller {
   @httpPost('/login',validate(loginSchema))
   async login(req:Request,res:Response,next:NextFunction){
     const {email,password} = req.body
-    console.log("Req body",req.body)
     try {
         const loginDTO:TDRloginRequestDTO = {email,password}
     const {doctor,refreshToken,message} = await this._drAuthService.login(loginDTO.email,loginDTO.password)
