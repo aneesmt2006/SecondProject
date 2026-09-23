@@ -1,3 +1,4 @@
+import logger from "./logger.js";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { config } from "../config/env.config.js";
@@ -17,7 +18,7 @@ export const s3 = new S3Client({
 
 const BUCKET_NAME = config.awsS3Bucket;
 export async function createPresignedPost(urlsArray: IcreatePresignedPost[]) {
-  console.log("URLS ARRAY", urlsArray);
+  logger.info("URLS ARRAY", urlsArray);
 
   const signedUrlsWithFile = await Promise.all(
     urlsArray.map(async(obj) => {
@@ -27,7 +28,7 @@ export async function createPresignedPost(urlsArray: IcreatePresignedPost[]) {
         Key: key,
         ContentType: obj.fileType,
       });
-      console.log("AWS REGION--------------->",config.awsRegion)
+      logger.info("AWS REGION--------------->",config.awsRegion)
       // const fileLink = `https://${BUCKET_NAME}.s3.${config.awsRegion}.amazonaws.com/public/${obj.fileName}`;
       // file link dont need , it only accessed through GET url api
       const signedUrl = await getSignedUrl(s3, command, {

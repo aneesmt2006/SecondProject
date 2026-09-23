@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import { inject, injectable } from "inversify";
 import type { IRagAskChatService } from "./interfaces/IRagAskChatService.js";
 import { TYPES } from "../types/type.js";
@@ -31,7 +32,7 @@ export class RagAskChatService implements IRagAskChatService {
             ? JSON.stringify(ResponseMapper.userMapping(userProfile), null, 2)
             : "No user medical profile completed yet.";
 
-            console.log("MedicalData--->",medicalData)
+            logger.info("MedicalData--->",medicalData)
         const pregnancyKnowledgeContext = buildRagContext(relevantResults);
         const system_instruction =  buildPregnancySystemInstruction();
         const prompt =  buildPregnancyAnswerPrompt({userMedicalProfile:medicalData,pregnancyKnowledgeContext:pregnancyKnowledgeContext,query})

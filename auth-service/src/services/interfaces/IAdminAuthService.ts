@@ -1,4 +1,6 @@
 import type { TDRresponseDTO } from "../../dtos/dr.dto.js";
+import type { IUser } from "../../utils/interface.utils.js";
+import type { IAdminDashboardStats } from "../../utils/interface.utils.js";
 import type { TGetuserResponseDTO, TuserResponseDTO } from "../../dtos/user.dto.js";
 
 export interface IAdminAuthService {
@@ -7,6 +9,5 @@ export interface IAdminAuthService {
     getAllDoctors():Promise<{doctors:TDRresponseDTO[],message:string}>
     updateDoctorStatus(id:string,status:string):Promise<{doctor:TDRresponseDTO,message:string}>
     updateUserStatus(id:string,status:boolean):Promise<{user:TuserResponseDTO,message:string}>
-    // getAllDoctorsApmnt():Promise<{doctors:TDRapmntDTO[],message:string}>
-
+    getDashboardStats():Promise<{stats: IAdminDashboardStats, message: string}>
 }

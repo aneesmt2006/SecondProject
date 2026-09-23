@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import { inject } from "inversify";
 import { controller, httpGet, httpPut, httpPost } from "inversify-express-utils";
 import type { interfaces } from "inversify-express-utils";
@@ -18,7 +19,7 @@ export class DoctorProfileController implements interfaces.Controller {
   async updateProfile(req: Request, res: Response, next: NextFunction) {
     try {
       const doctorId = req.headers['x-token-id'] as string;
-      console.log("doctorId from contoller---->",doctorId)
+      logger.info("doctorId from contoller---->",doctorId)
       const { profile, message } = await this._doctorProfileService.updateProfile(doctorId, req.body);
       commonResponse.success(res,message,profile,HTTP_STATUS.OK)
     } catch (error) {

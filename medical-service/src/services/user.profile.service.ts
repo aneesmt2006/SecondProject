@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import { injectable, inject } from "inversify";
 import { TYPES } from "../types/type.js";
 import type { IUserProfileRepository } from "../repositories/interfaces/IUserProfileRepository.js";
@@ -87,7 +88,7 @@ export class UserProfileService implements IUserProfileService {
    */
   async  getPatientsProfile(userIds:TUserIdsDTO):Promise<{profiles:TUsersDetDTO[],message:string}> {
     const patientsDoc = await this._userProfileRepo.findByIds(userIds)
-    console.log("Patinet profiles from DB -->",patientsDoc)
+    logger.info("Patinet profiles from DB -->",patientsDoc)
     if(!patientsDoc){
       throw new Error(AUTH_RESPONSE_MESSAGES.FETCH_FAILED)
     }
@@ -148,9 +149,9 @@ export class UserProfileService implements IUserProfileService {
                 value: patientData.bpReading ? `${patientData.bpReading} ` : "N/A",
                 unit: "mmHg",
                 status: getBloodPressureStatus(patientData.bpReading),
-                color: getBloodPressureStatus(patientData.bpReading) === 'Normal' ? "success" : "danger",
+                color: getBloodPressureStatus(patientData.bpReading) === 'Normal' ? "success" : "red",
                 date: (patientData.updatedAt ? new Date(patientData.updatedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]) || "",
-                desc: "Regular, healthy range" 
+                desc: getBloodPressureStatus(patientData.bpReading) === 'Normal' ? "Regular, healthy range" : "Not healty range,pls aware"
             },
             {
                 id: 2,
@@ -158,9 +159,9 @@ export class UserProfileService implements IUserProfileService {
                 value: patientData.gestationalSugar ? `${patientData.gestationalSugar}` : "N/A",
                 unit: "mg/dL",
                 status: getBloodSugarStatus(patientData.gestationalSugar),
-                color: getBloodSugarStatus(patientData.gestationalSugar) === 'Normal' ? "success" : "danger",
+                color: getBloodSugarStatus(patientData.gestationalSugar) === 'Normal' ? "success" : "red",
                 date: (patientData.updatedAt ? new Date(patientData.updatedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]) || "",
-                desc: "Fasting, within normal limits" 
+                desc: getBloodSugarStatus(patientData.gestationalSugar) === 'Normal' ? "Regular, healthy range" : "Not healthy range,pls aware "
             },
              {
                 id: 3,
@@ -211,22 +212,32 @@ export class UserProfileService implements IUserProfileService {
     return { profile: mappedUser, message: USER_PROFILE_MESSAGES.PROFILE_UPDATE_SUCCESS }
   }
 
-  async getPrimaryDoctor(userId: string): Promise<{ drProfile: TprimaryDoctor; message: string; }> {
+  async getPrimaryDoctor(userId: string,role:string): Promise<{ drProfile: TprimaryDoctor | null; message: string; }> {
     const userProfile = await this._userProfileRepo.findByUserId(userId);
     if(!userProfile){
       throw new Error(USER_PROFILE_MESSAGES.PROFILE_ID_NOT_FOUND);
     }
+    
+    if(!userProfile.primaryDoctor) {
+      return {drProfile: null, message: "No primary doctor assigned"};
+    }
+
     let authServiceResponse
     let data
     try {
-      authServiceResponse =  await axios.get<ApiResponse<TDoctor>>(`${config.authServiceUrl}/auth/dr/drEssential/${userProfile.primaryDoctor}`)
-      console.log("Auth service Response---->",authServiceResponse.data);
+      authServiceResponse =  await axios.get<ApiResponse<TDoctor>>(`${config.authServiceUrl}/auth/dr/drEssential/${userProfile.primaryDoctor}`, {
+        headers: {
+          'x-token-role': role
+        }
+      })
+      logger.info("Auth service Response---->",authServiceResponse.data);
       const {fullName:doctorName,doctorId,clinicName} = authServiceResponse.data.data
        data = {doctorName,doctorId,clinicName}
     } catch (error) {
+      logger.error("Auth service call failed:", error);
       throw new Error(ERROR_RESPONSE_MESSAGES.CONNECTING_OTHER_SERVICE)
     }
-    console.log("data to send to frond--->",data)
+    logger.info("data to send to frond--->",data)
     return {drProfile:data,message:COMMON_RESPONSE_MESSAGES.SUCCESS}
   }
 }

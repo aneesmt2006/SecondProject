@@ -12,3 +12,13 @@ export interface IPaymentOrder {
   createdAt?: Date;           
   updatedAt?: Date;    
 }
+
+export interface IRevenueOverviewItem {
+  label: string;
+  amount: number;
+}
+
+export interface IPaymentAdminDashboardStats {
+  totalRevenue: number;
+  revenueOverview: IRevenueOverviewItem[];
+}

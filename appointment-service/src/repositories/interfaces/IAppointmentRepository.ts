@@ -1,5 +1,4 @@
-import type { AppointmentQuery, IAppointment } from "../../utils/interface.utils.js";
-
+import type { AppointmentQuery, IAppointment, ITopDoctor, IRawFacetStats, IDoctorDashboardStats } from "../../utils/interface.utils.js";
 
 export interface IAppointentRepository {
     create(appointment:IAppointment):Promise<IAppointment>
@@ -14,5 +13,9 @@ export interface IAppointentRepository {
     findPendingBySlot(doctorId:string, date:string, time:string):Promise<IAppointment|null>
     findConfirmAppointmentsByDate(doctorId:string, statuses:string[], dates:string[]):Promise<IAppointment[]|null>
     updateMany(ids:string[], status:string):Promise<boolean>
-
+    findAdminStats():Promise<IRawFacetStats>
+    findAdminList(page: number, limit: number, filter: any):Promise<{data: IAppointment[], total: number}>
+    getUpcomingAppointmentsCount():Promise<number>
+    getTopDoctors(limit: number):Promise<ITopDoctor[]>
+    getDoctorDashboardStats(doctorId: string): Promise<{ todayAppointments: number, rawUpcoming: IAppointment[], totalPatients: number }>
 }

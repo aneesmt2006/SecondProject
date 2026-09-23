@@ -8,6 +8,6 @@ export interface IUserProfileService {
   getPatientsProfile(userIds:TUserIdsDTO):Promise<{profiles:TUsersDetDTO[],message:string}>
   getPatientMedicalRecord(userId:string):Promise<{medicalRecord:PatientDTO,message:string}>
   setPrimaryDoctor(doctorId:string,userId:string):Promise<{profile:TUserProfileResponseDTO;message:string}>
-  getPrimaryDoctor(userId:string):Promise<{drProfile:TprimaryDoctor,message:string}>
+  getPrimaryDoctor(userId:string,role:string):Promise<{drProfile:TprimaryDoctor | null,message:string}>
 
 }

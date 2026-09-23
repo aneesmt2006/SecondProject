@@ -112,6 +112,7 @@ export class drAuthController implements interfaces.Controller {
   async getDoctorEssentials(req:Request,res:Response,next:NextFunction){
       try {
         const id = req.params.id as string
+        console.log("id is there ?==>",id)
         const {doctor,message } = await this._drAuthService.getDoctorEssentials(id)
         commonResponse.success(res,message,doctor,HTTP_STATUS.OK)
       } catch (error) {

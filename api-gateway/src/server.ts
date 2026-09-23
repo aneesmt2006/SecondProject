@@ -8,6 +8,9 @@ const server: Server = app.listen(config.port, () => {
   logger.info(`API Gateway running on port ${config.port} [${config.deploy}]`);
 });
 
+
+
+
 const shutdown = async (signal: string): Promise<void> => {
   logger.info(`${signal} received — starting graceful shutdown`);
 
@@ -29,6 +32,9 @@ const shutdown = async (signal: string): Promise<void> => {
     process.exit(1);
   }, 15_000).unref();
 };
+
+
+
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT',  () => shutdown('SIGINT'));

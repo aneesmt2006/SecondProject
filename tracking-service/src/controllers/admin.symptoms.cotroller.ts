@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import { inject } from "inversify";
 import { controller, httpPost, httpPut, httpGet, type interfaces } from "inversify-express-utils";
 import { TYPES } from "../types/type.js";
@@ -13,7 +14,7 @@ export class AdminSymptomsController implements interfaces.Controller {
 
     @httpPost('/create')
     async createSymptoms(req:Request,res:Response,next:NextFunction){
-        console.log("Create hitttt",req.body)
+        logger.info("Create hitttt",req.body)
        try {
          const {symptoms,message} = await this._symptomsService.create(req.body)
          commonResponse.success(res,message,symptoms,HTTP_STATUS.CREATED)
@@ -25,7 +26,7 @@ export class AdminSymptomsController implements interfaces.Controller {
     @role(['admin'])
     @httpPut('/update')
     async updateSymptoms(req:Request,res:Response,next:NextFunction){
-        console.log("Update hit")
+        logger.info("Update hit")
        try {
          const {symptoms,message} = await this._symptomsService.update(req.body)
          commonResponse.success(res,message,symptoms,HTTP_STATUS.OK)

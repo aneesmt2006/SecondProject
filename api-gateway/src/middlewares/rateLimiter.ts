@@ -55,7 +55,7 @@ export const globalLimiter = buildLimiter({
 // 15 req / 15 min — brute-force protection on auth routes
 export const authLimiter = buildLimiter({
   windowMs: 15 * 60 * 1000,
-  max: 15,
+  max: 50,
   keyPrefix: 'auth',
   message: 'Too many authentication attempts. Please try again later.',
 });

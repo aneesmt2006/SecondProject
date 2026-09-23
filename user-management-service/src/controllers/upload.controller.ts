@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import type { NextFunction, Request, Response } from "express";
 import { controller, httpGet, httpPost, type interfaces } from "inversify-express-utils";
 import { createPresignedPost } from "../utils/s3.js";
@@ -12,10 +13,10 @@ import { generateReadUrl } from "../utils/s3.read.signedurl.js";
 export class UplaodController implements interfaces.Controller {
     @httpPost('/signed-url')
     public async register(req:Request,res:Response,next:NextFunction){
-        console.log("Signed url hit");
+        logger.info("Signed url hit");
         try {
              let urls = req.body.array
-             console.log('array---',urls)
+             logger.info('array---',urls)
              if(!Array.isArray(urls)){
                 throw new Error("File must be inside Array")
              }

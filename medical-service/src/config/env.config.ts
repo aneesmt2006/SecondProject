@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -19,7 +20,7 @@ export const config = {
  
 }
 
-console.log("Environment Config Loaded (Medical Service):", {
+logger.info("Environment Config Loaded (Medical Service):", {
     mongoUrlPresent: !!config.mongoUrl,
     mongoUrlStart: config.mongoUrl ? config.mongoUrl.substring(0, 15) + '...' : 'undefined'
 });

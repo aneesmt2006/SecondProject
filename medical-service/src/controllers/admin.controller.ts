@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import { controller, httpGet, type interfaces } from "inversify-express-utils";
 import { TYPES } from "../types/type.js";
 import type { IAdminService } from "../services/interfaces/IAdminService.js";
@@ -17,10 +18,10 @@ export class AdminController implements interfaces.Controller {
     
     @httpGet('/usersProfile')
     async getUsersProfile(req:Request,res:Response,next:NextFunction){
-        console.log("Users profile hit ------>")
+        logger.info("Users profile hit ------>")
         try {
         const {message,profiles} = await this._adminService.findAllUserProfile()
-        console.log("PROFILESS_______>",profiles)
+        logger.info("PROFILESS_______>",profiles)
         commonResponse.success(res,message,profiles,HTTP_STATUS.OK)
         } catch (error) {
             next(error)

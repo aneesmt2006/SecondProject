@@ -30,6 +30,20 @@ export interface IUserProfile extends IProfile {
   updatedAt?: Date;
 }
 
+export interface mainData {
+  fullName:string,
+  age:number
+}
+
+export interface IMedicalPrescription {
+appointmentId : string,
+userId:string,
+doctorName:string,
+content:string,
+createdAt?: Date;
+updatedAt?: Date;
+}
+
 export interface IRagChunk extends Document {
   text: string;
   embedding: number[];

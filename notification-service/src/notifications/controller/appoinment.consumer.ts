@@ -8,7 +8,7 @@ export class NotificationConsumer {
   private readonly logger = new Logger(NotificationConsumer.name);
   constructor(private readonly appoinmentService: NotificationServicePort) {}
 
-  @EventPattern('appoinment.confirmed')
+  @EventPattern('appointment.confirmed')
   @UsePipes(
     new ValidationPipe({
       whitelist: true, //remove extra fields
@@ -20,13 +20,14 @@ export class NotificationConsumer {
     @Payload() payload: AppoinmentConfirmedDTO,
     @Ctx() context: RmqContext,
   ): Promise<void> {
+    console.log('Is hitted gere ?');
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const channel = context.getChannelRef();
     const message = context.getMessage();
 
     try {
       this.logger.log(
-        `Recieved message from Appoinment Id -->${payload.appoinmentId}`,
+        `Recieved message from Appoinment Id -->${payload.appointmentId}`,
       );
       await this.appoinmentService.appointmentSuccess(payload);
 

@@ -1,9 +1,10 @@
-import type { IUserProfile } from "../../utils/interface.utils.js";
+import type { IUserProfile, mainData } from "../../utils/interface.utils.js";
 
 export interface IUserProfileRepository {
   create(data: IUserProfile): Promise<IUserProfile>;
   update(userId: string, data: Partial<IUserProfile>): Promise<IUserProfile | null>;
   findByUserId(userId: string): Promise<IUserProfile | null>;
   findByIds(userIds:string[]):Promise<IUserProfile[]|null>
+  findRecentUsers(recent:number):Promise<mainData[]|null>
   
 }

@@ -10,6 +10,7 @@ import bcrypt from "bcryptjs";
 import { _generateTokens } from "../utils/jwt.utils.js";
 import { redisClient } from "../config/redis.config.js";
 import { ResponseMapper } from "../utils/response.utils.js";
+import type { IAdminDashboardStats } from "../utils/interface.utils.js";
 import type {  TDRresponseDTO } from "../dtos/dr.dto.js";
 
 
@@ -67,7 +68,7 @@ export class AdminAuthService implements IAdminAuthService{
     phone: user.phone!,
     dateOfBirth: user.dateOfBirth || "",
     profileImage: user.profileImage || "",
-
+    status:user.isActive,
     role: user.role,
     createdAt: user.createdAt!,
     updatedAt: user.updatedAt!,
@@ -159,11 +160,14 @@ export class AdminAuthService implements IAdminAuthService{
    }
 
 
-  //  async getAllDoctorsApmnt(): Promise<{ doctors: TDRapmntDTO[]; message: string; }> {
-  //    const doctors = await this._adminRepo.findDoctorsActive()
+   //    const mappedDoctors = doctors.map((doctor)=>ResponseMapper.doctorApmntMapping(doctor));
 
-  //    const mappedDoctors = doctors.map((doctor)=>ResponseMapper.doctorApmntMapping(doctor));
-  //    return {doctors:mappedDoctors,message:ADMIN_RESPONSE_MESSAGES.FETCHED_SUCCESS}
+   //    return {doctors:mappedDoctors,message:ADMIN_RESPONSE_MESSAGES.DOCTORS_LISTED_SUCCESS}
 
-  //  }
+   //  }
+   
+    async getDashboardStats(): Promise<{ stats: IAdminDashboardStats; message: string; }> {
+      const stats = await this._adminRepo.getDashboardStats();
+      return { stats, message: "Dashboard stats fetched successfully" };
+    }
 }

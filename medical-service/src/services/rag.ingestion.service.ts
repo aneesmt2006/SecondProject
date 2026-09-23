@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import { inject, injectable } from "inversify";
 import type { IRagIngestionService } from "./interfaces/IRagIngestionService.js";
 import { TYPES } from "../types/type.js";
@@ -49,7 +50,7 @@ export class RagIngestionService implements IRagIngestionService {
                 documentHash
             })
 
-            console.log(`Embedded ${source} chunk ${index+1}/${chunks.length}`)
+            logger.info(`Embedded ${source} chunk ${index+1}/${chunks.length}`)
         }
         await this._ragRepo.insertMany(documents)
         return {source,chunksInserted:documents.length}

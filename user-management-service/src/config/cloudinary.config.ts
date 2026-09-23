@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import { config } from "./env.config.js";
 import { v2 as cloudinary } from "cloudinary";
 import type { UploadApiResponse, UploadApiErrorResponse } from "cloudinary";
@@ -21,12 +22,12 @@ export const uploadToCloudinary = async (files: Express.Multer.File[]):Promise<s
           uploadResult: UploadApiResponse | undefined
         ) => {
           if (error) {
-            console.log("Cloudinary error for", file.originalname, error);
+            logger.info("Cloudinary error for", file.originalname, error);
             reject(error);
           } else if (!uploadResult) {
             reject(new Error("Images not Uploaded .something happen wrong"));
           } else {
-            console.log("Uploaded :", uploadResult.public_id);
+            logger.info("Uploaded :", uploadResult.public_id);
             resolve(uploadResult);
           }
         }

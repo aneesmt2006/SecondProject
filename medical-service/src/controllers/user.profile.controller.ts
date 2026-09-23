@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import { inject } from "inversify";
 import { controller, httpGet, httpPost, httpPut } from "inversify-express-utils";
 import type { interfaces } from "inversify-express-utils";
@@ -55,7 +56,7 @@ export class UserProfileController implements interfaces.Controller {
   @httpPost('/forDoctors')
   async getPatientProfiles(req:Request,res:Response,next:NextFunction){
     try {
-      console.log("Hitted medical service ----->",req.body)
+      logger.info("Hitted medical service ----->",req.body)
       const patientIds = req.body.patientIds || req.body;
       const {profiles,message} = await this._userProfileService.getPatientsProfile(patientIds)
       commonResponse.success(res,message,profiles,HTTP_STATUS.OK)
@@ -97,7 +98,8 @@ export class UserProfileController implements interfaces.Controller {
     try {
       
       const authUserId = req.headers['x-token-id'] as string
-      const {drProfile,message} = await this._userProfileService.getPrimaryDoctor(authUserId)
+      const authUserRole = req.headers['x-token-role'] as string
+      const {drProfile,message} = await this._userProfileService.getPrimaryDoctor(authUserId,authUserRole)
       commonResponse.success(res,message,drProfile,HTTP_STATUS.OK)
     } catch (error) {
       next(error)

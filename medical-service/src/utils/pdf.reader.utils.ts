@@ -1,3 +1,4 @@
+import logger from "./logger.js";
 import fs from "fs";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 
@@ -14,7 +15,7 @@ export const extractTextFromPdf = async (
     // Verify it looks like plain text and not random binary data
     const isText = !/[\x00-\x08\x0E-\x1F]/.test(textContent.slice(0, 1024));
     if (isText) {
-      console.warn(`[Warning] File at ${filePath} is not a valid PDF (lacks %PDF signature). Falling back to plain text ingestion.`);
+      logger.warn(`[Warning] File at ${filePath} is not a valid PDF (lacks %PDF signature). Falling back to plain text ingestion.`);
       return {
         buffer,
         text: textContent.trim(),
@@ -27,6 +28,7 @@ export const extractTextFromPdf = async (
   }).promise;
 
   let text = "";
+  
 
   for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
     const page = await pdf.getPage(pageNum);

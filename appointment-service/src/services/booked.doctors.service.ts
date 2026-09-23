@@ -51,7 +51,7 @@ export class BookedDoctorsService implements IBookedDoctorsService {
       let patientProfilesFromMedicalService: any[] = [];
       try {
           const response = await this._medicalClient.fetchPatientProfile(patientIds, doctorId);
-          patientProfilesFromMedicalService = response.data?.data || [];
+          patientProfilesFromMedicalService = response.data || [];
       } catch (error: any) {
           logger.error("Failed to fetch patient profiles for booked patients", { error: error.message });
           throw new AppError("Failed to fetch patient profiles", HTTP_STATUS.INTERNAL_SERVER_ERROR);

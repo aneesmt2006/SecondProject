@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { Logger } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -9,13 +9,15 @@ import {
 import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import type { JoinRoomDto } from 'src/dtos/joinRoomVideo.dto';
+import { config } from '../../config/env.config';
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: config.frontEndUrl || '*',
   },
 })
 export class SignalingGateway {
+  private readonly logger = new Logger(SignalingGateway.name);
   @WebSocketServer()
   server!: Server;
 
@@ -53,15 +55,14 @@ export class SignalingGateway {
     const existingUsers = room.users.filter((id) => id !== client.id);
     client.emit('room-users', existingUsers);
 
-    console.log(`User ${userName} ${client.id} joined room ${roomName}`);
+    this.logger.log(`User ${userName} ${client.id} joined room ${roomName}`);
   }
 
   @SubscribeMessage('offer')
   handleOffer(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { target: string; offer: any; caller: string },
+    @MessageBody() data: { target: string; offer: RTCSessionDescriptionInit; caller: string },
   ) {
-    console.log('Offer event from backend listened');
     const { target, offer, caller } = data;
     this.server.to(target).emit('offer', { offer, caller });
   }
@@ -69,7 +70,7 @@ export class SignalingGateway {
   @SubscribeMessage('answer')
   handleAnswer(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { target: string; answer: any },
+    @MessageBody() data: { target: string; answer: RTCSessionDescriptionInit },
   ) {
     const { answer, target } = data;
     this.server.to(target).emit('answer', { answer, answerer: client.id });
@@ -78,7 +79,7 @@ export class SignalingGateway {
   @SubscribeMessage('ice-candidate')
   handleIceCandidate(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { target: string; candidate: any },
+    @MessageBody() data: { target: string; candidate: RTCIceCandidateInit },
   ) {
     const { target, candidate } = data;
     this.server
@@ -110,6 +111,6 @@ export class SignalingGateway {
       this.socketToRoom.delete(client.id);
     }
 
-    console.log(`User ${client.id} disconnected`);
+    this.logger.log(`User ${client.id} disconnected`);
   }
 }

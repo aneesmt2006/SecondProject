@@ -6,5 +6,7 @@ export const TYPES = {
     BookSlotService:Symbol.for("BookSlotService"),
     BookedDoctorsService:Symbol.for("BookedDoctorsService"),
     MedicalClient:Symbol.for('MedicalClient'),
-    UserClient:Symbol.for('UserClient')
+    UserClient:Symbol.for('UserClient'),
+    AuthClient:Symbol.for('AuthClient'),
+    PaymentClient:Symbol.for('PaymentClient')
 }

@@ -8,10 +8,13 @@ import { AdminService } from "../services/admin.service.js";
 import "../controllers/user.profile.controller.js";
 import  "../controllers/admin.controller.js";
 import "../controllers/ask.question.controller.js"
+import "../controllers/priscription.controller.js"
 import { AdminRepository } from "../repositories/admin.repository.js";
 import { RagIngestionService } from "../services/rag.ingestion.service.js";
 import { RagRepository } from "../repositories/rag.repository.js";
 import { RagAskChatService } from "../services/rag.ask.chat.service.js";
+import { MedicalPrescriptionService } from "../services/medical.prescription.service.js";
+import { MedicalPrescriptionRepository } from "../repositories/medical.prescription.repository.js";
 
 const container = new Container();
 
@@ -22,6 +25,8 @@ container.bind(TYPES.AdminRepository).to(AdminRepository);
 container.bind(TYPES.RagIngestionService).to(RagIngestionService);
 container.bind(TYPES.RagIngestionRepository).to(RagRepository);
 container.bind(TYPES.RagAskChatService).to(RagAskChatService);
+container.bind(TYPES.MedicalPrescriptionService).to(MedicalPrescriptionService)
+container.bind(TYPES.MedicalPrescriptionRepository).to(MedicalPrescriptionRepository)
 
 
 export { container };

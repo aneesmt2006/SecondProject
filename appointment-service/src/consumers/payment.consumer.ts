@@ -22,39 +22,62 @@ export const startPaymentConsumer = async (): Promise<void> => {
 
     try {
       const event = JSON.parse(message.content.toString());
-      const { eventType, appointmentId } = event;
+      const { eventType, appointmentId, pattern, data } = event;
 
-      if (eventType !== 'PAYMENT_SUCCESS') {
+      if (eventType === 'PAYMENT_SUCCESS') {
+        logger.info('Processing payment success', { appointmentId });
+
+        const appointmentService = container.get<IAppointmentService>(TYPES.AppointmentService);
+        const { appointment } = await appointmentService.update(appointmentId, 'SUCCESS');
+
+        logger.info('Appointment updated to SUCCESS', { appointmentId });
+
+        // Notify other services (notification-service picks this up)
+        channel.publish(
+          APPOINTMENT_EXCHANGE,
+          'appointment.confirmed',
+          Buffer.from(JSON.stringify({
+            pattern: 'appointment.confirmed',
+            data: {
+              appointmentId: appointment.appointmentId,
+              appointmentTime: appointment.appointmentTime,
+              doctorId: appointment.doctorId,
+              userId: appointment.userId,
+              appointmentDate: appointment.appointmentDate,
+            },
+          })),
+        );
+
+        channel.ack(message);
+      } else if (pattern === 'payment.refunded' || eventType === 'PAYMENT_REFUNDED') {
+        // Extract appoinmentId from data if it exists, or fall back to top-level
+        const targetAppointmentId = data?.appoinmentId || data?.appointmentId || appointmentId;
+        
+        if (!targetAppointmentId) {
+           logger.warn('No appointment ID found in refund event');
+           channel.ack(message);
+           return;
+        }
+
+        logger.info('Processing payment refunded acknowledgment', { appointmentId: targetAppointmentId });
+        const appointmentService = container.get<IAppointmentService>(TYPES.AppointmentService);
+        await appointmentService.update(targetAppointmentId, 'REFUNDED');
+        logger.info('Appointment updated to REFUNDED', { appointmentId: targetAppointmentId });
+        
+        channel.ack(message);
+      } else {
         channel.ack(message);
         return;
       }
-
-      logger.info('Processing payment success', { appointmentId });
-
-      const appointmentService = container.get<IAppointmentService>(TYPES.AppointmentService);
-      const { appointment } = await appointmentService.update(appointmentId, 'SUCCESS');
-
-      logger.info('Appointment updated to SUCCESS', { appointmentId });
-
-      // Notify other services (notification-service picks this up)
-      channel.publish(
-        APPOINTMENT_EXCHANGE,
-        'appointment.confirmed',
-        Buffer.from(JSON.stringify({
-          pattern: 'appointment.confirmed',
-          data: {
-            appointmentId: appointment.appointmentId,
-            appointmentTime: appointment.appointmentTime,
-            doctorId: appointment.doctorId,
-            userId: appointment.userId,
-            appointmentDate: appointment.appointmentDate,
-          },
-        })),
-      );
-
-      channel.ack(message);
     } catch (error: any) {
       logger.error('Error processing payment event', { error: error.message });
+
+      // If it's a business logic error (e.g., slot expired causing a 400), don't retry
+      if (error.statusCode >= 400 && error.statusCode < 500) {
+          logger.warn('Business logic error, skipping retries', { error: error.message });
+          channel.ack(message);
+          return;
+      }
 
       const headers = message.properties.headers || {};
       const retryCount = (headers['x-retry-count'] || 0) as number;

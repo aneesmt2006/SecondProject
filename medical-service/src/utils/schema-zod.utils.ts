@@ -28,3 +28,10 @@ export const pregnantProfileSchema = z.object({
 
   otherHealthIssues: z.string().optional(),
 });
+
+export const doctorPrescription = z.object({
+  appointmentId:z.string(),
+  userId:z.string(),
+  doctorName : z.string(),
+  content:z.string()
+})

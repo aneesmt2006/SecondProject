@@ -3,7 +3,6 @@ import express, {
   type Request,
   type Response,
 } from 'express';
-import { randomUUID } from 'crypto';
 import { GatewayController } from './controllers/GatewayController.js';
 import { handleError } from './middlewares/errorHandler.js';
 import cors from 'cors';
@@ -14,6 +13,7 @@ import cookieParser from 'cookie-parser';
 import { metricsHandler } from './utils/metrics.js';
 import { globalLimiter } from './middlewares/rateLimiter.js';
 import { config } from './config/env.js';
+import { randomUUID } from 'crypto';
 
 
 
@@ -33,7 +33,7 @@ app.use(cookieParser());
 
 // Inject X-Request-ID for distributed tracing across services
 app.use((req: Request, res: Response, next: NextFunction) => {
-  const requestId = (req.headers['x-request-id'] as string | undefined) ?? randomUUID();
+  const requestId = req.headers['x-request-id'] as string ?? randomUUID();
   req.headers['x-request-id'] = requestId;
   res.setHeader('X-Request-ID', requestId);
   next();

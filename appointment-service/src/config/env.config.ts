@@ -20,7 +20,9 @@ export const config = {
   medicalServiceUrl: requireEnv('MEDICAL_SERVICE_URL'),
   usersManagementServiceUrl: requireEnv('USERS_MANAGEMENT_SERVICE_URL'),
   redisUrl: requireEnv('REDIS_URL'),
-  slotLockTTL: process.env.SLOT_LOCK_TTL || '900', // Default 15 mins
+  slotLockTTL: process.env.SLOT_LOCK_TTL || '120', // Default 2 mins  
   deploy: process.env.DEPLOY || 'development',
   service: process.env.SERVICE || 'appointment-service',
+  authServiceUrl: requireEnv('AUTH_SERVICE_URL'),
+  paymentServiceUrl: requireEnv('PAYMENT_SERVICE_URL'),
 };

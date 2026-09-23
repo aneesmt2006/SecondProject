@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 
 import { container } from "../config/inversify.config.js";
 import { getChannel } from "../config/rabbitmq.config.js";
@@ -7,9 +8,9 @@ import { TYPES } from "../types/type.js";
 export const consumeAppointmentEvents = async () => {
   const channel = getChannel();
 
-  const EXCHANGE = 'appoinment.events';
-  const QUEUE = 'appoinment.payment.refund';
-  const ROUTING_KEY = 'appoinment.cancelled';
+  const EXCHANGE = 'appointment.events';
+  const QUEUE = 'appointment.payment.refund';
+  const ROUTING_KEY = 'appointment.cancelled';
   
 
   await channel.assertExchange(EXCHANGE, 'topic', { durable: true });
@@ -18,26 +19,26 @@ export const consumeAppointmentEvents = async () => {
 
   await channel.bindQueue(QUEUE, EXCHANGE, ROUTING_KEY);
 
-  console.log("📥 Listening for Appointment CANCELLED events...");
+  logger.info("📥 Listening for Appointment CANCELLED events...");
 
   channel.consume(QUEUE, async (msg) => {
     if(msg){
       const event = JSON.parse(msg.content.toString());
-      console.log("Received cancel event:", event);
+      logger.info("Received cancel event:", event);
         
       try {
-        const {status,eventType,appoinmentId,appoinmentDate,appoinmentTime} = event
+        const {status,eventType,appointmentId,appointmentDate,appointmentTime} = event
 
       if(eventType==='PAYMENT_REFUNDED'){
-        console.log("Nan listened cheythittund---->😇😇")
+        logger.info("Nan listened cheythittund---->😇😇")
         const paymentService =  container.get<IPaymentService>(TYPES.PaymentService);
-        await paymentService.refund(appoinmentId,status,appoinmentDate,appoinmentTime)
+        await paymentService.refund(appointmentId,status,appointmentDate,appointmentTime)
       }
       
 
       channel.ack(msg);
       } catch (error) {
-        console.log("Refund consumer error ",error)
+        logger.info("Refund consumer error ",error)
         channel.nack(msg,false,false)
       }
     }

@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
 import type { IPaymentRepository } from "./interfaces/IPaymentCreateRepository.js";
-import type { IPaymentOrder } from "../utils/interface.utils.js";
+import type { IPaymentOrder, IPaymentAdminDashboardStats, IRevenueOverviewItem } from "../utils/interface.utils.js";
 import { PaymentOrderModel } from "../models/booking.payment.model.js";
 
 @injectable()
@@ -20,5 +20,30 @@ export class PaymentRepository implements IPaymentRepository {
 
     async findByAppoinmentId(appoinmentId: string): Promise<IPaymentOrder|null> {
         return await PaymentOrderModel.findOne({appoinmentId})
+    }
+
+    async getTotalRevenue(startDate: Date): Promise<number> {
+        const totalRevenueResult = await PaymentOrderModel.aggregate([
+            { $match: { status: "SUCCESS", createdAt: { $gte: startDate } } },
+            { $group: { _id: null, total: { $sum: "$amount" } } }
+        ]);
+        return totalRevenueResult.length > 0 ? totalRevenueResult[0].total : 0;
+    }
+
+    async getRevenueByPeriod(startDate: Date, groupByFormat: 'daily' | 'monthly' | 'yearly'): Promise<{_id: number, total: number}[]> {
+        let groupStage;
+        if (groupByFormat === 'monthly') {
+            groupStage = { $month: "$createdAt" };
+        } else if (groupByFormat === 'yearly') {
+            groupStage = { $year: "$createdAt" };
+        } else {
+            groupStage = { $dayOfWeek: "$createdAt" };
+        }
+        
+        return await PaymentOrderModel.aggregate([
+            { $match: { status: "SUCCESS", createdAt: { $gte: startDate } } },
+            { $group: { _id: groupStage, total: { $sum: "$amount" } } },
+            { $sort: { _id: 1 } }
+        ]);
     }
 }

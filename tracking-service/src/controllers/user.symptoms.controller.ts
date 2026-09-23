@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import { inject } from "inversify";
 import { controller, httpPost, type interfaces } from "inversify-express-utils";
 import { TYPES } from "../types/type.js";
@@ -17,10 +18,11 @@ export class UserSymptomsController implements interfaces.Controller {
     async logSymptoms(req: Request, res: Response, next: NextFunction) {
         try {
             const userId = idHandler(req, res, next);
+            const role = req.headers['x-token-role'] as string
             if (!userId) return commonResponse.failure(res, "User ID missing", HTTP_STATUS.UNAUTHORIZED);
 
             // Log payload for debugging
-            console.log("Log symptoms payload:", req.body);
+            logger.info("Log symptoms payload:", req.body);
 
             const { week, selectedNormalSymptoms, selectedAbnormalSymptoms } = req.body;
             
@@ -28,7 +30,8 @@ export class UserSymptomsController implements interfaces.Controller {
                 week: Number(week),
                 selectedNormalSymptoms,
                 selectedAbnormalSymptoms,
-                userId
+                userId,
+                role
             });
 
             commonResponse.success(res, result.message, result.data, HTTP_STATUS.CREATED);

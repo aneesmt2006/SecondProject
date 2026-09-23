@@ -30,7 +30,7 @@ const schema = new Schema<IAppointment>(
 
     status: {
       type: String,
-      enum: ["PENDING", "BOOKED", "SUCCESS", "CANCELED", "CANCELLED", "EXPIRED"],
+      enum: ["PENDING", "BOOKED", "SUCCESS", "CANCELED", "CANCELLED", "EXPIRED", "COMPLETED", "REFUNDED"],
       default: "PENDING",
     },
     isRecurring:{

@@ -19,7 +19,7 @@ export class NotificationService implements NotificationServicePort {
    * @param data - Appointment confirmation details
    */
   async appointmentSuccess(data: AppoinmentConfirmedDTO) {
-    const userMsg = `Your appoinment is confirmed on ${data.appoinmentTime} at ${data.appoinmentDate}`;
+    const userMsg = `Your appoinment is confirmed on ${data.appointmentTime} at ${data.appointmentDate}`;
 
     const userNoti = await this.notificationRepo.createNotification({
       receiverId: data.userId,
@@ -30,9 +30,9 @@ export class NotificationService implements NotificationServicePort {
       payload: {
         userId: data.userId,
         doctorId: data.doctorId,
-        appointmentDate: data.appoinmentDate,
-        appointmentTime: data.appoinmentTime,
-        appointmentId: data.appoinmentId,
+        appointmentDate: data.appointmentDate,
+        appointmentTime: data.appointmentTime,
+        appointmentId: data.appointmentId,
       },
       isRead: false,
     });
@@ -46,7 +46,7 @@ export class NotificationService implements NotificationServicePort {
       });
     }
 
-    const doctorMsg = `Hi Doctor, an appointment has been booked on ${data.appoinmentDate} Time ${data.appoinmentTime}`;
+    const doctorMsg = `Hi Doctor, an appointment has been booked on ${data.appointmentDate} Time ${data.appointmentTime}`;
     const doctorNoti = await this.notificationRepo.createNotification({
       receiverId: data.doctorId,
       role: 'DOCTOR',
@@ -56,9 +56,9 @@ export class NotificationService implements NotificationServicePort {
       payload: {
         userId: data.userId,
         doctorId: data.doctorId,
-        appointmentDate: data.appoinmentDate,
-        appointmentTime: data.appoinmentTime,
-        appointmentId: data.appoinmentId,
+        appointmentDate: data.appointmentDate,
+        appointmentTime: data.appointmentTime,
+        appointmentId: data.appointmentId,
       },
       isRead: false,
     });

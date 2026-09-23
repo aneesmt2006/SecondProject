@@ -1,3 +1,4 @@
+import logger from "./logger.js";
 import { connectDB } from "../config/db.config.js";
 import { container } from "../config/inversify.config.js"
 import type { IRagIngestionService } from "../services/interfaces/IRagIngestionService.js";
@@ -12,6 +13,6 @@ const script = async()=>{
   }
     const result = await ragService.ingestPdf(pdfPath)
 
-    console.log(result)
+    logger.info(result)
 }
-script().catch(console.error)
+script().catch(logger.error)

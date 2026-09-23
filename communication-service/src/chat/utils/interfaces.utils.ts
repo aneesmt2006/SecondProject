@@ -14,7 +14,7 @@ export interface IChatMessage {
   threadId: string;
   senderType: 'user' | 'doctor' | 'admin';
   senderId: string;
-  messageText: string;
-  attachmentUrl: string;
+  messageText?: string;
+  attachmentUrl?: string;
   readStatus: boolean;
 }

@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -10,7 +11,7 @@ export const config = {
   appointmentServiceUrl:process.env.APPOINMENT_SERVICE_URL
 };
 
-console.log("Environment Config Loaded (Tracking Service):", {
+logger.info("Environment Config Loaded (Tracking Service):", {
     mongoUrlPresent: !!config.mongoUrl,
     mongoUrlStart: config.mongoUrl ? config.mongoUrl.substring(0, 15) + '...' : 'undefined'
 });

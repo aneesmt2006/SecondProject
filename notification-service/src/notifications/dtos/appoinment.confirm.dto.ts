@@ -3,7 +3,7 @@ import { IsNotEmpty, IsString } from 'class-validator';
 export class AppoinmentConfirmedDTO {
   @IsNotEmpty()
   @IsString()
-  appoinmentId!: string;
+  appointmentId!: string;
 
   @IsNotEmpty()
   @IsString()
@@ -15,9 +15,9 @@ export class AppoinmentConfirmedDTO {
 
   @IsNotEmpty()
   @IsString()
-  appoinmentDate: string;
+  appointmentDate: string;
 
   @IsNotEmpty()
   @IsString()
-  appoinmentTime: string;
+  appointmentTime: string;
 }

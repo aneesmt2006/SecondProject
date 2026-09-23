@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import { inject, injectable } from "inversify";
 import type { TfetusCreateDTO, TfetusResponseDTO } from "../dtos/fetus.dto.js";
 import type { IFetusService } from "./interfaces/IFetusService.js";
@@ -21,9 +22,9 @@ export class FetusService implements IFetusService{
      * @returns Created fetus data + success message
      */
     async create(fetusData: TfetusCreateDTO): Promise<{fetus:TfetusResponseDTO, message: string; }> {
-        console.log("<------------------------>fetus service Hit",fetusData)
+        logger.info("<------------------------>fetus service Hit",fetusData)
         const weekExist = await this._fetusRepo.findByweek(fetusData.week)
-        console.log("IF week exist print week",weekExist)
+        logger.info("IF week exist print week",weekExist)
         if(weekExist) throw new Error(ADMIN_RESPONSE_MESSAGES.WEEK_EXIST)
         const fetusDoc = await this._fetusRepo.create(fetusData);
         if(!fetusDoc) throw new Error(ADMIN_RESPONSE_MESSAGES.FAILED_CREATE_FETUS)
@@ -39,7 +40,7 @@ export class FetusService implements IFetusService{
     async update(fetusData: TfetusCreateDTO): Promise<{fetus:TfetusResponseDTO, message: string; }> {
         const fetus = await this._fetusRepo.findByweek(fetusData.week!)
         if(!fetus)throw new Error(ADMIN_RESPONSE_MESSAGES.WEEK_NOT_EXIST)
-        console.log("Updating document",fetus)
+        logger.info("Updating document",fetus)
 
         const updatePayload:IFetus = {
             week:fetus.week,
@@ -51,7 +52,7 @@ export class FetusService implements IFetusService{
         }
         const fetusDoc = await this._fetusRepo.update(fetus._id!,updatePayload)
 
-        console.log("Updated doc",fetusDoc)
+        logger.info("Updated doc",fetusDoc)
         const mappedFetus = ResponseMapper.fetusResponseMapping(fetusDoc!)
 
         return {fetus:mappedFetus,message:ADMIN_RESPONSE_MESSAGES.UPDATE_FETUS}

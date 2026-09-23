@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import { controller, httpGet, httpPost, httpPut, type interfaces } from "inversify-express-utils";
 import type { IFetusService } from "../services/interfaces/IFetusService.js";
 import { inject } from "inversify";
@@ -23,7 +24,7 @@ export class AdminFetusController implements interfaces.Controller{
   @role(['admin'])
   @httpPost('/create',validate(fetusSchema))
   async fetusCreate(req:Request,res:Response,next:NextFunction){
-    console.log('<------------------------>fetus creation Hit')
+    logger.info('<------------------------>fetus creation Hit')
    try {
     const {fetus,message} = await this._fetusService.create(req.body)
     commonResponse.success(res,message,fetus,HTTP_STATUS.CREATED)
@@ -34,7 +35,7 @@ export class AdminFetusController implements interfaces.Controller{
   @role(['admin'])
   @httpPut('/update')
   async fetusUpdate(req:Request,res:Response,next:NextFunction){
-    console.log("Update hit")
+    logger.info("Update hit")
     try {
       const {fetus,message} = await this._fetusService.update(req.body)
       commonResponse.success(res,message,fetus,HTTP_STATUS.OK)
@@ -59,7 +60,7 @@ export class AdminFetusController implements interfaces.Controller{
   async getCurrentWeek(req:Request,res:Response,next:NextFunction){
     try {
       const week = req.params.week
-      console.log("week----->",week)
+      logger.info("week----->",week)
       if(!week) commonResponse.failure(res,"params week fail",400)
       const {fetusData,message} = await this._fetusService.findWeekData(Number(week))
       commonResponse.success(res,message,fetusData,HTTP_STATUS.OK)

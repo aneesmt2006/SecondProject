@@ -1,6 +1,7 @@
+
 import winston from "winston";
 import LokiTransport from "winston-loki";
-import { config } from "../config/env.config.js";
+
 
 const logger = winston.createLogger({
   level: "info",
@@ -21,7 +22,7 @@ const logger = winston.createLogger({
       labels: { service: "payment-service" },
       json: true,
       replaceTimestamp: true,
-      onConnectionError: (err) => console.error(err)
+      onConnectionError: (err) => logger.error(err)
     })
   ],
 });

@@ -1,6 +1,5 @@
 import winston from "winston";
 import LokiTransport from "winston-loki";
-import { config } from "../config/env.config.js";
 
 const logger = winston.createLogger({
   level: "info",
@@ -17,11 +16,11 @@ const logger = winston.createLogger({
       )
     }),
     new LokiTransport({
-      host: "http://loki:3100",
+      host: process.env.LOKI_HOST || "http://localhost:3100",
       labels: { service: "medical-service" },
       json: true,
       replaceTimestamp: true,
-      onConnectionError: (err) => console.error(err)
+      onConnectionError: (err: any) => console.error("Loki connection error:", err?.message || err)
     })
   ],
 });

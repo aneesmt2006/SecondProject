@@ -21,7 +21,7 @@ export class DoctorSlotService implements IDoctorSlotService {
   /**
    * Creates or updates a doctor's slot configuration
    * @param data - Slot configuration data as IDoctorSlot
-   * @returns Created/Updated slot DTO + success message
+   * @returns Created/Updated slot DTO + if(payment refund ) +  success message
    */
   async createOrUpdateSlot(data: IDoctorSlot): Promise<{ slot: TDoctorSlotResponseDTO; message: string }> {
     logger.info("DoctorSlotService.createOrUpdateSlot hit", { doctorId: data.doctorId });
@@ -60,11 +60,16 @@ export class DoctorSlotService implements IDoctorSlotService {
    * @returns Slot DTO or null + success message
    */
   async getSlotByDoctorId(doctorId: string): Promise<{ slot: TDoctorSlotResponseDTO|null; message: string }> {
+    console.log("Id is ther ?",doctorId)
     const result = await this._doctorSlotRepository.getSlotByDoctorId(doctorId);
+    console.log("Result is checking--->",result)
     if (!result) {
        return { slot: null, message: DOCTOR_SLOT_MESSAGES.SLOT_GET_SUCCESS };
     }
     const mappedSlot = ResponseMapper.doctorSlotMapping(result);
+
+    logger.info("Mapped Result is checking--->",mappedSlot)
+
 
     return { slot: mappedSlot, message: DOCTOR_SLOT_MESSAGES.SLOT_GET_SUCCESS };
   }

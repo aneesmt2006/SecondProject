@@ -7,5 +7,5 @@ export interface IAdminAuthRepository{
     updateDoctorStatus(id:string,status:string):Promise<IDoctor | null>
     updateUserStatus(id:string,status:boolean):Promise<IUser | null>
     findDoctorsActive():Promise<IDoctor[]>
-
+    getDashboardStats():Promise<{ totalPatients: number, pendingDoctors: number }>
 }

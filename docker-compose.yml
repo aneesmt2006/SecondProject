@@ -115,6 +115,14 @@ services:
       - appointment-service
     logging: *logging
 
+  communication-service:
+    build: ./communication-service
+    ports:
+      - "3035:3035"
+    env_file:
+      - ./communication-service/.env
+    logging: *logging
+
   rabbitmq:
     image: rabbitmq:3-management
     ports:

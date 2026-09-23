@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../types/type.js";
 import type { IUserSymptomsService } from "./interfaces/IUserSymptomsService.js";
@@ -21,10 +22,10 @@ export class UserSymptomsService implements IUserSymptomsService {
      * @param data - Object containing week, selected symptoms, and userId
      * @returns Logged symptoms data + success message
      */
-    async logSymptoms(data: { week: number, selectedNormalSymptoms: string[], selectedAbnormalSymptoms: string[], userId: string }): Promise<{ message: string, data: IUserSymptoms }> {
-        const { week, selectedNormalSymptoms, selectedAbnormalSymptoms, userId } = data;
+    async logSymptoms(data: { week: number, selectedNormalSymptoms: string[], selectedAbnormalSymptoms: string[], userId: string,role:string }): Promise<{ message: string, data: IUserSymptoms }> {
+        const { week, selectedNormalSymptoms, selectedAbnormalSymptoms, userId,role } = data;
 
-        console.log("From service what happened to me--->")
+        logger.info("From service what happened to me--->")
 
         // 1. Fetch master symptoms for the week
         const masterSymptoms = await this._symptomsRepo.findByWeek(week);
@@ -48,25 +49,33 @@ export class UserSymptomsService implements IUserSymptomsService {
        const abnormal = selectedAbnormalSymptoms.filter((sympt)=>masterSymptoms.abnormalSymptoms.includes(sympt))
        let userDetResposne;
        let mainDoctorResponse
-       console.log(`${config.medicalServiceUrl}/patient/profile/forDoctors`)
-       console.log(`${config.appointmentServiceUrl}/booking/user/main-doctor`)
+       logger.info(`${config.medicalServiceUrl}/patient/profile/forDoctors`)
+       logger.info(`${config.appointmentServiceUrl}/booking/user/main-doctor`)
        try {
-         userDetResposne =  await axios.post<ApiResponse<IUserDet[]>>(`${config.medicalServiceUrl}/patient/profile/forDoctors`,[userId])
+         userDetResposne =  await axios.post<ApiResponse<IUserDet[]>>(`${config.medicalServiceUrl}/patient/profile/forDoctors`, [userId], {
+             headers: {
+                 'x-token-role': role,
+                 'x-token-id': userId
+             }
+         });
         mainDoctorResponse = await axios.get<ApiResponse<string>>(`${config.appointmentServiceUrl}/booking/user/main-doctor`,{
             headers:{
                 'x-token-id': userId
             }
         })
 
-        console.log("<-----Print userDetResposne---->",userDetResposne);
-       } catch (error) {
-         console.log("Error while communicate to service-service medical / user-management",error)
+        logger.info("<-----Print userDetResposne---->", userDetResposne.data);
+       } catch (error: any) {
+         logger.info("Error while communicate to service-service medical / user-management", error?.message || "Unknown error");
+         if (error?.response?.data) {
+             logger.info("Error response data: ", error.response.data);
+         }
          throw new Error("Some issue found")
        }
        const doctorId = mainDoctorResponse.data.data
        const userDet = userDetResposne.data.data
-       console.log("DOctor id from tracking-->",doctorId)
-       console.log("User detials from tracking-->",userDet)
+       logger.info("DOctor id from tracking-->",doctorId)
+       logger.info("User detials from tracking-->",userDet)
 
        if(abnormal){
             publishEvent('tracking.abnormality',{

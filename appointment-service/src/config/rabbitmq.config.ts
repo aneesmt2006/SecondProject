@@ -98,6 +98,7 @@ await channel.assertQueue(PAYMENT_QUEUE, {
   },
 });
 await channel.bindQueue(PAYMENT_QUEUE, PAYMENT_EXCHANGE, PAYMENT_ROUTING_KEY);
+await channel.bindQueue(PAYMENT_QUEUE, PAYMENT_EXCHANGE, 'payment.refunded');
 
 // 2. Retry: Failed messages wait here for RETRY_TTL_MS, then re-enter the main queue
 await channel.assertExchange(RETRY_EXCHANGE, 'topic', { durable: true });
@@ -118,6 +119,7 @@ await channel.bindQueue(DLQ_QUEUE, DLQ_EXCHANGE, DLQ_ROUTING_KEY);
 
 // 4. Outbound: This service publishes appointment events (confirmed / cancelled)
 await channel.assertExchange(APPOINTMENT_EXCHANGE, 'topic', { durable: true });
+
 await channel.assertQueue(NOTIFICATION_QUEUE, { durable: true });
 await channel.bindQueue(NOTIFICATION_QUEUE, APPOINTMENT_EXCHANGE, 'appointment.confirmed');
 

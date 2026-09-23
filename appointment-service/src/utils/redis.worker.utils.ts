@@ -36,3 +36,9 @@ export const isLocked=async(doctorId:string,date:string,time:string):Promise<boo
     console.log("Is key exists or not ",isExist)
     return isExist===1?true:false
 }
+
+export const isLockValid=async(doctorId:string,date:string,time:string,lockToken:string):Promise<boolean>=>{
+    const key = redisKeyGenerator(doctorId,date,time);
+    const val = await redisClient.get(key);
+    return val === lockToken;
+}

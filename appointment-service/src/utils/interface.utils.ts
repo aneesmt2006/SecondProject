@@ -5,7 +5,8 @@ export type TAppointmentStatus =
   | "CANCELED"
   | "CANCELLED"
   | "EXPIRED"
-  | "COMPLETED";
+  | "COMPLETED"
+  | "REFUNDED";
 
 export interface IAppointment {
   _id?: string;
@@ -88,4 +89,49 @@ export interface DoctorsProfile {
 
 export interface PatientProfile {
   
+}
+
+export interface ITopDoctor {
+  id: string;
+  name: string;
+  specialty: string;
+  appointments: number;
+}
+
+export interface IRevenueOverviewItem {
+  label: string;
+  amount: number;
+}
+
+export interface IAdminDashboardStats {
+  totalRegisteredWomen: number;
+  pendingDoctorApprovals: number;
+  upcomingAppointments: number;
+  totalRevenue: number;
+  revenueOverview: IRevenueOverviewItem[];
+  topDoctors: ITopDoctor[];
+}
+
+export interface IDoctorDashboardStats {
+  todayAppointments: number;
+  upcomingAppointments: number;
+  totalPatients: number;
+}
+
+export interface IBookingManagementStats {
+  totalBookings: number;
+  todayBookings: number;
+  upcoming: number;
+  completed: number;
+  cancelled: number;
+  refunded: number;
+}
+
+export interface IRawFacetStats {
+  totalBookings: { count: number }[];
+  todayBookings: { count: number }[];
+  upcoming: { count: number }[];
+  completed: { count: number }[];
+  cancelled: { count: number }[];
+  refunded: { count: number }[];
 }

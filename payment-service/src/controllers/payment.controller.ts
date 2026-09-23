@@ -1,5 +1,6 @@
+import logger from "../utils/logger.js";
 import { inject } from "inversify";
-import { controller, httpPost, type interfaces } from "inversify-express-utils";
+import { controller, httpGet, httpPost, type interfaces } from "inversify-express-utils";
 import { TYPES } from "../types/type.js";
 import type { IPaymentService } from "../services/interfaces/IPaymentService.js";
 import { validate } from "../middlewares/validator.js";
@@ -18,7 +19,7 @@ export class PaymentController implements interfaces.Controller {
 
     @httpPost('/order',validate(paymentInitiateSchema))
     async createOrder(req:Request,res:Response,next:NextFunction){
-        console.log("Payment controlelr hit--->>>>",req.body)
+        logger.info("Payment controlelr hit--->>>>",req.body)
         try {
             const {message,payment}  =  await this._paymentService.create(req.body)
             commonResponse.success(res,message,payment,HTTP_STATUS.OK)
@@ -34,6 +35,17 @@ export class PaymentController implements interfaces.Controller {
             commonResponse.success(res,message,status,HTTP_STATUS.OK)
         } catch (error) {
             next(error)
+        }
+    }
+
+    @httpGet('/internal/dashboard-stats')
+    async getInternalDashboardStats(req:Request, res:Response, next:NextFunction){
+        try {
+            const period = (req.query.period as 'daily' | 'monthly' | 'yearly') || 'daily';
+            const { stats, message } = await this._paymentService.getAdminDashboardStats(period);
+            commonResponse.success(res, message, stats, HTTP_STATUS.OK);
+        } catch (error) {
+            next(error);
         }
     }
 }

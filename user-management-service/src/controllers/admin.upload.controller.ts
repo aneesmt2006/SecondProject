@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import type { NextFunction, Request, Response } from "express";
 import { controller, httpPost, type interfaces } from "inversify-express-utils";
 import { commonResponse } from "../utils/common.reponse.utils.js";
@@ -7,7 +8,7 @@ import { uploadToCloudinary } from '../config/cloudinary.config.js';
 import { ADMIN_RESPONSE_MESSAGES } from "../constants/response-messages.constants.js";
 import { role } from "../decorators/role.decorator.js";
 
-@role(['admin','doctor'])
+@role(['admin','doctor','user'])
 @controller('/super-admin/upload')
 export class AdminUploadController implements interfaces.Controller {
 
@@ -18,18 +19,19 @@ async uploadImages(req: Request, res: Response, next: NextFunction) {
     const files = req.files as Express.Multer.File[];
 
     if (!files || files.length === 0) {
-      console.log('No files received');
+      logger.info('No files received');
       commonResponse.failure(res,ADMIN_RESPONSE_MESSAGES.NO_FILES,HTTP_STATUS.BAD_REQUEST)
       return;
     }
 
    const getUrls = await uploadToCloudinary(files)
+   logger.info("What happen ==>",getUrls)
    urls = getUrls
 
-    console.log('All URLs:', urls);
+    logger.info('All URLs:', urls);
     commonResponse.success(res,ADMIN_RESPONSE_MESSAGES.IMAGE_UPLOADED,urls,HTTP_STATUS.OK)
   } catch (error) {
-    console.error('Full upload error:', error);  
+    logger.error('Full upload error:', error);  
     next(error);  
   }
 }

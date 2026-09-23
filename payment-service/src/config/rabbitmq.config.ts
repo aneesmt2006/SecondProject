@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import amqp, { type ChannelModel } from 'amqplib'
 import { config } from './env.config.js'
 
@@ -18,9 +19,9 @@ export const connectRabbitMQ = async()=>{
      channel = await connection.createChannel()
      await channel.assertExchange(EXCHANGE_NAME,EXCHANGE_TYPE,{durable:true});
      
-     console.log("Rabbitmq connected sucess🟠🟠🟠")
+     logger.info("Rabbitmq connected sucess🟠🟠🟠")
    } catch (error) {
-    console.log(error)
+    logger.info(error)
    }
 }
 
@@ -28,7 +29,7 @@ export const connectRabbitMQ = async()=>{
 export const publishEvent= async(routingKey:string,payload:Record<string, any>)=>{
    try {
      if(!channel){
-        console.log("Rabbitmq channel is not initialized")
+        logger.info("Rabbitmq channel is not initialized")
         return 
     }
 
@@ -36,7 +37,7 @@ export const publishEvent= async(routingKey:string,payload:Record<string, any>)=
 
     channel.publish(EXCHANGE_NAME,routingKey,messageBuffer,{persistent:true})
    } catch (error) {
-    console.log(error)
+    logger.info(error)
    }
 } 
 

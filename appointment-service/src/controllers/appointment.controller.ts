@@ -37,9 +37,9 @@ export class AppointmentController {
     async getDoctorAppointments(req:Request,res:Response,next:NextFunction){
         try {
             const doctorId = req.headers['x-token-id'] as string
-            const { date } = req.query as { date?: string };
-            console.log("date",date,"doctorId",doctorId)
-            const {patients,message} = await this._appointmentService.findAllDrappointments(doctorId,date)
+            const { status } = req.query as { status?: string };
+            console.log("status",status,"doctorId",doctorId)
+            const {patients,message} = await this._appointmentService.findAllDrappointments(doctorId,status)
             commonResponse.success(res,message,patients,HTTP_STATUS.OK)
         } catch (error) {
             next(error)
@@ -56,11 +56,13 @@ export class AppointmentController {
         }
     }
 
+    @role(['user','doctor'])
     @httpGet('/user/history')
     async getUserVisitHistory(req:Request,res:Response,next:NextFunction){
         try {
-            const userId = req.headers['x-token-id'] as string;
-            const {history,message} = await this._appointmentService.getUserVisitHistory(userId);
+            const userId = req.headers['x-token-role']==='user' ? req.headers['x-token-id'] as string : req.query.userId ;
+            console.log("User id is ther ?",userId)
+            const {history,message} = await this._appointmentService.getUserVisitHistory(userId as string);
             commonResponse.success(res,message,history,HTTP_STATUS.OK)
         } catch (error) {
             next(error)
@@ -75,6 +77,59 @@ export class AppointmentController {
             commonResponse.success(res,message,doctorId,HTTP_STATUS.OK)
         } catch (error) {
             next(error)
+        }
+    }
+
+    @role(['admin'])
+    @httpGet('/admin/stats')
+    async getAdminStats(req: Request, res: Response, next: NextFunction) {
+        try {
+            const period = (req.query.period as 'daily' | 'monthly' | 'yearly') || 'daily';
+            const role = req.headers['x-token-role'] as string | undefined;
+            const userId = req.headers['x-token-id'] as string | undefined;
+
+            const { stats, message } = await this._appointmentService.getAdminDashboardStats(period, role, userId);
+            commonResponse.success(res, message, stats, HTTP_STATUS.OK);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    @role(['admin'])
+    @httpGet('/admin/list')
+    async getAdminList(req: Request, res: Response, next: NextFunction) {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const filter = {};
+            
+            const { appointments, totalPages, currentPage, totalCount, message } = await this._appointmentService.getAdminAppointmentsList(page, limit, filter);
+            commonResponse.success(res, message, { appointments, totalPages, currentPage, totalCount }, HTTP_STATUS.OK);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    @role(['admin'])
+    @httpGet('/admin/booking-stats')
+    async getBookingManagementStats(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { stats, message } = await this._appointmentService.getBookingManagementStats();
+            commonResponse.success(res, message, stats, HTTP_STATUS.OK);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    @role(['doctor'])
+    @httpGet('/doctor/stats')
+    async getDoctorStats(req: Request, res: Response, next: NextFunction) {
+        try {
+            const doctorId = req.headers['x-token-id'] as string;
+            const { stats, message } = await this._appointmentService.getDoctorDashboardStats(doctorId);
+            commonResponse.success(res, message, stats, HTTP_STATUS.OK);
+        } catch (error) {
+            next(error);
         }
     }
 }

@@ -1,9 +1,10 @@
+import logger from "../utils/logger.js";
 import mongoose from "mongoose";
 import { config } from "./env.config.js";
 
 export const connectDB = async () => {
   const url = config.mongoUrl;
-  console.log("MOngod url ",url)
+  logger.info("MOngod url ",url)
   try {
     if (!url) {
       throw new Error("DB url is Missing");
@@ -12,9 +13,9 @@ export const connectDB = async () => {
     await mongoose.connect(url, {
       dbName: "Payment-Service",
     });
-    console.log("Connecting to MongoDB success");
+    logger.info("Connecting to MongoDB success");
   } catch (error) {
-    console.error("Failed to connect DB", error);
+    logger.error("Failed to connect DB", error);
     process.exit(1);
   }
 };

@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -15,7 +16,7 @@ export const config = {
  cloudinary_secret_key:process.env.CLOUDINARY_API_SECRET,
 }
 
-console.log("Environment Config Loaded:", {
+logger.info("Environment Config Loaded:", {
     awsRegion: config.awsRegion,
     awsS3Bucket: config.awsS3Bucket
 });

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Inject, Injectable } from '@nestjs/common';
 import { IChatService } from './interfaces/chat.service.interface';
 import { TMessageDTO } from 'src/dtos/message.dto';
@@ -17,6 +16,7 @@ export class ChatService implements IChatService {
     private readonly messageRepo: IMessageRepository,
   ) {}
 
+  /** Saves a chat message, creating a thread if one doesn't exist */
   async sendMessage(message: TMessageDTO): Promise<{ message: IChatMessage }> {
     let existThread = await this.threadRepo.findThread(
       message.userId,
@@ -41,31 +41,32 @@ export class ChatService implements IChatService {
     return { message: newMessage };
   }
 
+  /** Fetches messages for a user–doctor thread */
   async getThreadMessages(
     userId: string,
     doctorId: string,
   ): Promise<{ messages: IChatMessage[]; message: string }> {
-    console.log('User id ', userId, 'doctorId', doctorId);
     const thread = await this.threadRepo.findThread(userId, doctorId);
-    // console.log('From chat service ---->', thread);
-    let fetchMessages;
-    if (thread) {
-      fetchMessages = await this.messageRepo.getMessages(
-        thread?._id as string,
-        10,
-      );
+    
+    if (!thread) {
+      return { messages: [], message: CHAT_MESSAGES.NO_MESSAGES };
     }
+
+    const fetchMessages = await this.messageRepo.getMessages(
+      thread._id as string,
+      10,
+    );
 
     if (!fetchMessages || fetchMessages.length === 0) {
       return { messages: [], message: CHAT_MESSAGES.NO_MESSAGES };
     }
     return {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      messages: fetchMessages ?? [],
+      messages: fetchMessages,
       message: CHAT_MESSAGES.FETCHED_SUCCESS,
     };
   }
 
+  /** Fetches all threads for a given user */
   async getUserThreads(
     userId: string,
   ): Promise<{ threads: IChatThread[]; message: string }> {

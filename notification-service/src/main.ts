@@ -10,7 +10,7 @@ async function bootstrap() {
     transport: Transport.RMQ,
     options: {
       urls: [config.rabbitmqUrl!], //replac manual amqp.connect , channel.consume
-      queue: 'notifications.appoinments.confirmed',
+      queue: 'notifications.appointments.confirmed',
       queueOptions: { durable: true },
       noAck: false,
     },

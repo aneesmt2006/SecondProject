@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import { inject, injectable } from "inversify";
 import type { ISymptomsService } from "./interfaces/ISymptomsService.js";
 import { TYPES } from "../types/type.js";
@@ -53,7 +54,7 @@ export class SymptomsService implements ISymptomsService{
         if(!symptoms) throw new Error(ADMIN_RESPONSE_MESSAGES.EMPTY_REPO);
 
 
-        console.log("Service hit respone from repo---->",symptoms)
+        logger.info("Service hit respone from repo---->",symptoms)
         const mappedSymtptoms = ResponseMapper.symptomsResponseMapping(symptoms)
 
         return {symptoms:mappedSymtptoms,message:ADMIN_RESPONSE_MESSAGES.CREATE}

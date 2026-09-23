@@ -1,3 +1,4 @@
+import logger from "../utils/logger.js";
 import { injectable } from "inversify";
 import fetusModel from "../models/fetus.model.js";
 import type { IFetus } from "../utils/interface.utils.js";
@@ -17,7 +18,7 @@ export class FetusRepository implements IFetusRepository {
 
   async update(id: string, fetusData: IFetus): Promise<IFetus | null> {
     const fetus = await fetusModel.findByIdAndUpdate(id,fetusData,{new:true});
-    console.log("updatedd ok from repo",fetus)
+    logger.info("updatedd ok from repo",fetus)
     return fetus;
   }
 

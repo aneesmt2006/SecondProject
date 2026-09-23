@@ -27,3 +27,8 @@ export interface IDoctor {
   createAt?: Date;
   updatedAt?: Date;
 }
+
+export interface IAdminDashboardStats {
+  totalPatients: number;
+  pendingDoctors: number;
+}

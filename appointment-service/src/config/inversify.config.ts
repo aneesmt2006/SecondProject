@@ -18,6 +18,8 @@ import { BookSlotsService } from "../services/book.slots.service.js";
 import type { IBookedDoctorsService } from "../services/interfaces/IBookedDoctorsService.js";
 import { BookedDoctorsService } from "../services/booked.doctors.service.js";
 import { MedicalClient } from "../client/medical.client.js";
+import { AuthClient } from "../client/auth.client.js";
+import { PaymentClient } from "../client/payment.client.js";
 
 const container = new Container();
 
@@ -32,6 +34,8 @@ import { UserClient } from "../client/user.client.js";
 
 container.bind(TYPES.MedicalClient).to(MedicalClient);
 container.bind(TYPES.UserClient).to(UserClient);
+container.bind(TYPES.AuthClient).to(AuthClient);
+container.bind(TYPES.PaymentClient).to(PaymentClient);
 
 
 export { container };

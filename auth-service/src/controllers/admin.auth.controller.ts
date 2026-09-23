@@ -54,6 +54,7 @@ export class AdminController implements interfaces.Controller{
     @role(['admin'])
     @httpGet('/getAllDoctors')
     async getAllDoctors(req:Request,res:Response,next:NextFunction){
+      console.log("Controller touched====>")
       try {
         const {doctors,message} = await this._adminAuthService.getAllDoctors();
         commonResponse.success(res,message,doctors,HTTP_STATUS.OK)
@@ -95,11 +96,22 @@ export class AdminController implements interfaces.Controller{
     // @httpGet('/getAllDrApmnt')
     // async getAllDoctorsForApmnt(req:Request,res:Response,next:NextFunction){
     //   try {
-    //     const {doctors,message} = await this._adminAuthService.getAllDoctorsApmnt();
-    //     commonResponse.success(res,message,doctors,HTTP_STATUS.OK)
-    //   } catch (error) {
-    //     next(error)
-    //   }
+    //    const {doctors,message} = await this._adminAuthService.getAllDoctorsApmnt();
+    //    commonResponse.success(res,message,doctors,HTTP_STATUS.OK)
+    //  } catch (error) {
+    //    next(error)
+    //  }
     // }
+
+    @httpGet('/internal/dashboard-stats')
+    async getInternalDashboardStats(req:Request, res:Response, next:NextFunction) {
+        try {
+          console.log("Conroller reached================>")
+            const { stats, message } = await this._adminAuthService.getDashboardStats();
+            commonResponse.success(res, message, stats, HTTP_STATUS.OK);
+        } catch (error) {
+            next(error);
+        }
+    }
 
 }

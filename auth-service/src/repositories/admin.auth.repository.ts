@@ -33,4 +33,13 @@ export class AdminAuthRepository implements IAdminAuthRepository{
     async findDoctorsActive(): Promise<IDoctor[]> {
         return await DoctorModel.find({role:"docotr",status:"approved"})
     }
+
+    async getDashboardStats(): Promise<{ totalPatients: number; pendingDoctors: number; }> {
+        const [totalPatients, pendingDoctors] = await Promise.all([
+            userModel.countDocuments({ role: "user" }),
+            DoctorModel.countDocuments({ role: "doctor", status: "pending" })
+        ]);
+        
+        return { totalPatients, pendingDoctors };
+    }
 }

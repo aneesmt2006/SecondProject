@@ -1,7 +1,8 @@
 import { injectable } from "inversify";
 import UserProfileModel from "../models/user.profile.model.js";
 import type { IUserProfileRepository } from "./interfaces/IUserProfileRepository.js";
-import type { IUserProfile } from "../utils/interface.utils.js";
+import type { IUserProfile, mainData } from "../utils/interface.utils.js";
+import { calculateAge } from "../utils/age.calculator.utils.js";
 
 @injectable()
 export class UserProfileRepository implements IUserProfileRepository {
@@ -19,6 +20,17 @@ export class UserProfileRepository implements IUserProfileRepository {
 
   async findByIds(userIds: string[]): Promise<IUserProfile[] | null> {
     return await UserProfileModel.find({userId:{$in:userIds}})
+  }
+
+  async findRecentUsers(recent: number): Promise<mainData[] | null> {
+
+    const res = await UserProfileModel.find({},{fullName:1,dateOfBirth:1}).sort({createdAt:-1})
+    const mapped = res.map((user)=>{
+      let age = calculateAge(user.dateOfBirth!)
+      return {fullName:user.fullName!,age}
+    })
+
+    return mapped
   }
 
   

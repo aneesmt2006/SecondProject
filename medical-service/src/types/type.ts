@@ -6,5 +6,7 @@ export const TYPES = {
     AdminRepository:Symbol.for("AdminRepository"),
     RagIngestionService:Symbol.for("RagIngestionService"),
     RagIngestionRepository:Symbol.for("RagIngestionRepository"),
-    RagAskChatService:Symbol.for("RagAskChatService")
+    RagAskChatService:Symbol.for("RagAskChatService"),
+    MedicalPrescriptionService: Symbol.for("MedicalPrescriptionService"),
+    MedicalPrescriptionRepository: Symbol.for("MedicalPrescriptionRepository")
 }

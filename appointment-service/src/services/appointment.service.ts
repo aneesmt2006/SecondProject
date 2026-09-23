@@ -1,5 +1,5 @@
 import type { IAppointentRepository } from "../repositories/interfaces/IAppointmentRepository.js";
-import type { IAppointment, PatientDet } from "../utils/interface.utils.js";
+import type { IAppointment, PatientDet, IAdminDashboardStats, IBookingManagementStats, IDoctorDashboardStats } from "../utils/interface.utils.js";
 import { inject, injectable } from "inversify";
 import type { IAppointmentService } from "./interfaces/IAppointmentService.js";
 import type { TApmntPatientsDetailsDTO, TCompleteAppointmentDTO, TCreateAppointmentDTO, TCreateAppointmentResponseDTO, TUserVisitHistoryDTO } from "../dtos/appointment.dto.js";
@@ -8,8 +8,10 @@ import { COMMON_MESSAGE, ERROR_MESSAGE, SUCCESS_MESSAGE } from "../constants/com
 import { ResponseMapper } from "../utils/response.mapper.utils.js";
 import { getChannel, APPOINTMENT_EXCHANGE } from "../config/rabbitmq.config.js";
 import { parseDate } from "../utils/date.utils.js";
-import { isLocked, lockSlot, releaseSlot } from "../utils/redis.worker.utils.js";
+import { isLocked, isLockValid, lockSlot, releaseSlot } from "../utils/redis.worker.utils.js";
 import { randomUUID } from "crypto";
+import type { AuthClient } from "../client/auth.client.js";
+import type { PaymentClient } from "../client/payment.client.js";
 import type { MedicalClient } from "../client/medical.client.js";
 import type { UserClient } from "../client/user.client.js";
 import logger from "../utils/logger.js";
@@ -21,7 +23,9 @@ export class AppointmentService implements IAppointmentService {
     constructor(
         @inject(TYPES.AppointmentRepository) private _appointmentRepo: IAppointentRepository,
         @inject(TYPES.MedicalClient) private _medicalClient: MedicalClient,
-        @inject(TYPES.UserClient) private _userClient: UserClient
+        @inject(TYPES.UserClient) private _userClient: UserClient,
+        @inject(TYPES.AuthClient) private _authClient: AuthClient,
+        @inject(TYPES.PaymentClient) private _paymentClient: PaymentClient
     ) {}
 
     async create(appointment: TCreateAppointmentDTO): Promise<{ appointment: TCreateAppointmentResponseDTO; message: string; }> {
@@ -40,6 +44,8 @@ export class AppointmentService implements IAppointmentService {
         const appointmentData: IAppointment = { ...appointment, status: "PENDING", lockToken: randomId };
         const appointmentDoc = await this._appointmentRepo.create(appointmentData);
 
+        
+
         if (!appointmentDoc) {
             throw new AppError(ERROR_MESSAGE.DB_NOT_EXIST, HTTP_STATUS.INTERNAL_SERVER_ERROR);
         }
@@ -52,9 +58,10 @@ export class AppointmentService implements IAppointmentService {
         const existingApp = await this._appointmentRepo.findById(id);
         if (!existingApp) throw new AppError(ERROR_MESSAGE.DB_NOT_EXIST, HTTP_STATUS.NOT_FOUND);
 
-        const isSlotExpire = await isLocked(existingApp.doctorId, existingApp.appointmentDate, existingApp.appointmentTime);
+        const validLock = await isLockValid(existingApp.doctorId, existingApp.appointmentDate, existingApp.appointmentTime, existingApp.lockToken);
         
-        if (existingApp.status === 'EXPIRED') {
+        // If the slot is already EXPIRED, or if we are trying to set SUCCESS (payment succeeded) but the lock expired (validLock is false)
+        if (existingApp.status === 'EXPIRED' || (status === 'SUCCESS' && existingApp.status === 'PENDING' && !validLock)) {
             const channel = getChannel();
             const payload = { 
                 status: 'REFUNDED', 
@@ -64,6 +71,12 @@ export class AppointmentService implements IAppointmentService {
                 appointmentTime: existingApp.appointmentTime 
             };
             channel.publish(APPOINTMENT_EXCHANGE, 'appointment.cancelled', Buffer.from(JSON.stringify(payload)));
+            
+            // Ensure the DB status reflects that it's EXPIRED if it wasn't already
+            if (existingApp.status === 'PENDING') {
+                await this._appointmentRepo.update(id, 'EXPIRED');
+            }
+
             throw new AppError("Due to time expire, slot is booked by someone. Payment will refund", HTTP_STATUS.BAD_REQUEST);
         }
         
@@ -90,32 +103,37 @@ export class AppointmentService implements IAppointmentService {
         return { appointment: mappedAppointment, message: SUCCESS_MESSAGE.APMNT_UPDATED };
     }
 
-    async findAllDrappointments(doctorId: string, date?: string): Promise<{ patients: TApmntPatientsDetailsDTO[]; message: string; }> {
+    async findAllDrappointments(doctorId: string, status?: string): Promise<{ patients: TApmntPatientsDetailsDTO[]; message: string; }> {
         const now = new Date();
 
         const query: any = {
             doctorId,
-            status: { $in: ['SUCCESS', 'BOOKED'] },
-            consultationStatus: 'PENDING',
         };
 
-        if (date && date.trim() !== "") {
-            const parsed = new Date(date);
-            if (!isNaN(parsed.getTime())) {
-                query.appointmentDate = parsed.toLocaleDateString("en-US");
-            }
+        if (status === 'Completed') {
+            query.consultationStatus = 'COMPLETED';
+        } else if (status === 'Cancelled') {
+            query.status = { $in: ['CANCELLED', 'CANCELED', 'REFUNDED'] };
+        } else { // 'Upcoming', 'Expired', or default
+            query.status = { $in: ['SUCCESS', 'BOOKED'] };
+            query.consultationStatus = 'PENDING';
         }
 
         const appointments = await this._appointmentRepo.getAllAppointmentsForDoctor(query);
+
+        // console.log("DB response====> ",appointments)
         
         if (!appointments || appointments.length === 0) {
             return { patients: [], message: COMMON_MESSAGE.FETCH_SUCCESS };
         }
 
         let filtered = appointments;
-        if (!date || date.trim() === "") {
+        if (status === 'Expired') {
             filtered = appointments.filter(a =>
-                a.consultationStatus === 'PENDING' &&
+                now >= new Date(parseDate(a.appointmentDate, a.appointmentTime).getTime() + 30 * 60 * 1000)
+            );
+        } else if (status === 'Upcoming' || !status) {
+            filtered = appointments.filter(a =>
                 now < new Date(parseDate(a.appointmentDate, a.appointmentTime).getTime() + 30 * 60 * 1000)
             );
         }
@@ -130,15 +148,23 @@ export class AppointmentService implements IAppointmentService {
         }
 
         const patientIds = filtered.map(apmnt => apmnt.userId).filter(Boolean);
+
+        console.log("Patient Ids==>",patientIds)
         
         let patientDetails: PatientDet[] = [];
         try {
             const response = await this._medicalClient.fetchPatientProfile(patientIds, doctorId);
-            patientDetails = response.data?.data || [];
+            if ((response as any).error) {
+                throw new Error((response as any).message);
+            }
+            console.log("2")
+            patientDetails = response.data || [];
         } catch (error: any) {
             logger.error("Medical service for patient details connecting Error:", { error: error.message });
             throw new AppError("Failed to connect to medical service for patient details", HTTP_STATUS.INTERNAL_SERVER_ERROR);
         }
+
+            console.log("3")
 
         if (patientDetails.length === 0) {
             return { patients: [], message: COMMON_MESSAGE.FETCH_SUCCESS };
@@ -146,6 +172,8 @@ export class AppointmentService implements IAppointmentService {
 
         const patientMap = new Map<string, PatientDet>();
         patientDetails.forEach(patient => patientMap.set(patient.userId, patient));
+
+            console.log("4")
 
         const merged: TApmntPatientsDetailsDTO[] = filtered.map((apmnt) => {
             const patientDet = patientMap.get(apmnt.userId);
@@ -164,6 +192,7 @@ export class AppointmentService implements IAppointmentService {
             };
         });
 
+        console.log("Sending response is ====>",merged)
         return { patients: merged, message: COMMON_MESSAGE.FETCH_SUCCESS };
     }
 
@@ -216,7 +245,7 @@ export class AppointmentService implements IAppointmentService {
             let status: 'Completed' | 'Upcoming' | 'Cancelled' | 'Scheduled' | 'Expired' = 'Scheduled';
             if (apmnt.consultationStatus === 'COMPLETED') {
                 status = 'Completed';
-            } else if (apmnt.status === 'CANCELLED' || apmnt.status === 'CANCELED') {
+            } else if (apmnt.status === 'CANCELLED' || apmnt.status === 'CANCELED' || apmnt.status === 'REFUNDED') {
                 status = 'Cancelled';
             } else if (appointmentDateObj > now || now < new Date(appointmentDateObj.getTime() + 30 * 60 * 1000)) {
                 status = 'Upcoming';
@@ -267,5 +296,118 @@ export class AppointmentService implements IAppointmentService {
         }
 
         return { doctorId, message: COMMON_MESSAGE.FETCH_SUCCESS };
+    }
+
+    async getAdminDashboardStats(period: 'daily' | 'monthly' | 'yearly', role?: string, userId?: string): Promise<{ stats: IAdminDashboardStats, message: string }> {
+        // Prepare headers to forward auth context
+        const headers: any = {};
+        if (role) headers['x-token-role'] = role;
+        if (userId) headers['x-token-id'] = userId;
+
+        // Fetch local data
+        const upcomingAppointments = await this._appointmentRepo.getUpcomingAppointmentsCount();
+        const topDoctors = await this._appointmentRepo.getTopDoctors(5);
+
+        // Fetch remote data via dedicated clients
+        const authPromise = this._authClient.getDashboardStats(headers).catch(() => ({ error: true })) as any;
+        const paymentPromise = this._paymentClient.getDashboardStats(period, headers).catch(() => ({ error: true })) as any;
+        const authDoctorsPromise = this._authClient.getAllDoctors(headers).catch(() => ({ error: true })) as any;
+
+        const [authRes, paymentRes, authDoctorsRes] = await Promise.all([authPromise, paymentPromise, authDoctorsPromise]);
+
+        const totalRegisteredWomen = authRes?.error ? 0 : authRes?.data?.totalPatients || 0;
+        const pendingDoctorApprovals = authRes?.error ? 0 : authRes?.data?.pendingDoctors || 0;
+        
+        const totalRevenue = paymentRes?.error ? 0 : paymentRes?.data?.totalRevenue || 0;
+        const revenueOverview = paymentRes?.error ? [] : paymentRes?.data?.revenueOverview || [];
+
+        const allDoctors = authDoctorsRes?.error ? [] : authDoctorsRes?.data || [];
+
+        // Map top doctors with real names
+        const enrichedTopDoctors = topDoctors.map(doc => {
+            const found = allDoctors.find((d: any) => d.id === doc.id || d._id === doc.id);
+            return {
+                ...doc,
+                name: found ? found.fullName : doc.name,
+                specialty: found ? found.specialization : doc.specialty
+            };
+        });
+
+        const stats = {
+            totalRegisteredWomen,
+            pendingDoctorApprovals,
+            upcomingAppointments,
+            totalRevenue,
+            revenueOverview,
+            topDoctors: enrichedTopDoctors
+        };
+
+        return { stats, message: COMMON_MESSAGE.FETCH_SUCCESS };
+    }
+
+    async getAdminAppointmentsList(page: number, limit: number, filter: any = {}): Promise<{ appointments: any[], totalPages: number, currentPage: number, totalCount: number, message: string }> {
+        const { data, total } = await this._appointmentRepo.findAdminList(page, limit, filter);
+        
+        const mappedAppointments = data.map(apmnt => ({
+            bookingId: apmnt._id ? apmnt._id.toString().substring(0, 8) : "",
+            apmntId: apmnt._id,
+            userId: apmnt.userId,
+            doctorId: apmnt.doctorId,
+            appointmentDate: apmnt.appointmentDate,
+            appointmentTime: apmnt.appointmentTime,
+            status: apmnt.status,
+            consultationStatus: apmnt.consultationStatus,
+            amount: apmnt.amount,
+            isRecurring: apmnt.isRecurring,
+            notes: apmnt.notes
+        }));
+
+        return { 
+            appointments: mappedAppointments, 
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+            totalCount: total,
+            message: COMMON_MESSAGE.FETCH_SUCCESS 
+        };
+    }
+
+    async getBookingManagementStats(): Promise<{ stats: IBookingManagementStats; message: string; }> {
+        const stats = await this._appointmentRepo.findAdminStats();
+        
+        // Extract values from facet array outputs (or default to 0)
+        const formatStat = (field: any) => (field && field.length > 0) ? field[0].count : 0;
+        
+        const formattedStats = {
+            totalBookings: formatStat(stats.totalBookings),
+            todayBookings: formatStat(stats.todayBookings),
+            upcoming: formatStat(stats.upcoming),
+            completed: formatStat(stats.completed),
+            cancelled: formatStat(stats.cancelled),
+            refunded: formatStat(stats.refunded)
+        };
+        
+        return { stats: formattedStats, message: COMMON_MESSAGE.FETCH_SUCCESS };
+    }
+
+    async getDoctorDashboardStats(doctorId: string): Promise<{ stats: IDoctorDashboardStats; message: string; }> {
+        const { todayAppointments, rawUpcoming, totalPatients } = await this._appointmentRepo.getDoctorDashboardStats(doctorId);
+        
+        let upcomingCount = 0;
+        const now = new Date();
+        for (const apmnt of rawUpcoming) {
+            const apmntDateObj = parseDate(apmnt.appointmentDate, apmnt.appointmentTime);
+            // Allow 30 minute buffer after appointment time before considering it expired
+            if (apmntDateObj.getTime() + 30 * 60 * 1000 > now.getTime()) {
+                upcomingCount++;
+            }
+        }
+
+        const stats: IDoctorDashboardStats = {
+            todayAppointments,
+            upcomingAppointments: upcomingCount,
+            totalPatients
+        };
+
+        return { stats, message: COMMON_MESSAGE.FETCH_SUCCESS };
     }
 }
