@@ -1,0 +1,22 @@
+global:
+  resolve_timeout: 5m
+  
+  # Global SMTP Configuration (Example using Gmail)
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'anussssss11@gmail.com'
+  smtp_auth_username: 'anussssss11@gmail.com'
+  smtp_auth_password: 'tmot ikbd qtha mxmu' # Use an App Password, not your real password
+  smtp_require_tls: true
+
+route:
+  group_by: ['alertname', 'job']
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 1h
+  receiver: 'email_alerts'
+
+receivers:
+  - name: 'email_alerts'
+    email_configs:
+      - to: 'preg3210@gmail.com' # Who should receive the alerts
+        send_resolved: true

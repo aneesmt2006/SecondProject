@@ -3,50 +3,68 @@ import { AppModule } from './app.module';
 import { Transport } from '@nestjs/microservices';
 import { config } from './config/env.config';
 import 'reflect-metadata';
+import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.connectMicroservice({
-    transport: Transport.RMQ,
-    options: {
-      urls: [config.rabbitmqUrl!], //replac manual amqp.connect , channel.consume
-      queue: 'notifications.appointments.confirmed',
-      queueOptions: { durable: true },
-      noAck: false,
-    },
-  });
+  const logger = new Logger('Bootstrap');
+  try {
+    const app = await NestFactory.create(AppModule);
+    app.enableShutdownHooks();
 
-  app.connectMicroservice({
-    transport: Transport.RMQ,
-    options: {
-      urls: [config.rabbitmqUrl!], //replac manual amqp.connect , channel.consume
-      queue: 'notifications.payments.refunded',
-      exchangeType: 'topic',
-      exchange: 'payment.events',
-      routingKey: 'payment.refunded',
-      queueOptions: { durable: true },
-      noAck: false,
-    },
-  });
+    app.connectMicroservice({
+      transport: Transport.RMQ,
+      options: {
+        urls: [config.rabbitmqUrl!],
+        queue: 'notifications.appointments.confirmed',
+        queueOptions: { durable: true },
+        noAck: false,
+      },
+    });
 
-  app.connectMicroservice({
-    transport: Transport.RMQ,
-    options: {
-      urls: [config.rabbitmqUrl!], //replac manual amqp.connect , channel.consume
-      queue: 'notifications.triggering.abnormality',
-      exchange: 'tracking.events',
-      routingKey: 'tracking.abnormality',
-      queueOptions: { durable: true },
-      noAck: false,
-    },
-  });
+    app.connectMicroservice({
+      transport: Transport.RMQ,
+      options: {
+        urls: [config.rabbitmqUrl!], 
+        queue: 'notifications.payments.refunded',
+        exchangeType: 'topic',
+        exchange: 'payment.events',
+        routingKey: 'payment.refunded',
+        queueOptions: { durable: true },
+        noAck: false,
+      },
+    });
 
-  await app.startAllMicroservices();
+    app.connectMicroservice({
+      transport: Transport.RMQ,
+      options: {
+        urls: [config.rabbitmqUrl!], 
+        queue: 'notifications.triggering.abnormality',
+        exchange: 'tracking.events',
+        routingKey: 'tracking.abnormality',
+        queueOptions: { durable: true },
+        noAck: false,
+      },
+    });
 
-  await app.listen(3015);
+    await app.startAllMicroservices();
 
-  console.log('Websocket HTTP server running ');
-  console.log('Notification service running for events');
+    // Add Prometheus metrics endpoint
+    const client = require('prom-client');
+    const register = new client.Registry();
+    client.collectDefaultMetrics({ register });
+    app.use('/metrics', async (req: any, res: any) => {
+      res.setHeader('Content-Type', register.contentType);
+      res.send(await register.metrics());
+    });
+
+    await app.listen(3015);
+
+    logger.log('Websocket HTTP server running');
+    logger.log('Notification service running for events');
+  } catch (error) {
+    logger.error("Failed to start notification service:", error);
+    process.exit(1);
+  }
 }
 
 bootstrap();

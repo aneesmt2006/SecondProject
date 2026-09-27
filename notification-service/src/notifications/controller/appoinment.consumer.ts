@@ -74,7 +74,7 @@ export class NotificationConsumer {
     @Payload() payload: any,
     @Ctx() context: RmqContext,
   ): Promise<void> {
-    console.log('the dat in evetn is', JSON.stringify(payload));
+    this.logger.log('the data in evetn is', JSON.stringify(payload));
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const channel = context.getChannelRef();
     const message = context.getMessage();

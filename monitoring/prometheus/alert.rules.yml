@@ -1,0 +1,32 @@
+groups:
+  - name: microservices_alerts
+    rules:
+      # Alert when a microservice goes down for more than 1 minute
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Instance {{ $labels.instance }} is down"
+          description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute."
+
+      # Alert when HTTP error rate (5xx responses) is high (over 5% of total traffic in 5 minutes)
+      - alert: HighErrorRate
+        expr: (sum by (job) (rate(http_requests_total{status=~"5.."}[5m])) / sum by (job) (rate(http_requests_total[5m]))) > 0.05
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High Error Rate on {{ $labels.job }}"
+          description: "Service {{ $labels.job }} is experiencing a 5xx error rate above 5% for the last 1 minute."
+
+      # Alert when memory usage is dangerously high (e.g., above 90% of a predefined threshold, assuming prom-client metrics)
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes > 500000000 # 500MB as a conservative threshold for a node process
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Memory Usage on {{ $labels.instance }}"
+          description: "Node.js process {{ $labels.instance }} is consuming more than 500MB of RAM."

@@ -11,6 +11,7 @@ import "./controllers/admin.auth.controller.js"
 import "./controllers/token.controller.js"
 import cookieParser from 'cookie-parser'
 import logger from "./utils/logger.js";
+import { metricsHandler } from "./utils/metrics.js";
 
 
 
@@ -25,6 +26,8 @@ server.setConfig((app) => {
     logger.info(`Body ${JSON.stringify(req.body)}`);
     next();
   });
+  
+  app.get('/metrics', metricsHandler);
   
 });
 

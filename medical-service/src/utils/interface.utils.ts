@@ -35,6 +35,11 @@ export interface mainData {
   age:number
 }
 
+export interface onlyData{
+  fullName:string;
+  primaryDoctor:string
+}
+
 export interface IMedicalPrescription {
 appointmentId : string,
 userId:string,

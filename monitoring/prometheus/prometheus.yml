@@ -1,6 +1,15 @@
 global:
   scrape_interval: 15s
 
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "alert.rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+
 scrape_configs:
   - job_name: 'api-gateway'
     static_configs:
@@ -26,3 +35,6 @@ scrape_configs:
   - job_name: 'tracking-service'
     static_configs:
       - targets: ['tracking-service:3017']
+  - job_name: 'communication-service'
+    static_configs:
+      - targets: ['communication-service:3035']

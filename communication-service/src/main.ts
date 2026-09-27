@@ -11,6 +11,16 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   const PORT = config.port ?? 3035;
+
+  // Add Prometheus metrics endpoint
+  const client = require('prom-client');
+  const register = new client.Registry();
+  client.collectDefaultMetrics({ register });
+  app.use('/metrics', async (req: any, res: any) => {
+    res.setHeader('Content-Type', register.contentType);
+    res.send(await register.metrics());
+  });
+
   await app.listen(PORT);
   logger.log(`Communication Service running on port ${PORT}`);
 }

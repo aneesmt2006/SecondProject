@@ -10,7 +10,13 @@ redisClient.on('error', (err) => {
   logger.error('Redis client error', { error: err.message });
 });
 
-// Top-level await: Stops app startup until Redis connects.
-// If Redis is down, the app crashes here (Fail-Fast pattern).
-await redisClient.connect();
-logger.info('Redis connected successfully (appointment-service)');
+while (true) {
+  try {
+    await redisClient.connect();
+    logger.info('Redis connected successfully (appointment-service)');
+    break;
+  } catch (error) {
+    logger.error('Failed to connect to Redis, retrying in 5 seconds...', error);
+    await new Promise(resolve => setTimeout(resolve, 5000));
+  }
+}

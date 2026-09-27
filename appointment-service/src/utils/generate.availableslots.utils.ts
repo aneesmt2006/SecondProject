@@ -34,13 +34,19 @@ export const generateAvailableSlots = (daySchedule:IDaySchedule,duration:string,
     
 
 
+    const formatTime = (d: Date) => {
+        let h = d.getHours();
+        const m = d.getMinutes();
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12;
+        h = h ? h : 12; 
+        const minStr = m < 10 ? '0' + m : m;
+        return `${h}:${minStr} ${ampm}`;
+    };
+
     for(let time=startDate ;time < endDate ; time = new Date(time.getTime() + Number(duration) * 60*1000)){
             if(!isInbreak(time)){
-                const formatted = time.toLocaleDateString("en-US",{
-                    hour:'numeric',
-                    minute:'2-digit',
-                    hour12:true
-                })
+                const formatted = formatTime(time);
 
                 // Default status is 'available', 'past' if in past. 
                 // We will update 'booked' status in the service layer.
@@ -48,7 +54,6 @@ export const generateAvailableSlots = (daySchedule:IDaySchedule,duration:string,
 
                 slots.push({time:formatted,status})
             }
-
             
     }
 

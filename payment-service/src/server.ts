@@ -2,20 +2,59 @@ import app from "./app.js";
 import { config } from "./config/env.config.js";
 import { connectRabbitMQ } from "./config/rabbitmq.config.js";
 import { consumeAppointmentEvents } from "./consumers/refund.consumer.js";
+import logger from "./utils/logger.js";
+import type { Server } from 'http';
 
 const PORT = config.port;
+let server: Server;
 
 const start = async () => {
   try {
     await connectRabbitMQ();
     await consumeAppointmentEvents();
 
-    app.listen(PORT, () => {
-      console.log(`  Payment SERVICE running on port ${PORT}`);
+    server = app.listen(PORT, () => {
+      logger.info(`Payment SERVICE running on port ${PORT}`);
     });
   } catch (error) {
-    console.log(error);
+    logger.error("Failed to start payment service", error);
   }
 };
 
 start();
+
+const shutdown = async (signal: string): Promise<void> => {
+  logger.info(`${signal} received — starting graceful shutdown`);
+
+  if (server) {
+    server.close(() => {
+      logger.info('Graceful shutdown complete');
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
+
+  setTimeout(() => {
+    logger.error('Graceful shutdown timed out — forcing exit');
+    process.exit(1);
+  }, 15_000).unref();
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT',  () => shutdown('SIGINT'));
+
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled promise rejection', {
+    reason: String(reason),
+    promise: String(promise),
+  });
+});
+
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught exception — shutting down', {
+    error: error.message,
+    stack: error.stack,
+  });
+  shutdown('uncaughtException');
+});

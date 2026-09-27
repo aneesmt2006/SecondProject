@@ -58,7 +58,7 @@ export class BookSlotsService implements IBookSlotsService {
         // 4. Update Status based on Appointments
         const finalSlots = generatedSlots.map(slot => {
             const isBooked = existingAppointments.some(app => {
-              return app.appointmentTime === slot.time.split(',')[1] &&
+              return app.appointmentTime === slot.time &&
                 ["BOOKED", "PENDING", "SUCCESS"].includes(app.status);
             });
             

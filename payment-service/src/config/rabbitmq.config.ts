@@ -14,14 +14,18 @@ const EXCHANGE_TYPE='topic'
 
 
 export const connectRabbitMQ = async()=>{
-   try {
-      connection = await amqp.connect(config.rabbitmqUrl as string)
-     channel = await connection.createChannel()
-     await channel.assertExchange(EXCHANGE_NAME,EXCHANGE_TYPE,{durable:true});
-     
-     logger.info("Rabbitmq connected sucess🟠🟠🟠")
-   } catch (error) {
-    logger.info(error)
+   while (true) {
+       try {
+          connection = await amqp.connect(config.rabbitmqUrl as string)
+          channel = await connection.createChannel()
+          await channel.assertExchange(EXCHANGE_NAME,EXCHANGE_TYPE,{durable:true});
+          
+          logger.info("Rabbitmq connected sucess🟠🟠🟠")
+          break;
+       } catch (error) {
+          logger.error("Failed to connect to RabbitMQ, retrying in 5 seconds...", error)
+          await new Promise(resolve => setTimeout(resolve, 5000));
+       }
    }
 }
 
