@@ -1,0 +1,32 @@
+name: Build and Push API Gateway
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "api-gateway/**"
+      - ".github/workflows/docker-api-gateway.yml"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push API Gateway
+        uses: docker/build-push-action@v6
+        with:
+          context: ./api-gateway
+          push: true
+          tags: |
+            muhammedanees786/api-gateway:latest
+            muhammedanees786/api-gateway:${{ github.sha }}
