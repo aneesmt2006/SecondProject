@@ -8,10 +8,11 @@ export const errorHandler = (
   error: Error,
   req: Request,
   res: Response,
-  _next: NextFunction
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _next: NextFunction,
 ) => {
   // Extract Request ID if available
-  const requestId = req.headers['x-request-id'] as string | undefined;
+  const requestId = req.headers["x-request-id"] as string | undefined;
 
   // Operational Errors (e.g., 400, 401, 404)
   if (error instanceof AppError && error.isOperational) {
@@ -20,7 +21,7 @@ export const errorHandler = (
       path: req.originalUrl,
       statusCode: error.statusCode,
     });
-    
+
     res.status(error.statusCode).json({
       status: "error",
       message: error.message,
@@ -35,13 +36,12 @@ export const errorHandler = (
     stack: error.stack,
   });
 
-  const message = config.deploy === 'development' 
-    ? error.message 
-    : 'Internal Server Error';
+  const message =
+    config.deploy === "development" ? error.message : "Internal Server Error";
 
   res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
     status: "error",
     message,
-    ...(config.deploy === 'development' && { stack: error.stack })
+    ...(config.deploy === "development" && { stack: error.stack }),
   });
 };

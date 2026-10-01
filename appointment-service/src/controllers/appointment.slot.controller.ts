@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { inject, injectable } from "inversify";
 import { controller, httpGet, type interfaces } from "inversify-express-utils";
 import { TYPES } from "../types/type.js";
@@ -7,14 +8,13 @@ import { commonResponse } from "../utils/common.response.utils.js";
 import { HTTP_STATUS } from "../constants/http-status.constant.js";
 import { role } from "../decorators/role.decorator.js";
 
-
 @controller("/book/slots")
 export class DoctorBookSlotsController implements interfaces.Controller {
   constructor(
-    @inject(TYPES.BookSlotService) private _bookSlotService: IBookSlotsService
+    @inject(TYPES.BookSlotService) private _bookSlotService: IBookSlotsService,
   ) {}
 
-  @role(['user','admin'])
+  @role(["user", "admin"])
   @httpGet("/")
   async getDoctorSlots(req: Request, res: Response, next: NextFunction) {
     try {
@@ -24,15 +24,13 @@ export class DoctorBookSlotsController implements interfaces.Controller {
       };
 
       if (!doctorId || !date) {
-         // Handle missing params properly
-         throw new Error("Missing doctorId or date");
+        // Handle missing params properly
+        throw new Error("Missing doctorId or date");
       }
 
-      const { doctorSlots, message } = await this._bookSlotService.getDoctorSlots(
-        doctorId,
-        date
-      );
-      commonResponse.success(res, message, doctorSlots, HTTP_STATUS.OK)
+      const { doctorSlots, message } =
+        await this._bookSlotService.getDoctorSlots(doctorId, date);
+      commonResponse.success(res, message, doctorSlots, HTTP_STATUS.OK);
     } catch (error) {
       next(error);
     }

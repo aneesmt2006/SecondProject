@@ -99,8 +99,16 @@ while (true) {
         "x-dead-letter-routing-key": DLQ_ROUTING_KEY,
       },
     });
-    await channel.bindQueue(PAYMENT_QUEUE, PAYMENT_EXCHANGE, PAYMENT_ROUTING_KEY);
-    await channel.bindQueue(PAYMENT_QUEUE, PAYMENT_EXCHANGE, "payment.refunded");
+    await channel.bindQueue(
+      PAYMENT_QUEUE,
+      PAYMENT_EXCHANGE,
+      PAYMENT_ROUTING_KEY,
+    );
+    await channel.bindQueue(
+      PAYMENT_QUEUE,
+      PAYMENT_EXCHANGE,
+      "payment.refunded",
+    );
 
     // 2. Retry: Failed messages wait here for RETRY_TTL_MS, then re-enter the main queue
     await channel.assertExchange(RETRY_EXCHANGE, "topic", { durable: true });
@@ -135,15 +143,19 @@ while (true) {
 
     // ─── Error Listeners ────────────────────────────────────────────────────────
     connection.on("error", (err) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       logger.error("RabbitMQ connection error", { error: err.message });
     });
     connection.on("close", () => {
       logger.error("RabbitMQ connection closed unexpectedly");
     });
-    
+
     break; // Successfully connected, break the loop
   } catch (error) {
-    logger.error("Failed to connect to RabbitMQ, retrying in 5 seconds...", error);
+    logger.error(
+      "Failed to connect to RabbitMQ, retrying in 5 seconds...",
+      error,
+    );
     await new Promise((resolve) => setTimeout(resolve, 5000));
   }
 }

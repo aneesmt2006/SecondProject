@@ -16,7 +16,7 @@ export interface IAppointment {
   appointmentTime: string;
   amount: number;
   status: TAppointmentStatus;
-  lockToken:string;
+  lockToken: string;
   isRecurring?: boolean;
   consultationStatus?: string;
   notes?: string;
@@ -81,15 +81,14 @@ export interface PatientDet {
 }
 
 export interface DoctorsProfile {
-  fullName: string
-  specialization: string
-  profileImageLink:string
+  fullName: string;
+  specialization: string;
+  profileImageLink: string;
   doctorId: string;
 }
 
-export interface PatientProfile {
-  
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface PatientProfile {}
 
 export interface ITopDoctor {
   id: string;

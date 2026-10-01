@@ -25,7 +25,7 @@ export class SignalingGateway {
   private socketToRoom = new Map<string, string>();
 
   @SubscribeMessage('join-room')
-  HandlejoinRoom(
+  async HandlejoinRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { roomName: string; userName: string },
   ) {
@@ -43,7 +43,7 @@ export class SignalingGateway {
     this.socketToRoom.set(client.id, room.id);
 
     // Join socket.io Room
-    client.join(room.id);
+    await client.join(room.id);
 
     // Notify other user in the Room
     client.to(room.id).emit('user-joined', {
@@ -61,7 +61,8 @@ export class SignalingGateway {
   @SubscribeMessage('offer')
   handleOffer(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { target: string; offer: RTCSessionDescriptionInit; caller: string },
+    @MessageBody()
+    data: { target: string; offer: RTCSessionDescriptionInit; caller: string },
   ) {
     const { target, offer, caller } = data;
     this.server.to(target).emit('offer', { offer, caller });

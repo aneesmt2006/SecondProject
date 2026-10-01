@@ -1,4 +1,4 @@
 export const TYPES = {
-    PaymentService:Symbol.for("PaymentService"),
-    PaymentRespository:Symbol.for("PaymentRepository")
-}
+  PaymentService: Symbol.for("PaymentService"),
+  PaymentRespository: Symbol.for("PaymentRepository"),
+};

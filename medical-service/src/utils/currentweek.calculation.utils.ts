@@ -5,7 +5,7 @@ export const calculateCurrentWeek = (lmp: string) => {
   const today = new Date();
 
   const diffDays = Math.floor(
-    (today.getTime() - lmpDate.getTime()) / (1000 * 60 * 60 * 24)
+    (today.getTime() - lmpDate.getTime()) / (1000 * 60 * 60 * 24),
   );
 
   const week = Math.floor(diffDays / 7);

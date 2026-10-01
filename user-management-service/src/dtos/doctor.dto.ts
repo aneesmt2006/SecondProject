@@ -1,26 +1,25 @@
-import type { IDoctorProfile} from "../utils/interface.utils.js";
+import type { IDoctorProfile } from "../utils/interface.utils.js";
 
-export type TDoctorProfileUpdateRequestDTO = IDoctorProfile 
+export type TDoctorProfileUpdateRequestDTO = IDoctorProfile;
 
 export type TDoctorProfileResponseDTO = IDoctorProfile & {
-    doctorId:string
-}
+  doctorId: string;
+};
 
 export type TDoctorApmntDetDTO = {
-    doctorId:string,
-    fullName?: string;
-    experience: string;
-    profileImageLink?: string;
-    online_fee: string;
-}
+  doctorId: string;
+  fullName?: string;
+  experience: string;
+  profileImageLink?: string;
+  online_fee: string;
+};
 
 export type TDoctorBooksSlotsDTO = {
-    doctorId:string,
-    specialization:string,
-    profileImageLink:string,
-    online_fee:string,
-    slots:{time:string,status:string}[],
-    slotDuration:string,
-    address:string
-
-}
+  doctorId: string;
+  specialization: string;
+  profileImageLink: string;
+  online_fee: string;
+  slots: { time: string; status: string }[];
+  slotDuration: string;
+  address: string;
+};

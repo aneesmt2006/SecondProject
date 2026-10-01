@@ -3,7 +3,7 @@ import fs from "fs";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 
 export const extractTextFromPdf = async (
-  filePath: string
+  filePath: string,
 ): Promise<{ buffer: Buffer; text: string }> => {
   const buffer = fs.readFileSync(filePath);
 
@@ -13,9 +13,12 @@ export const extractTextFromPdf = async (
   if (!isPdf) {
     const textContent = buffer.toString("utf-8");
     // Verify it looks like plain text and not random binary data
+    // eslint-disable-next-line no-control-regex
     const isText = !/[\x00-\x08\x0E-\x1F]/.test(textContent.slice(0, 1024));
     if (isText) {
-      logger.warn(`[Warning] File at ${filePath} is not a valid PDF (lacks %PDF signature). Falling back to plain text ingestion.`);
+      logger.warn(
+        `[Warning] File at ${filePath} is not a valid PDF (lacks %PDF signature). Falling back to plain text ingestion.`,
+      );
       return {
         buffer,
         text: textContent.trim(),
@@ -28,7 +31,6 @@ export const extractTextFromPdf = async (
   }).promise;
 
   let text = "";
-  
 
   for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
     const page = await pdf.getPage(pageNum);
@@ -36,6 +38,7 @@ export const extractTextFromPdf = async (
     const content = await page.getTextContent();
 
     const pageText = content.items
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
       .map((item: any) => ("str" in item ? item.str : ""))
       .join(" ");
 

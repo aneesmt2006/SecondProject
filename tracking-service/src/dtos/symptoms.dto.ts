@@ -1,10 +1,11 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { ISymptoms } from "../utils/interface.utils.js";
 
 export type TsymptomsCreateDTO = {
-   week: number;
+  week: number;
   normalSymptoms: string | string[];
   abnormalSymptoms: string | string[];
-}
+};
 export type TsymptomsReponseDTO = {
   id: string;
   week: number;

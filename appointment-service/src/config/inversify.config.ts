@@ -2,7 +2,7 @@ import { Container } from "inversify";
 import { TYPES } from "../types/type.js";
 import { AppointmentRepository } from "../repositories/appointment.repository.js";
 import { AppointmentService } from "../services/appointment.service.js";
-import "../controllers/appointment.controller.js"; 
+import "../controllers/appointment.controller.js";
 import "../controllers/doctor.slot.controller.js";
 import "../controllers/appointment.slot.controller.js";
 import "../controllers/appointment.chatting.controller.js";
@@ -23,12 +23,22 @@ import { PaymentClient } from "../client/payment.client.js";
 
 const container = new Container();
 
-container.bind<IAppointentRepository>(TYPES.AppointmentRepository).to(AppointmentRepository);
-container.bind<IAppointmentService>(TYPES.AppointmentService).to(AppointmentService);
-container.bind<IDoctorSlotRepository>(TYPES.DoctorSlotRepository).to(DoctorSlotRepository);
-container.bind<IDoctorSlotService>(TYPES.DoctorSlotService).to(DoctorSlotService);
+container
+  .bind<IAppointentRepository>(TYPES.AppointmentRepository)
+  .to(AppointmentRepository);
+container
+  .bind<IAppointmentService>(TYPES.AppointmentService)
+  .to(AppointmentService);
+container
+  .bind<IDoctorSlotRepository>(TYPES.DoctorSlotRepository)
+  .to(DoctorSlotRepository);
+container
+  .bind<IDoctorSlotService>(TYPES.DoctorSlotService)
+  .to(DoctorSlotService);
 container.bind<IBookSlotsService>(TYPES.BookSlotService).to(BookSlotsService);
-container.bind<IBookedDoctorsService>(TYPES.BookedDoctorsService).to(BookedDoctorsService)
+container
+  .bind<IBookedDoctorsService>(TYPES.BookedDoctorsService)
+  .to(BookedDoctorsService);
 
 import { UserClient } from "../client/user.client.js";
 
@@ -36,6 +46,5 @@ container.bind(TYPES.MedicalClient).to(MedicalClient);
 container.bind(TYPES.UserClient).to(UserClient);
 container.bind(TYPES.AuthClient).to(AuthClient);
 container.bind(TYPES.PaymentClient).to(PaymentClient);
-
 
 export { container };

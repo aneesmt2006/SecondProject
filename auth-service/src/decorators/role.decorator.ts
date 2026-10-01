@@ -19,6 +19,7 @@ interface ControllerMethodMetadata {
 }
 
 export const role = (allowedRoles: string[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return (target: NewableFunction | object, key?: string, descriptor?: PropertyDescriptor): void => {
 
         if (key === undefined) {

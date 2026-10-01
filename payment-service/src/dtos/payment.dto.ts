@@ -1,10 +1,9 @@
-
 export type TPaymentCreateDTO = {
-    userId:string,
-    doctorId:string,
-    amount:number,
-    appoinmentId:string
-}
+  userId: string;
+  doctorId: string;
+  amount: number;
+  appoinmentId: string;
+};
 
 export type TPaymentCreateResponseDTO = {
   tempOrderId: string;
@@ -14,15 +13,14 @@ export type TPaymentCreateResponseDTO = {
   keyId: string;
 };
 
-
 export type TPaymentVerifyDTO = {
-  orderCreationId: string;        
-  razorpayPaymentId: string;      
-  razorpayOrderId: string;        
-  razorpaySignature: string;      
+  orderCreationId: string;
+  razorpayPaymentId: string;
+  razorpayOrderId: string;
+  razorpaySignature: string;
 };
 
 export type TPaymentUpdateDTO = {
-  appoinmentId:string,
-  status:string
-}
+  appoinmentId: string;
+  status: string;
+};

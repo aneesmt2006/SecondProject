@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import { InversifyExpressServer } from "inversify-express-utils";
 import container from "./config/inversify.config.js";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { redisClient } from "./config/redis.config.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import "./config/db.config.js";

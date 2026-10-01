@@ -4,7 +4,9 @@ import type { IMedicalPrescriptionRepository } from "./interfaces/IMedicalPrescr
 import type { IMedicalPrescription } from "../utils/interface.utils.js";
 
 @injectable()
-export class MedicalPrescriptionRepository implements IMedicalPrescriptionRepository {
+export class MedicalPrescriptionRepository
+  implements IMedicalPrescriptionRepository
+{
   async create(data: IMedicalPrescription): Promise<IMedicalPrescription> {
     return await MedicalPrescriptionModel.findOneAndUpdate(
       { appointmentId: data.appointmentId },
@@ -13,11 +15,13 @@ export class MedicalPrescriptionRepository implements IMedicalPrescriptionReposi
         new: true,
         upsert: true,
         runValidators: true,
-      }
+      },
     );
   }
 
-  async findByAppointmentId(appointmentId: string): Promise<IMedicalPrescription | null> {
+  async findByAppointmentId(
+    appointmentId: string,
+  ): Promise<IMedicalPrescription | null> {
     return await MedicalPrescriptionModel.findOne({ appointmentId });
   }
 

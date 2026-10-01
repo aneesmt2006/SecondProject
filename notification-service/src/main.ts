@@ -24,7 +24,7 @@ async function bootstrap() {
     app.connectMicroservice({
       transport: Transport.RMQ,
       options: {
-        urls: [config.rabbitmqUrl!], 
+        urls: [config.rabbitmqUrl!],
         queue: 'notifications.payments.refunded',
         exchangeType: 'topic',
         exchange: 'payment.events',
@@ -37,7 +37,7 @@ async function bootstrap() {
     app.connectMicroservice({
       transport: Transport.RMQ,
       options: {
-        urls: [config.rabbitmqUrl!], 
+        urls: [config.rabbitmqUrl!],
         queue: 'notifications.triggering.abnormality',
         exchange: 'tracking.events',
         routingKey: 'tracking.abnormality',
@@ -49,22 +49,30 @@ async function bootstrap() {
     await app.startAllMicroservices();
 
     // Add Prometheus metrics endpoint
-    const client = require('prom-client');
+    const client = await import('prom-client');
     const register = new client.Registry();
     client.collectDefaultMetrics({ register });
-    app.use('/metrics', async (req: any, res: any) => {
-      res.setHeader('Content-Type', register.contentType);
-      res.send(await register.metrics());
-    });
+    app.use(
+      '/metrics',
+      async (
+        req: import('express').Request,
+        res: import('express').Response,
+      ) => {
+        res.setHeader('Content-Type', register.contentType);
+        res.send(await register.metrics());
+      },
+    );
 
     await app.listen(3015);
 
     logger.log('Websocket HTTP server running');
     logger.log('Notification service running for events');
   } catch (error) {
-    logger.error("Failed to start notification service:", error);
+    logger.error('Failed to start notification service:', error);
     process.exit(1);
   }
 }
 
-bootstrap();
+bootstrap().catch((err: unknown) => {
+  console.error(err);
+});

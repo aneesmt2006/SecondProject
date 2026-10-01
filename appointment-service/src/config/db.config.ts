@@ -8,6 +8,7 @@ await mongoose.connect(config.mongoUrl, {
 });
 logger.info("MongoDB connected successfully (appointment-service)");
 
-mongoose.connection.on('error', (err) => {
-  logger.error('MongoDB connection error', { error: err.message });
+mongoose.connection.on("error", (err) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  logger.error("MongoDB connection error", { error: err.message });
 });

@@ -15,8 +15,12 @@ export const connectDB = async () => {
     logger.info("Connecting to MongoDB success");
 
     try {
-      const MedicalPrescriptionModel = (await import("../models/prescription.model.js")).default;
-      await MedicalPrescriptionModel.collection.dropIndex('userId_1').catch(() => {});
+      const MedicalPrescriptionModel = (
+        await import("../models/prescription.model.js")
+      ).default;
+      await MedicalPrescriptionModel.collection
+        .dropIndex("userId_1")
+        .catch(() => {});
       await MedicalPrescriptionModel.syncIndexes().catch(() => {});
     } catch (indexErr) {
       logger.warn("Index sync warning:", indexErr);

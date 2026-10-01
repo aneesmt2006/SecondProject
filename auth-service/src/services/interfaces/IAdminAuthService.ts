@@ -1,4 +1,5 @@
 import type { TDRresponseDTO } from "../../dtos/dr.dto.js";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { IUser } from "../../utils/interface.utils.js";
 import type { IAdminDashboardStats } from "../../utils/interface.utils.js";
 import type { TGetuserResponseDTO, TuserResponseDTO } from "../../dtos/user.dto.js";

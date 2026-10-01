@@ -12,47 +12,51 @@ import { config } from "../config/env.config.js";
 import { embedDocument } from "../utils/embed.doc.js";
 import type { ICreateRagChunkInput } from "../utils/interface.utils.js";
 
-
 @injectable()
 export class RagIngestionService implements IRagIngestionService {
-    constructor(@inject(TYPES.RagIngestionRepository)private _ragRepo:IRagRepository){}
+  constructor(
+    @inject(TYPES.RagIngestionRepository) private _ragRepo: IRagRepository,
+  ) {}
 
-    
-    async ingestPdf(filePath: string): Promise<IngestPregnancyPdfResultDto> {
-        const absolutePath = path.resolve(filePath)
-        const source = path.basename(absolutePath)
+  async ingestPdf(filePath: string): Promise<IngestPregnancyPdfResultDto> {
+    const absolutePath = path.resolve(filePath);
+    const source = path.basename(absolutePath);
 
-        const  { buffer,text} = await extractTextFromPdf(absolutePath)
-        const documentHash = create256Hash(buffer)
-        const cleanedText= normalizeText(text)
-        if(!cleanedText){
-            throw new Error(`No readable text found in PDF :${source}`)
-        }
+    const { buffer, text } = await extractTextFromPdf(absolutePath);
+    const documentHash = create256Hash(buffer);
+    const cleanedText = normalizeText(text);
+    if (!cleanedText) {
+      throw new Error(`No readable text found in PDF :${source}`);
+    }
 
-        const chunks = chunkTextByWords(text,config.ragMaxWords,config.ragOverlapWords)
+    const chunks = chunkTextByWords(
+      text,
+      config.ragMaxWords,
+      config.ragOverlapWords,
+    );
 
-        if(!chunks.length){
-            throw new Error(`No usable chunks created from PDF :${source}`)
-        }
+    if (!chunks.length) {
+      throw new Error(`No usable chunks created from PDF :${source}`);
+    }
 
-        await this._ragRepo.deleteBySourceOrDocumentHash(source,documentHash);
-        const documents:ICreateRagChunkInput[] = [];
+    await this._ragRepo.deleteBySourceOrDocumentHash(source, documentHash);
+    const documents: ICreateRagChunkInput[] = [];
 
-        for(let index=0;index<chunks.length;index++){
-            const chunk = chunks[index]!;
-            const embedding  = await embedDocument(chunk,source)
+    for (let index = 0; index < chunks.length; index++) {
+      const chunk = chunks[index]!;
+      const embedding = await embedDocument(chunk, source);
 
-            documents.push({
-                text:chunk,
-                embedding,
-                source,
-                chunkIndex:index,
-                documentHash
-            })
+      documents.push({
+        text: chunk,
+        embedding,
+        source,
+        chunkIndex: index,
+        documentHash,
+      });
 
-            logger.info(`Embedded ${source} chunk ${index+1}/${chunks.length}`)
-        }
-        await this._ragRepo.insertMany(documents)
-        return {source,chunksInserted:documents.length}
-    }   
+      logger.info(`Embedded ${source} chunk ${index + 1}/${chunks.length}`);
+    }
+    await this._ragRepo.insertMany(documents);
+    return { source, chunksInserted: documents.length };
+  }
 }

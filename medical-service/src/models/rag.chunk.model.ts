@@ -12,8 +12,11 @@ const PregnancyRagChunkSchema = new Schema<IRagChunk>(
   },
   {
     timestamps: true,
-    collection: config.ragCollection||'pregnancy_rag_chunks',
+    collection: config.ragCollection || "pregnancy_rag_chunks",
   },
 );
 
-export default mongoose.model<IRagChunk>('PregnancyRagChunk',PregnancyRagChunkSchema)
+export default mongoose.model<IRagChunk>(
+  "PregnancyRagChunk",
+  PregnancyRagChunkSchema,
+);

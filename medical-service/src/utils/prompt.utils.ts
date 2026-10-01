@@ -13,7 +13,6 @@ Rules:
   `.trim();
 }
 
-
 export function buildPregnancyAnswerPrompt(input: {
   userMedicalProfile: string;
   pregnancyKnowledgeContext: string;

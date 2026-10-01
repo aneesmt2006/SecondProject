@@ -27,3 +27,10 @@ export interface IUserDet {
   trimester: string;
   isFirstPregnancy?: boolean;
 }
+
+export interface IPrimaryDoctor {
+  fullName: string;
+  specialization: string;
+  profileImageLink: string;
+  doctorId: string;
+}

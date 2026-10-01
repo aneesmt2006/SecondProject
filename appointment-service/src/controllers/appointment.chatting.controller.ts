@@ -16,24 +16,24 @@ export class BookedDoctorsForChat {
   @httpGet("/doctors")
   async findBookedDoctors(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.headers['x-token-id'] as string;
-      const {bookedDoctors,message}  = await this._bookedDoctorsService.bookedDoctors(userId);
-      commonResponse.success(res,message,bookedDoctors,HTTP_STATUS.OK)
+      const userId = req.headers["x-token-id"] as string;
+      const { bookedDoctors, message } =
+        await this._bookedDoctorsService.bookedDoctors(userId);
+      commonResponse.success(res, message, bookedDoctors, HTTP_STATUS.OK);
     } catch (error) {
-        next(error)
+      next(error);
     }
   }
 
-
-   @httpGet("/patients")
+  @httpGet("/patients")
   async findBookedPatients(req: Request, res: Response, next: NextFunction) {
     try {
-      const doctorId = req.headers['x-token-id'] as string;
-      const {bookedPatients,message}  = await this._bookedDoctorsService.bookedPatients(doctorId);
-      commonResponse.success(res,message,bookedPatients,HTTP_STATUS.OK)
+      const doctorId = req.headers["x-token-id"] as string;
+      const { bookedPatients, message } =
+        await this._bookedDoctorsService.bookedPatients(doctorId);
+      commonResponse.success(res, message, bookedPatients, HTTP_STATUS.OK);
     } catch (error) {
-        next(error)
+      next(error);
     }
   }
-
 }

@@ -1,5 +1,9 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { AskPregnancyQuestionResponseDto } from "../../dtos/rag.dto.js";
 
 export interface IRagAskChatService {
-    ask(query:string,userId:string):Promise<{answer:string,message:string}>
+  ask(
+    query: string,
+    userId: string,
+  ): Promise<{ answer: string; message: string }>;
 }

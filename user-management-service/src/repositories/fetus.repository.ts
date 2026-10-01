@@ -17,18 +17,20 @@ export class FetusRepository implements IFetusRepository {
   }
 
   async update(id: string, fetusData: IFetus): Promise<IFetus | null> {
-    const fetus = await fetusModel.findByIdAndUpdate(id,fetusData,{new:true});
-    logger.info("updatedd ok from repo",fetus)
+    const fetus = await fetusModel.findByIdAndUpdate(id, fetusData, {
+      new: true,
+    });
+    logger.info("updatedd ok from repo", fetus);
     return fetus;
   }
 
   async findByweek(week: number): Promise<IFetus | null> {
-      const fetus = await fetusModel.findOne({week:week})
-      return fetus
+    const fetus = await fetusModel.findOne({ week: week });
+    return fetus;
   }
 
   async find(): Promise<IFetus[] | null> {
-      const fetuses = await fetusModel.find({})
-      return fetuses 
+    const fetuses = await fetusModel.find({});
+    return fetuses;
   }
 }

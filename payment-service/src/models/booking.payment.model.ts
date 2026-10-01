@@ -52,7 +52,7 @@ const schema = new Schema<IPaymentOrder>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 export const PaymentOrderModel = mongoose.model("PaymentOrder", schema);

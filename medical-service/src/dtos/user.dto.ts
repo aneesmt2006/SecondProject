@@ -2,24 +2,26 @@ import type { IProfile } from "../utils/interface.utils.js";
 
 export type TUserProfUpdateRequestDTO = IProfile;
 
-export type TUserProfileResponseDTO = IProfile & { currentWeek: number; dueDate: string };
+export type TUserProfileResponseDTO = IProfile & {
+  currentWeek: number;
+  dueDate: string;
+};
 
-export type TUserIdsDTO  = string[];
+export type TUserIdsDTO = string[];
 export type TUsersDetDTO = {
-    userId:string
-    fullName: string;
-    age:number,
-    week:number,
-    trimester:string
-    isFirstPregnancy:boolean
-}
-
+  userId: string;
+  fullName: string;
+  age: number;
+  week: number;
+  trimester: string;
+  isFirstPregnancy: boolean;
+};
 
 export type PregnancyInfo = {
   week: number;
   trimester: string;
   dueDate: string;
-  progress: number;     // percentage
+  progress: number; // percentage
 };
 
 export type VitalRecord = {

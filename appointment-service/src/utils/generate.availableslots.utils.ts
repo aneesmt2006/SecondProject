@@ -1,62 +1,71 @@
-import type { IDaySchedule } from "./interface.utils.js"
+import type { IDaySchedule } from "./interface.utils.js";
 
-export const generateAvailableSlots = (daySchedule:IDaySchedule,duration:string,selectedDate:Date) =>{
-    if(!daySchedule.enabled) return []
+export const generateAvailableSlots = (
+  daySchedule: IDaySchedule,
+  duration: string,
+  selectedDate: Date,
+) => {
+  if (!daySchedule.enabled) return [];
 
-    const {start,end,breaks} = daySchedule
+  const { start, end, breaks } = daySchedule;
 
-    const slots :{time:string,status:string}[] = [] 
+  const slots: { time: string; status: string }[] = [];
 
-    const convertToDate = (date:Date,timeStr:string)=>{
-         const [time,modifier] = timeStr.split(" ")
-         let [hours,minutes] = time!.split(":").map(Number)
+  const convertToDate = (date: Date, timeStr: string) => {
+    const [time, modifier] = timeStr.split(" ");
+    // eslint-disable-next-line prefer-const
+    let [hours, minutes] = time!.split(":").map(Number);
 
-         if (modifier === "PM" && hours !== 12) hours! += 12;
-         if (modifier === "AM" && hours === 12) hours = 0;
+    if (modifier === "PM" && hours !== 12) hours! += 12;
+    if (modifier === "AM" && hours === 12) hours = 0;
 
-        const newDate = new Date(date);
-        newDate.setHours(hours!, minutes, 0, 0);
-        return newDate;
+    const newDate = new Date(date);
+    newDate.setHours(hours!, minutes, 0, 0);
+    return newDate;
+  };
+
+  const startDate = convertToDate(selectedDate, start!);
+  const endDate = convertToDate(selectedDate, end!);
+
+  const now = new Date();
+
+  const isInbreak = (slot: Date) =>
+    breaks
+      ?.filter((br) => br && br.start && br.end)
+      .some((br) => {
+        const brStart = convertToDate(selectedDate, br.start);
+        const brEnd = convertToDate(selectedDate, br.end);
+        return slot >= brStart && slot <= brEnd;
+      });
+
+  const formatTime = (d: Date) => {
+    let h = d.getHours();
+    const m = d.getMinutes();
+    const ampm = h >= 12 ? "PM" : "AM";
+    h = h % 12;
+    h = h ? h : 12;
+    const minStr = m < 10 ? "0" + m : m;
+    return `${h}:${minStr} ${ampm}`;
+  };
+
+  for (
+    let time = startDate;
+    time < endDate;
+    time = new Date(time.getTime() + Number(duration) * 60 * 1000)
+  ) {
+    if (!isInbreak(time)) {
+      const formatted = formatTime(time);
+
+      // Default status is 'available', 'past' if in past.
+      // We will update 'booked' status in the service layer.
+      const status =
+        selectedDate.toDateString() === now.toDateString() && time < now
+          ? "past"
+          : "available";
+
+      slots.push({ time: formatted, status });
     }
+  }
 
-    const startDate = convertToDate(selectedDate,start!)
-    const endDate = convertToDate(selectedDate,end!)
-
-
-    const now = new Date()
-
-    const isInbreak=(slot:Date)=>
-        breaks?.filter(br => br && br.start && br.end).some((br)=>{
-            let brStart = convertToDate(selectedDate,br.start)
-            let brEnd = convertToDate(selectedDate,br.end)
-            return slot >= brStart && slot <= brEnd
-        })
-    
-
-
-    const formatTime = (d: Date) => {
-        let h = d.getHours();
-        const m = d.getMinutes();
-        const ampm = h >= 12 ? 'PM' : 'AM';
-        h = h % 12;
-        h = h ? h : 12; 
-        const minStr = m < 10 ? '0' + m : m;
-        return `${h}:${minStr} ${ampm}`;
-    };
-
-    for(let time=startDate ;time < endDate ; time = new Date(time.getTime() + Number(duration) * 60*1000)){
-            if(!isInbreak(time)){
-                const formatted = formatTime(time);
-
-                // Default status is 'available', 'past' if in past. 
-                // We will update 'booked' status in the service layer.
-                const status = selectedDate.toDateString() === now.toDateString() && time < now ? "past" :"available"
-
-                slots.push({time:formatted,status})
-            }
-            
-    }
-
-    return slots
-
-}
+  return slots;
+};

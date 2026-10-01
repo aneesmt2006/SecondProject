@@ -8,21 +8,29 @@ import { COMMON_RESPONSE_MESSAGES } from "../constants/response-messages.constan
 @injectable()
 export class MedicalPrescriptionService implements IMedicalPrescriptionService {
   constructor(
-    @inject(TYPES.MedicalPrescriptionRepository) private _prescriptionRepo: IMedicalPrescriptionRepository
+    @inject(TYPES.MedicalPrescriptionRepository)
+    private _prescriptionRepo: IMedicalPrescriptionRepository,
   ) {}
 
-  async createPrescription(data: IMedicalPrescription): Promise<{data:IMedicalPrescription,message:string}> {
+  async createPrescription(
+    data: IMedicalPrescription,
+  ): Promise<{ data: IMedicalPrescription; message: string }> {
     const res = await this._prescriptionRepo.create(data);
-    return {data:res , message:COMMON_RESPONSE_MESSAGES.SUCCESS}
-  }
-
-  async getPrescriptionByAppointmentId(appointmentId: string): Promise<{ data: IMedicalPrescription | null; message: string }> {
-    const res = await this._prescriptionRepo.findByAppointmentId(appointmentId);
-    if(!res?.content) return {data:null,message:"Not provided prescription"}
     return { data: res, message: COMMON_RESPONSE_MESSAGES.SUCCESS };
   }
 
-  async getPrescriptionsByUserId(userId: string): Promise<{ data: IMedicalPrescription[] | null; message: string }> {
+  async getPrescriptionByAppointmentId(
+    appointmentId: string,
+  ): Promise<{ data: IMedicalPrescription | null; message: string }> {
+    const res = await this._prescriptionRepo.findByAppointmentId(appointmentId);
+    if (!res?.content)
+      return { data: null, message: "Not provided prescription" };
+    return { data: res, message: COMMON_RESPONSE_MESSAGES.SUCCESS };
+  }
+
+  async getPrescriptionsByUserId(
+    userId: string,
+  ): Promise<{ data: IMedicalPrescription[] | null; message: string }> {
     const res = await this._prescriptionRepo.findByUserId(userId);
     return { data: res, message: COMMON_RESPONSE_MESSAGES.SUCCESS };
   }

@@ -4,11 +4,12 @@ import { TYPES } from "../types/type.js";
 import type { IUserSymptomsService } from "./interfaces/IUserSymptomsService.js";
 import type { IUserSymptomsRepository } from "../repositories/interfaces/IUserSymptomsRepository.js";
 import type { ISymptomsRepository } from "../repositories/interfaces/ISymptomsRepository.js";
-import type { IUserDet, IUserSymptoms } from "../utils/interface.utils.js";
+import type { IUserDet, IUserSymptoms, IPrimaryDoctor } from "../utils/interface.utils.js";
 import { publishEvent } from "../config/rabbitmq.config.js";
 import axios from "axios";
 import { config } from "../config/env.config.js";
 import type { ApiResponse } from "../utils/api.response.utils.js";
+import { role } from "../decorators/role.decorator.js"
 
 @injectable()
 export class UserSymptomsService implements IUserSymptomsService {
@@ -54,13 +55,14 @@ export class UserSymptomsService implements IUserSymptomsService {
        try {
          userDetResposne =  await axios.post<ApiResponse<IUserDet[]>>(`${config.medicalServiceUrl}/patient/profile/forDoctors`, [userId], {
              headers: {
-                 'x-token-role': role,
+                 'x-token-role':role,
                  'x-token-id': userId
              }
          });
-        mainDoctorResponse = await axios.get<ApiResponse<string>>(`${config.appointmentServiceUrl}/booking/user/main-doctor`,{
+        mainDoctorResponse = await axios.get<ApiResponse<IPrimaryDoctor>>(`${config.medicalServiceUrl}/patient/profile/primaryDoctor`,{
             headers:{
-                'x-token-id': userId
+                'x-token-id': userId,
+                'x-token-role': role
             }
         })
 
@@ -72,12 +74,12 @@ export class UserSymptomsService implements IUserSymptomsService {
          }
          throw new Error("Some issue found")
        }
-       const doctorId = mainDoctorResponse.data.data
+       const doctorId = mainDoctorResponse.data.data?.doctorId;
        const userDet = userDetResposne.data.data
        logger.info("DOctor id from tracking-->",doctorId)
        logger.info("User detials from tracking-->",userDet)
 
-       if(abnormal){
+       if(abnormal && abnormal.length > 0){
             publishEvent('tracking.abnormality',{
                 pattern:'tracking.abnormality',
                 data:{

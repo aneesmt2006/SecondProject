@@ -1,4 +1,3 @@
-
 export interface AskPregnancyQuestionDto {
   query: string;
   userId?: string;

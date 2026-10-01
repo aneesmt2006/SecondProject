@@ -1,4 +1,4 @@
-import {z} from 'zod'
+import { z } from "zod";
 export const pregnantProfileSchema = z.object({
   fullName: z.string().min(1, "Full name is required"),
   dateOfBirth: z.string().min(1, "Date of birth is required"),
@@ -30,8 +30,8 @@ export const pregnantProfileSchema = z.object({
 });
 
 export const doctorPrescription = z.object({
-  appointmentId:z.string(),
-  userId:z.string(),
-  doctorName : z.string(),
-  content:z.string()
-})
+  appointmentId: z.string(),
+  userId: z.string(),
+  doctorName: z.string(),
+  content: z.string(),
+});

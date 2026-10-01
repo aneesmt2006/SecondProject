@@ -9,7 +9,7 @@ export function normalizeText(text: string): string {
 export function chunkTextByWords(
   text: string,
   maxWords: number,
-  overlapWords: number
+  overlapWords: number,
 ): string[] {
   const words = text.split(/\s+/).filter(Boolean);
   const chunks: string[] = [];

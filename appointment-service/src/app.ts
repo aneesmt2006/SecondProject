@@ -14,34 +14,35 @@ import helmet from "helmet";
 const server = new InversifyExpressServer(container);
 
 server.setConfig((app) => {
-    app.use(helmet());
+  app.use(helmet());
 
-    // 1MB limit for security
-    app.use(bodyParser.json({ limit: '1mb' }));
-    app.use(bodyParser.urlencoded({ extended: false, limit: '1mb' }));
+  // 1MB limit for security
+  app.use(bodyParser.json({ limit: "1mb" }));
+  app.use(bodyParser.urlencoded({ extended: false, limit: "1mb" }));
 
-    // Extract x-request-id from gateway and propagate it
-    app.use((req, res, next) => {
-        const requestId = (req.headers['x-request-id'] as string | undefined) ?? randomUUID();
-        req.headers['x-request-id'] = requestId;
-        res.setHeader('X-Request-ID', requestId);
-        next();
+  // Extract x-request-id from gateway and propagate it
+  app.use((req, res, next) => {
+    const requestId =
+      (req.headers["x-request-id"] as string | undefined) ?? randomUUID();
+    req.headers["x-request-id"] = requestId;
+    res.setHeader("X-Request-ID", requestId);
+    next();
+  });
+
+  // Structured logging for every request
+  app.use((req, res, next) => {
+    logger.info(`${req.method} ${req.url}`, {
+      requestId: req.headers["x-request-id"],
+      ip: req.ip,
     });
+    next();
+  });
 
-    // Structured logging for every request
-    app.use((req, res, next) => {
-        logger.info(`${req.method} ${req.url}`, {
-            requestId: req.headers['x-request-id'],
-            ip: req.ip,
-        });
-        next();
-    });
-
-    app.get('/metrics', metricsHandler);
+  app.get("/metrics", metricsHandler);
 });
 
 server.setErrorConfig((app) => {
-    app.use(errorHandler);
+  app.use(errorHandler);
 });
 
 const app = server.build();

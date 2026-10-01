@@ -2,7 +2,15 @@ import logger from "../utils/logger.js";
 import type { NextFunction, Request, Response } from "express";
 import { HTTP_STATUS } from "../constants/http-status.constant.js";
 
-export const errorHandler = (err:Error,req:Request,res:Response,next:NextFunction)=>{
-    logger.error("Express Error Handler caught:", err);
-    return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({message:err.message})
-}
+export const errorHandler = (
+  err: Error,
+  req: Request,
+  res: Response,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  next: NextFunction,
+) => {
+  logger.error("Express Error Handler caught:", err);
+  return res
+    .status(HTTP_STATUS.INTERNAL_SERVER_ERROR)
+    .json({ message: err.message });
+};

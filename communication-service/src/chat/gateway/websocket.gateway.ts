@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Inject, Logger } from '@nestjs/common';
 import {
   ConnectedSocket,

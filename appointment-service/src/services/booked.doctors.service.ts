@@ -1,6 +1,9 @@
 import { inject, injectable } from "inversify";
 import type { IBookedDoctorsService } from "./interfaces/IBookedDoctorsService.js";
-import type { TBookedDoctors, TBookedPatients } from "../dtos/appointment.dto.js";
+import type {
+  TBookedDoctors,
+  TBookedPatients,
+} from "../dtos/appointment.dto.js";
 import { TYPES } from "../types/type.js";
 import type { IAppointentRepository } from "../repositories/interfaces/IAppointmentRepository.js";
 import { ResponseMapper } from "../utils/response.mapper.utils.js";
@@ -14,54 +17,87 @@ import { HTTP_STATUS } from "../constants/http-status.constant.js";
 @injectable()
 export class BookedDoctorsService implements IBookedDoctorsService {
   constructor(
-    @inject(TYPES.AppointmentRepository) private readonly _apmntRepo: IAppointentRepository,
+    @inject(TYPES.AppointmentRepository)
+    private readonly _apmntRepo: IAppointentRepository,
     @inject(TYPES.UserClient) private readonly _userClient: UserClient,
-    @inject(TYPES.MedicalClient) private readonly _medicalClient: MedicalClient
+    @inject(TYPES.MedicalClient) private readonly _medicalClient: MedicalClient,
   ) {}
 
-  async bookedDoctors(userId: string): Promise<{ bookedDoctors: TBookedDoctors[] | null, message: string }> {
-      const bookedApmnts = await this._apmntRepo.findByUserId(userId);
-      const doctorIds = [...new Set(bookedApmnts.map(apmnt => apmnt.doctorId))];
-      
-      if (!doctorIds || doctorIds.length === 0) {
-          return { bookedDoctors: [], message: COMMON_MESSAGE.FETCH_SUCCESS };
-      }
+  async bookedDoctors(
+    userId: string,
+  ): Promise<{ bookedDoctors: TBookedDoctors[] | null; message: string }> {
+    const bookedApmnts = await this._apmntRepo.findByUserId(userId);
+    const doctorIds = [...new Set(bookedApmnts.map((apmnt) => apmnt.doctorId))];
 
-      let doctorProfilesFromApmntservice: any[] = [];
-      try {
-          doctorProfilesFromApmntservice = await this._userClient.fetchDoctorProfiles(doctorIds);
-      } catch (error: any) {
-          logger.error("Failed to fetch doctor profiles for booked doctors", { error: error.message });
-          throw new AppError("Error while connecting to Users Management service", HTTP_STATUS.INTERNAL_SERVER_ERROR);
-      }
-      
-      const drProfileData = doctorProfilesFromApmntservice.map((dr) => ResponseMapper.doctorProfileForUserChatMapping(dr));
+    if (!doctorIds || doctorIds.length === 0) {
+      return { bookedDoctors: [], message: COMMON_MESSAGE.FETCH_SUCCESS };
+    }
 
-      return { bookedDoctors: drProfileData, message: COMMON_MESSAGE.FETCH_SUCCESS };
+    let doctorProfilesFromApmntservice: any[] = [];
+    try {
+      doctorProfilesFromApmntservice =
+        await this._userClient.fetchDoctorProfiles(doctorIds);
+    } catch (error: any) {
+      logger.error("Failed to fetch doctor profiles for booked doctors", {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        error: error.message,
+      });
+      throw new AppError(
+        "Error while connecting to Users Management service",
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    const drProfileData = doctorProfilesFromApmntservice.map((dr) =>
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      ResponseMapper.doctorProfileForUserChatMapping(dr),
+    );
+
+    return {
+      bookedDoctors: drProfileData,
+      message: COMMON_MESSAGE.FETCH_SUCCESS,
+    };
   }
 
-  async bookedPatients(doctorId: string): Promise<{ bookedPatients: TBookedPatients[] | null; message: string; }> {
-      const bookedApmnts = await this._apmntRepo.findByDoctorId(doctorId);
-      const patientIds = [...new Set(bookedApmnts?.map(apmnt => apmnt.userId))];
+  async bookedPatients(
+    doctorId: string,
+  ): Promise<{ bookedPatients: TBookedPatients[] | null; message: string }> {
+    const bookedApmnts = await this._apmntRepo.findByDoctorId(doctorId);
+    const patientIds = [...new Set(bookedApmnts?.map((apmnt) => apmnt.userId))];
 
-      if (!patientIds || patientIds.length === 0) {
-          return { bookedPatients: [], message: COMMON_MESSAGE.FETCH_SUCCESS };
-      }
+    if (!patientIds || patientIds.length === 0) {
+      return { bookedPatients: [], message: COMMON_MESSAGE.FETCH_SUCCESS };
+    }
 
-      let patientProfilesFromMedicalService: any[] = [];
-      try {
-          const response = await this._medicalClient.fetchPatientProfile(patientIds, doctorId);
-          patientProfilesFromMedicalService = response.data || [];
-      } catch (error: any) {
-          logger.error("Failed to fetch patient profiles for booked patients", { error: error.message });
-          throw new AppError("Failed to fetch patient profiles", HTTP_STATUS.INTERNAL_SERVER_ERROR);
-      }
+    let patientProfilesFromMedicalService: any[] = [];
+    try {
+      const response = await this._medicalClient.fetchPatientProfile(
+        patientIds,
+        doctorId,
+      );
+      patientProfilesFromMedicalService = response.data || [];
+    } catch (error: any) {
+      logger.error("Failed to fetch patient profiles for booked patients", {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        error: error.message,
+      });
+      throw new AppError(
+        "Failed to fetch patient profiles",
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      );
+    }
 
-      const mappedPatients: TBookedPatients[] = patientProfilesFromMedicalService.map((patient: any) => ({
-          id: patient.userId,
-          name: patient.fullName
+    const mappedPatients: TBookedPatients[] =
+      patientProfilesFromMedicalService.map((patient: any) => ({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        id: patient.userId,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        name: patient.fullName,
       }));
 
-      return { bookedPatients: mappedPatients, message: COMMON_MESSAGE.FETCH_SUCCESS };
+    return {
+      bookedPatients: mappedPatients,
+      message: COMMON_MESSAGE.FETCH_SUCCESS,
+    };
   }
 }

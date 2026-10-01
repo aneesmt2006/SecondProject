@@ -1,9 +1,9 @@
-import { Router } from 'express';
-import { ServiceProxy } from '../services/ProxyService.js';
-import { withAuth } from '../middlewares/auth.js';
-import { authLimiter, strictLimiter } from '../middlewares/rateLimiter.js';
-import { config } from '../config/env.js';
-import { SERVICE_ROUTES } from '../constants/routes.constants.js';
+import { Router } from "express";
+import { ServiceProxy } from "../services/ProxyService.js";
+import { withAuth } from "../middlewares/auth.js";
+import { authLimiter, strictLimiter } from "../middlewares/rateLimiter.js";
+import { config } from "../config/env.js";
+import { SERVICE_ROUTES } from "../constants/routes.constants.js";
 
 const router = Router();
 const proxyService = new ServiceProxy();
@@ -15,9 +15,9 @@ router.use(
   withAuth,
   proxyService.createProxy({
     target: config.authServiceUrl,
-    pathRewrite: { [SERVICE_ROUTES.ACCOUNT.REWRITE]: '' },
+    pathRewrite: { [SERVICE_ROUTES.ACCOUNT.REWRITE]: "" },
     serviceName: SERVICE_ROUTES.ACCOUNT.SERVICE_NAME,
-  })
+  }),
 );
 
 router.use(
@@ -25,9 +25,9 @@ router.use(
   withAuth,
   proxyService.createProxy({
     target: config.usersManagementServiceUrl,
-    pathRewrite: { [SERVICE_ROUTES.USERS.REWRITE]: '' },
+    pathRewrite: { [SERVICE_ROUTES.USERS.REWRITE]: "" },
     serviceName: SERVICE_ROUTES.USERS.SERVICE_NAME,
-  })
+  }),
 );
 
 router.use(
@@ -35,9 +35,9 @@ router.use(
   withAuth,
   proxyService.createProxy({
     target: config.medicalServiceUrl,
-    pathRewrite: { [SERVICE_ROUTES.MEDICAL.REWRITE]: '' },
+    pathRewrite: { [SERVICE_ROUTES.MEDICAL.REWRITE]: "" },
     serviceName: SERVICE_ROUTES.MEDICAL.SERVICE_NAME,
-  })
+  }),
 );
 
 // strictLimiter — financial operations require tighter rate control
@@ -47,9 +47,9 @@ router.use(
   withAuth,
   proxyService.createProxy({
     target: config.paymentServiceUrl,
-    pathRewrite: { [SERVICE_ROUTES.PAYMENT.REWRITE]: '' },
+    pathRewrite: { [SERVICE_ROUTES.PAYMENT.REWRITE]: "" },
     serviceName: SERVICE_ROUTES.PAYMENT.SERVICE_NAME,
-  })
+  }),
 );
 
 router.use(
@@ -57,9 +57,9 @@ router.use(
   withAuth,
   proxyService.createProxy({
     target: config.appointmentServiceUrl,
-    pathRewrite: { [SERVICE_ROUTES.APPOINTMENT.REWRITE]: '' },
+    pathRewrite: { [SERVICE_ROUTES.APPOINTMENT.REWRITE]: "" },
     serviceName: SERVICE_ROUTES.APPOINTMENT.SERVICE_NAME,
-  })
+  }),
 );
 
 router.use(
@@ -67,9 +67,9 @@ router.use(
   withAuth,
   proxyService.createProxy({
     target: config.trackingServiceUrl,
-    pathRewrite: { [SERVICE_ROUTES.TRACKING.REWRITE]: '' },
+    pathRewrite: { [SERVICE_ROUTES.TRACKING.REWRITE]: "" },
     serviceName: SERVICE_ROUTES.TRACKING.SERVICE_NAME,
-  })
+  }),
 );
 
 router.use(
@@ -77,9 +77,9 @@ router.use(
   withAuth,
   proxyService.createProxy({
     target: config.communicationServiceUrl,
-    pathRewrite: { [SERVICE_ROUTES.COMMUNICATION.REWRITE]: '' },
+    pathRewrite: { [SERVICE_ROUTES.COMMUNICATION.REWRITE]: "" },
     serviceName: SERVICE_ROUTES.COMMUNICATION.SERVICE_NAME,
-  })
+  }),
 );
 
 export default router;

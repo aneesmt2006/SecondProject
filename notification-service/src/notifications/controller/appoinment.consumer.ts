@@ -2,6 +2,8 @@ import { Controller, Logger, UsePipes, ValidationPipe } from '@nestjs/common';
 import { NotificationServicePort } from '../services/abstraction/service.notification.abstraction';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { AppoinmentConfirmedDTO } from '../dtos/appoinment.confirm.dto';
+import { refundPaymentDTO } from '../dtos/refund.payment.dto';
+import { AbnormalityDTO } from '../dtos/abnormal.trigger.dto';
 
 @Controller()
 export class NotificationConsumer {
@@ -44,7 +46,7 @@ export class NotificationConsumer {
 
   @EventPattern('payment.refunded')
   async handleRefundPayment(
-    @Payload() payload: any,
+    @Payload() payload: refundPaymentDTO,
     @Ctx() context: RmqContext,
   ): Promise<void> {
     console.log(
@@ -71,7 +73,7 @@ export class NotificationConsumer {
 
   @EventPattern('tracking.abnormality')
   async handleAbnormalityMismatch(
-    @Payload() payload: any,
+    @Payload() payload: AbnormalityDTO,
     @Ctx() context: RmqContext,
   ): Promise<void> {
     this.logger.log('the data in evetn is', JSON.stringify(payload));

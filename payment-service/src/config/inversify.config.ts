@@ -7,9 +7,9 @@ import { PaymentRepository } from "../repositories/payment.respository.js";
 import "../controllers/payment.controller.js";
 const container = new Container();
 
-
-container.bind<IPaymentService>(TYPES.PaymentService).to(PaymentService)
-container.bind<IPaymentRepository>(TYPES.PaymentRespository).to(PaymentRepository)
-
+container.bind<IPaymentService>(TYPES.PaymentService).to(PaymentService);
+container
+  .bind<IPaymentRepository>(TYPES.PaymentRespository)
+  .to(PaymentRepository);
 
 export { container };

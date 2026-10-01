@@ -13,15 +13,20 @@ async function bootstrap() {
   const PORT = config.port ?? 3035;
 
   // Add Prometheus metrics endpoint
-  const client = require('prom-client');
+  const client = await import('prom-client');
   const register = new client.Registry();
   client.collectDefaultMetrics({ register });
-  app.use('/metrics', async (req: any, res: any) => {
-    res.setHeader('Content-Type', register.contentType);
-    res.send(await register.metrics());
-  });
+  app.use(
+    '/metrics',
+    async (req: import('express').Request, res: import('express').Response) => {
+      res.setHeader('Content-Type', register.contentType);
+      res.send(await register.metrics());
+    },
+  );
 
   await app.listen(PORT);
   logger.log(`Communication Service running on port ${PORT}`);
 }
-bootstrap();
+bootstrap().catch((err: unknown) => {
+  console.error(err);
+});

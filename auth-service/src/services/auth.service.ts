@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { config } from "../config/env.config.js";
 import { TYPES } from "../types/index.js";
 import { CONSTANTS } from "../constants/constants.js";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import jwt, { type Secret } from "jsonwebtoken";
 import type { IAuthService } from "./interfaces/IAuthService.js";
 import type { IAuthRepository } from "../repositories/interfaces/IAuthRepository.js";

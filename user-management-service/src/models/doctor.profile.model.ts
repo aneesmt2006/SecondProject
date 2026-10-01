@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 import type { IDoctorProfileDoc } from "../utils/interface.utils.js";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { required } from "zod/mini";
 
 const DoctorProfileSchema: Schema = new Schema(
@@ -7,7 +8,7 @@ const DoctorProfileSchema: Schema = new Schema(
     doctorId: { type: String, required: true, unique: true },
     fullName: { type: String },
     clinicName: { type: String },
-    specialization:{type:String,required:true},
+    specialization: { type: String, required: true },
     experience: { type: String },
     address: { type: String },
     profileImageLink: { type: String },
@@ -17,7 +18,10 @@ const DoctorProfileSchema: Schema = new Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-export default mongoose.model<IDoctorProfileDoc & Document>("DoctorProfile", DoctorProfileSchema);
+export default mongoose.model<IDoctorProfileDoc & Document>(
+  "DoctorProfile",
+  DoctorProfileSchema,
+);

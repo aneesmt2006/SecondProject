@@ -9,77 +9,97 @@ import { ADMIN_RESPONSE_MESSAGES } from "../constants/response-messages.constant
 import type { IFetus } from "../utils/interface.utils.js";
 
 @injectable()
-export class FetusService implements IFetusService{
-    private _fetusRepo:IFetusRepository;
-    
-    constructor(@inject(TYPES.FetusRepository)fetusRepo:IFetusRepository){
-        this._fetusRepo = fetusRepo
-    }
+export class FetusService implements IFetusService {
+  private _fetusRepo: IFetusRepository;
 
-    /**
-     * Creates new fetus development data for a week
-     * @param fetusData - Fetus creation DTO
-     * @returns Created fetus data + success message
-     */
-    async create(fetusData: TfetusCreateDTO): Promise<{fetus:TfetusResponseDTO, message: string; }> {
-        logger.info("<------------------------>fetus service Hit",fetusData)
-        const weekExist = await this._fetusRepo.findByweek(fetusData.week)
-        logger.info("IF week exist print week",weekExist)
-        if(weekExist) throw new Error(ADMIN_RESPONSE_MESSAGES.WEEK_EXIST)
-        const fetusDoc = await this._fetusRepo.create(fetusData);
-        if(!fetusDoc) throw new Error(ADMIN_RESPONSE_MESSAGES.FAILED_CREATE_FETUS)
-        const mappedFetus = ResponseMapper.fetusResponseMapping(fetusDoc);
-        return {fetus:mappedFetus,message:ADMIN_RESPONSE_MESSAGES.CREATE}
-    }
+  constructor(@inject(TYPES.FetusRepository) fetusRepo: IFetusRepository) {
+    this._fetusRepo = fetusRepo;
+  }
 
-    /**
-     * Updates fetus development data for a week
-     * @param fetusData - Fetus update DTO
-     * @returns Updated fetus data + success message
-     */
-    async update(fetusData: TfetusCreateDTO): Promise<{fetus:TfetusResponseDTO, message: string; }> {
-        const fetus = await this._fetusRepo.findByweek(fetusData.week!)
-        if(!fetus)throw new Error(ADMIN_RESPONSE_MESSAGES.WEEK_NOT_EXIST)
-        logger.info("Updating document",fetus)
+  /**
+   * Creates new fetus development data for a week
+   * @param fetusData - Fetus creation DTO
+   * @returns Created fetus data + success message
+   */
+  async create(
+    fetusData: TfetusCreateDTO,
+  ): Promise<{ fetus: TfetusResponseDTO; message: string }> {
+    logger.info("<------------------------>fetus service Hit", fetusData);
+    const weekExist = await this._fetusRepo.findByweek(fetusData.week);
+    logger.info("IF week exist print week", weekExist);
+    if (weekExist) throw new Error(ADMIN_RESPONSE_MESSAGES.WEEK_EXIST);
+    const fetusDoc = await this._fetusRepo.create(fetusData);
+    if (!fetusDoc) throw new Error(ADMIN_RESPONSE_MESSAGES.FAILED_CREATE_FETUS);
+    const mappedFetus = ResponseMapper.fetusResponseMapping(fetusDoc);
+    return { fetus: mappedFetus, message: ADMIN_RESPONSE_MESSAGES.CREATE };
+  }
 
-        const updatePayload:IFetus = {
-            week:fetus.week,
-            fetusImage:fetusData.fetusImage,
-            fruitImage:fetusData.fruitImage,
-            height:fetusData.height,
-            weight:fetusData.weight,
-            development:fetusData.development
-        }
-        const fetusDoc = await this._fetusRepo.update(fetus._id!,updatePayload)
+  /**
+   * Updates fetus development data for a week
+   * @param fetusData - Fetus update DTO
+   * @returns Updated fetus data + success message
+   */
+  async update(
+    fetusData: TfetusCreateDTO,
+  ): Promise<{ fetus: TfetusResponseDTO; message: string }> {
+    const fetus = await this._fetusRepo.findByweek(fetusData.week);
+    if (!fetus) throw new Error(ADMIN_RESPONSE_MESSAGES.WEEK_NOT_EXIST);
+    logger.info("Updating document", fetus);
 
-        logger.info("Updated doc",fetusDoc)
-        const mappedFetus = ResponseMapper.fetusResponseMapping(fetusDoc!)
+    const updatePayload: IFetus = {
+      week: fetus.week,
+      fetusImage: fetusData.fetusImage,
+      fruitImage: fetusData.fruitImage,
+      height: fetusData.height,
+      weight: fetusData.weight,
+      development: fetusData.development,
+    };
+    const fetusDoc = await this._fetusRepo.update(fetus._id!, updatePayload);
 
-        return {fetus:mappedFetus,message:ADMIN_RESPONSE_MESSAGES.UPDATE_FETUS}
-    }
+    logger.info("Updated doc", fetusDoc);
+    const mappedFetus = ResponseMapper.fetusResponseMapping(fetusDoc!);
 
-    /**
-     * Retrieves all fetus development records
-     * @returns List of fetus data + success message
-     */
-    async findAll(): Promise<{ fetusDatas: TfetusResponseDTO[]; message: string; }> {
-        const allDoc = await this._fetusRepo.find()
-        if(!allDoc) throw new Error(ADMIN_RESPONSE_MESSAGES.EMPTY_REPO)
+    return {
+      fetus: mappedFetus,
+      message: ADMIN_RESPONSE_MESSAGES.UPDATE_FETUS,
+    };
+  }
 
-        const mappedDoc = allDoc.map((fetus:IFetus)=>ResponseMapper.fetusResponseMapping(fetus))
-        return {fetusDatas:mappedDoc,message:ADMIN_RESPONSE_MESSAGES.FETCH_SUCCESS}
-    }
+  /**
+   * Retrieves all fetus development records
+   * @returns List of fetus data + success message
+   */
+  async findAll(): Promise<{
+    fetusDatas: TfetusResponseDTO[];
+    message: string;
+  }> {
+    const allDoc = await this._fetusRepo.find();
+    if (!allDoc) throw new Error(ADMIN_RESPONSE_MESSAGES.EMPTY_REPO);
 
-    /**
-     * Retrieves fetus development data for a specific week
-     * @param week - Week number
-     * @returns Fetus data for the week + success message
-     */
-    async findWeekData(week: number): Promise<{ fetusData: TfetusCreateDTO; message: string; }> {
-        const weekDoc = await this._fetusRepo.findByweek(week)
-        if(!weekDoc) throw new Error(ADMIN_RESPONSE_MESSAGES.WEEK_NOT_EXIST)
+    const mappedDoc = allDoc.map((fetus: IFetus) =>
+      ResponseMapper.fetusResponseMapping(fetus),
+    );
+    return {
+      fetusDatas: mappedDoc,
+      message: ADMIN_RESPONSE_MESSAGES.FETCH_SUCCESS,
+    };
+  }
 
-        const mappedWeek = ResponseMapper.fetusResponseMapping(weekDoc);
-        return {fetusData:mappedWeek,message:ADMIN_RESPONSE_MESSAGES.FETCH_SUCCESS}
-    }
+  /**
+   * Retrieves fetus development data for a specific week
+   * @param week - Week number
+   * @returns Fetus data for the week + success message
+   */
+  async findWeekData(
+    week: number,
+  ): Promise<{ fetusData: TfetusCreateDTO; message: string }> {
+    const weekDoc = await this._fetusRepo.findByweek(week);
+    if (!weekDoc) throw new Error(ADMIN_RESPONSE_MESSAGES.WEEK_NOT_EXIST);
+
+    const mappedWeek = ResponseMapper.fetusResponseMapping(weekDoc);
+    return {
+      fetusData: mappedWeek,
+      message: ADMIN_RESPONSE_MESSAGES.FETCH_SUCCESS,
+    };
+  }
 }

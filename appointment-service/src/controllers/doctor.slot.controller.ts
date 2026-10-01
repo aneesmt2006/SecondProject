@@ -10,16 +10,21 @@ import { role } from "../decorators/role.decorator.js";
 @controller("/doctor/slot")
 export class DoctorSlotController {
   constructor(
-    @inject(TYPES.DoctorSlotService) private doctorSlotService: IDoctorSlotService
+    @inject(TYPES.DoctorSlotService)
+    private doctorSlotService: IDoctorSlotService,
   ) {}
 
   @httpPost("/upsert")
   async createOrUpdateSlot(req: Request, res: Response, next: NextFunction) {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const data = req.body;
-      console.log("slot data------->",data)
-      const doctorId = req.headers['x-token-id'] as string
-      const { slot, message } = await this.doctorSlotService.createOrUpdateSlot({doctorId,...data});
+      console.log("slot data------->", data);
+      const doctorId = req.headers["x-token-id"] as string;
+      const { slot, message } = await this.doctorSlotService.createOrUpdateSlot(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        { doctorId, ...data },
+      );
       return commonResponse.success(res, message, slot, HTTP_STATUS.OK);
     } catch (error: any) {
       next(error);
@@ -29,15 +34,16 @@ export class DoctorSlotController {
   @httpGet("/")
   async getSlotByDoctorId(req: Request, res: Response, next: NextFunction) {
     try {
-      const doctorId = req.headers['x-token-id'] as string
-      const { slot, message } = await this.doctorSlotService.getSlotByDoctorId(doctorId!);
+      const doctorId = req.headers["x-token-id"] as string;
+      const { slot, message } =
+        await this.doctorSlotService.getSlotByDoctorId(doctorId);
       return commonResponse.success(res, message, slot, HTTP_STATUS.OK);
     } catch (error: any) {
       next(error);
     }
   }
 
-  @role(['admin'])
+  @role(["admin"])
   @httpGet("/getAllSlots")
   async getAllSlots(req: Request, res: Response, next: NextFunction) {
     try {

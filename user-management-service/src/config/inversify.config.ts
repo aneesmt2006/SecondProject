@@ -18,14 +18,19 @@ import "../controllers/admin.fetus.controller.js";
 import "../controllers/admin.upload.controller.js";
 import "../controllers/admin.symptoms.cotroller.js";
 
-
 const container = new Container();
 
-container.bind<IDoctorProfileRepository>(TYPES.DoctorProfileRepository).to(DoctorProfileRepository);
-container.bind<IDoctorProfileService>(TYPES.DoctorProfileService).to(DoctorProfileService);
+container
+  .bind<IDoctorProfileRepository>(TYPES.DoctorProfileRepository)
+  .to(DoctorProfileRepository);
+container
+  .bind<IDoctorProfileService>(TYPES.DoctorProfileService)
+  .to(DoctorProfileService);
 container.bind<IFetusRepository>(TYPES.FetusRepository).to(FetusRepository);
 container.bind<IFetusService>(TYPES.FetusService).to(FetusService);
-container.bind<ISymptomsService>(TYPES.SymptomsService).to(SymptomsService)
-container.bind<ISymptomsRepository>(TYPES.SymptomsRepository).to(SymptomsRepository)
+container.bind<ISymptomsService>(TYPES.SymptomsService).to(SymptomsService);
+container
+  .bind<ISymptomsRepository>(TYPES.SymptomsRepository)
+  .to(SymptomsRepository);
 
 export { container };

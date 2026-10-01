@@ -8,12 +8,12 @@ export const DOCTOR_PROFILE_MESSAGES = {
   PROFILE_UPDATE_SUCCESS: "Doctor profile updated successfully",
   PROFILE_GET_SUCCESS: "Doctor profile fetched successfully",
   PROFILE_NOT_FOUND: "Doctor profile not found",
-  DOCTOR_ID_MISSING:"Doctor ID missing"
+  DOCTOR_ID_MISSING: "Doctor ID missing",
 };
 
 export const AUTH_RESPONSE_MESSAGES = {
   FILE_UPLOAD: "File uploaded successfully",
-  SIGNED_URL_SUCCESS:"Signed url getting success"
+  SIGNED_URL_SUCCESS: "Signed url getting success",
 };
 
 export const ADMIN_RESPONSE_MESSAGES = {
@@ -27,7 +27,7 @@ export const ADMIN_RESPONSE_MESSAGES = {
   EMPTY_REPO: "No  data found",
   FETCH_SUCCESS: " data fetched successfully",
   NOT_ACCESS_TO_ADMIN_ROUTE: "Forbidden: Access Denied to ADMIN",
-  UPDATE_SYMPTOMS: "Symptoms data updated successfully"
+  UPDATE_SYMPTOMS: "Symptoms data updated successfully",
 };
 
 export const DOCTOR_SLOT_MESSAGES = {

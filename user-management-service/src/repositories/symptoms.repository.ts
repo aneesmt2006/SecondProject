@@ -1,30 +1,32 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { inject, injectable } from "inversify";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { TYPES } from "../types/type.js";
 import type { ISymptomsRepository } from "./interfaces/ISymptomsRepository.js";
 import type { ISymptoms } from "../utils/interface.utils.js";
 import symptomsModel from "../models/symptoms.model.js";
 
-
 @injectable()
 export class SymptomsRepository implements ISymptomsRepository {
-    
-    async create(symptomsData: ISymptoms): Promise<ISymptoms | null> {
-        return await symptomsModel.create(symptomsData)
-    }
+  async create(symptomsData: ISymptoms): Promise<ISymptoms | null> {
+    return await symptomsModel.create(symptomsData);
+  }
 
-    async update(id:string,symptomsData: ISymptoms): Promise<ISymptoms | null> {
-        return await symptomsModel.findOneAndUpdate({_id:id},symptomsData,{new:true})
-    }
+  async update(id: string, symptomsData: ISymptoms): Promise<ISymptoms | null> {
+    return await symptomsModel.findOneAndUpdate({ _id: id }, symptomsData, {
+      new: true,
+    });
+  }
 
-    async findById(id: string): Promise<ISymptoms | null> {
-         return await symptomsModel.findById(id)
-    }
+  async findById(id: string): Promise<ISymptoms | null> {
+    return await symptomsModel.findById(id);
+  }
 
-    async findByWeek(week: number): Promise<ISymptoms | null> {
-        return await symptomsModel.findOne({week})
-    }
+  async findByWeek(week: number): Promise<ISymptoms | null> {
+    return await symptomsModel.findOne({ week });
+  }
 
-    async find(): Promise<ISymptoms[] | null> {
-        return await symptomsModel.find({})
-    }
+  async find(): Promise<ISymptoms[] | null> {
+    return await symptomsModel.find({});
+  }
 }

@@ -27,7 +27,7 @@ export type TDoctorSlotResponseDTO = {
     Sunday: IDaySchedule;
   };
   slotDuration: string;
-  unavailableDates:string[],
+  unavailableDates: string[];
   createdAt: string;
   updatedAt: string;
 };

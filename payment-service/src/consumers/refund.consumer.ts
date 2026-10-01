@@ -8,12 +8,11 @@ import { TYPES } from "../types/type.js";
 export const consumeAppointmentEvents = async () => {
   const channel = getChannel();
 
-  const EXCHANGE = 'appointment.events';
-  const QUEUE = 'appointment.payment.refund';
-  const ROUTING_KEY = 'appointment.cancelled';
-  
+  const EXCHANGE = "appointment.events";
+  const QUEUE = "appointment.payment.refund";
+  const ROUTING_KEY = "appointment.cancelled";
 
-  await channel.assertExchange(EXCHANGE, 'topic', { durable: true });
+  await channel.assertExchange(EXCHANGE, "topic", { durable: true });
 
   await channel.assertQueue(QUEUE, { durable: true });
 
@@ -21,25 +20,44 @@ export const consumeAppointmentEvents = async () => {
 
   logger.info("📥 Listening for Appointment CANCELLED events...");
 
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises, @typescript-eslint/no-misused-promises
   channel.consume(QUEUE, async (msg) => {
-    if(msg){
+    if (msg) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const event = JSON.parse(msg.content.toString());
       logger.info("Received cancel event:", event);
-        
+
       try {
-        const {status,eventType,appointmentId,appointmentDate,appointmentTime} = event
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const {
+          status,
+          eventType,
+          appointmentId,
+          appointmentDate,
+          appointmentTime,
+        } = event;
 
-      if(eventType==='PAYMENT_REFUNDED'){
-        logger.info("Nan listened cheythittund---->😇😇")
-        const paymentService =  container.get<IPaymentService>(TYPES.PaymentService);
-        await paymentService.refund(appointmentId,status,appointmentDate,appointmentTime)
-      }
-      
+        if (eventType === "PAYMENT_REFUNDED") {
+          logger.info("Nan listened cheythittund---->😇😇");
+          const paymentService = container.get<IPaymentService>(
+            TYPES.PaymentService,
+          );
+          await paymentService.refund(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            appointmentId,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            status,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            appointmentDate,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            appointmentTime,
+          );
+        }
 
-      channel.ack(msg);
+        channel.ack(msg);
       } catch (error) {
-        logger.info("Refund consumer error ",error)
-        channel.nack(msg,false,false)
+        logger.info("Refund consumer error ", error);
+        channel.nack(msg, false, false);
       }
     }
   });

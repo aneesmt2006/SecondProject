@@ -47,7 +47,7 @@ export class ChatService implements IChatService {
     doctorId: string,
   ): Promise<{ messages: IChatMessage[]; message: string }> {
     const thread = await this.threadRepo.findThread(userId, doctorId);
-    
+
     if (!thread) {
       return { messages: [], message: CHAT_MESSAGES.NO_MESSAGES };
     }

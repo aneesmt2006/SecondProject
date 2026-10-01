@@ -8,23 +8,23 @@ import { commonResponse } from "../utils/common.reponse.utils.js";
 import { HTTP_STATUS } from "../constants/http-status.constant.js";
 import { role } from "../decorators/role.decorator.js";
 
-
-
-
-@role(['admin'])
-@controller('/admin/fetch')
+@role(["admin"])
+@controller("/admin/fetch")
 export class AdminController implements interfaces.Controller {
-    constructor(@inject(TYPES.AdminService)private _adminService:IAdminService){}
-    
-    @httpGet('/usersProfile')
-    async getUsersProfile(req:Request,res:Response,next:NextFunction){
-        logger.info("Users profile hit ------>")
-        try {
-        const {message,profiles} = await this._adminService.findAllUserProfile()
-        logger.info("PROFILESS_______>",profiles)
-        commonResponse.success(res,message,profiles,HTTP_STATUS.OK)
-        } catch (error) {
-            next(error)
-        }
+  constructor(
+    @inject(TYPES.AdminService) private _adminService: IAdminService,
+  ) {}
+
+  @httpGet("/usersProfile")
+  async getUsersProfile(req: Request, res: Response, next: NextFunction) {
+    logger.info("Users profile hit ------>");
+    try {
+      const { message, profiles } =
+        await this._adminService.findAllUserProfile();
+      logger.info("PROFILESS_______>", profiles);
+      commonResponse.success(res, message, profiles, HTTP_STATUS.OK);
+    } catch (error) {
+      next(error);
     }
+  }
 }

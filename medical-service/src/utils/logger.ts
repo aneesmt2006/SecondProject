@@ -6,22 +6,24 @@ const logger = winston.createLogger({
   defaultMeta: { service: "medical-service" },
   format: winston.format.combine(
     winston.format.timestamp(),
-    winston.format.json()
+    winston.format.json(),
   ),
   transports: [
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
-        winston.format.simple()
-      )
+        winston.format.simple(),
+      ),
     }),
     new LokiTransport({
       host: process.env.LOKI_HOST || "http://localhost:3100",
       labels: { service: "medical-service" },
       json: true,
       replaceTimestamp: true,
-      onConnectionError: (err: any) => console.error("Loki connection error:", err?.message || err)
-    })
+      onConnectionError: (err: any) =>
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        console.error("Loki connection error:", err?.message || err),
+    }),
   ],
 });
 

@@ -9,6 +9,7 @@ interface Config {
   jwtExpiresIn: jwtExpiresIn;
 }     
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const configs:Config = {
   env: config,
   jwtExpiresIn: config.jwtExpiresIn as jwtExpiresIn,

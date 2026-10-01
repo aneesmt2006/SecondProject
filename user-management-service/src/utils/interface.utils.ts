@@ -26,7 +26,7 @@ export interface IUserProfile extends IProfile {
 export interface IDoctorProfile {
   fullName?: string;
   clinicName?: string;
-  specialization?:string,
+  specialization?: string;
   experience?: string;
   address?: string;
   profileImageLink?: string;
@@ -42,29 +42,23 @@ export interface IDoctorProfileDoc extends IDoctorProfile {
   updatedAt?: Date;
 }
 
-export interface IFetus  {
-  _id?:string,
+export interface IFetus {
+  _id?: string;
   week: number;
   fetusImage: string;
   fruitImage: string;
   weight: string;
   height: string;
   development: string;
-  createdAt?:string,
-  updatedAt?:string,
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ISymptoms {
-  _id?:string,
-  week : number,
-  normalSymptoms: string,
-  abnormalSymptoms:string,
-  createdAt?:string,
-  updatedAt?:string,
+  _id?: string;
+  week: number;
+  normalSymptoms: string;
+  abnormalSymptoms: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
-
-
-
-
-
-

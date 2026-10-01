@@ -5,18 +5,19 @@ import { createAxiosBreaker } from "../utils/circuitBreaker.js";
 
 @injectable()
 export class PaymentClient {
-    private breaker: CircuitBreaker;
+  private breaker: CircuitBreaker;
 
-    constructor() {
-        this.breaker = createAxiosBreaker("PaymentService");
-    }
+  constructor() {
+    this.breaker = createAxiosBreaker("PaymentService");
+  }
 
-    async getDashboardStats(period: string, headers: any) {
-        return this.breaker.fire({
-            method: 'GET',
-            url: `${config.paymentServiceUrl}/create/internal/dashboard-stats?period=${period}`,
-            headers,
-            timeout: 5000
-        });
-    }
+  async getDashboardStats(period: string, headers: any) {
+    return this.breaker.fire({
+      method: "GET",
+      url: `${config.paymentServiceUrl}/create/internal/dashboard-stats?period=${period}`,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      headers,
+      timeout: 5000,
+    });
+  }
 }

@@ -15,7 +15,9 @@ try {
   await startSlotExpiryConsumer();
   logger.info("RabbitMQ Consumers started successfully");
 } catch (error) {
-  logger.error("Failed to start consumers", { error: (error as Error).message });
+  logger.error("Failed to start consumers", {
+    error: (error as Error).message,
+  });
   process.exit(1);
 }
 
@@ -24,9 +26,11 @@ const server = app.listen(PORT, () => {
 });
 
 // ─── Graceful Shutdown ────────────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/require-await
 const shutdown = async (signal: string): Promise<void> => {
   logger.info(`${signal} received — starting graceful shutdown`);
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   server.close(async () => {
     logger.info("HTTP server closed — draining existing connections");
 
@@ -61,13 +65,16 @@ const shutdown = async (signal: string): Promise<void> => {
   }, 15_000).unref();
 };
 
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 process.on("SIGTERM", () => shutdown("SIGTERM"));
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 process.on("SIGINT", () => shutdown("SIGINT"));
 
 // ─── Unhandled Rejection Safety Net ──────────────────────────────────────────
 process.on("unhandledRejection", (reason, promise) => {
   logger.error("Unhandled promise rejection", {
     reason: String(reason),
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     promise: String(promise),
   });
 });
@@ -77,5 +84,6 @@ process.on("uncaughtException", (error) => {
     error: error.message,
     stack: error.stack,
   });
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   shutdown("uncaughtException");
 });

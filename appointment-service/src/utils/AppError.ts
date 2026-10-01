@@ -7,13 +7,17 @@ export class AppError extends Error {
   public readonly statusCode: number;
   public readonly isOperational: boolean;
 
-  constructor(message: string, statusCode: number, isOperational: boolean = true) {
+  constructor(
+    message: string,
+    statusCode: number,
+    isOperational: boolean = true,
+  ) {
     super(message);
     Object.setPrototypeOf(this, new.target.prototype);
 
     this.statusCode = statusCode;
     this.isOperational = isOperational;
-    
+
     // Capture stack trace without including the constructor call in it
     Error.captureStackTrace(this, this.constructor);
   }

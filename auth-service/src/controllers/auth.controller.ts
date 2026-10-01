@@ -3,6 +3,7 @@ import {
   controller,
   httpGet,
   httpPost,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   httpPut,
 } from "inversify-express-utils";
 import type { interfaces } from "inversify-express-utils";
@@ -16,6 +17,7 @@ import {
 } from "../utils/schemas-zod.utils.js";
 import type { NextFunction, Request, Response } from "express";
 import type { IAuthService } from "../services/interfaces/IAuthService.js";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { AUTH_RESPONSE_MESSAGES } from "../constants/response-messages.constant.js";
 import { HTTP_STATUS } from "../constants/http-status.constant.js";
 import { config } from "../config/env.config.js";

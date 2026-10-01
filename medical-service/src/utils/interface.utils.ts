@@ -31,22 +31,22 @@ export interface IUserProfile extends IProfile {
 }
 
 export interface mainData {
-  fullName:string,
-  age:number
+  fullName: string;
+  age: number;
 }
 
-export interface onlyData{
-  fullName:string;
-  primaryDoctor:string
+export interface onlyData {
+  fullName: string;
+  primaryDoctor: string;
 }
 
 export interface IMedicalPrescription {
-appointmentId : string,
-userId:string,
-doctorName:string,
-content:string,
-createdAt?: Date;
-updatedAt?: Date;
+  appointmentId: string;
+  userId: string;
+  doctorName: string;
+  content: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface IRagChunk extends Document {
@@ -74,9 +74,9 @@ export interface IRagSearchResult {
   score: number;
 }
 
-export interface GenerateAnswerInput { 
-  systemInstruction:string,
-  prompt:string,
+export interface GenerateAnswerInput {
+  systemInstruction: string;
+  prompt: string;
 }
 export type TDoctor = {
   fullName: string;

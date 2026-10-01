@@ -9,34 +9,51 @@ import { HTTP_STATUS } from "../constants/http-status.constant.js";
 import { role } from "../decorators/role.decorator.js";
 import { idHandler } from "../middlewares/idHandler.js";
 
-@controller('/user/symptoms')
+@controller("/user/symptoms")
 export class UserSymptomsController implements interfaces.Controller {
-    constructor(@inject(TYPES.UserSymptomsService) private _userSymptomsService: IUserSymptomsService) {}
+  constructor(
+    @inject(TYPES.UserSymptomsService)
+    private _userSymptomsService: IUserSymptomsService,
+  ) {}
 
-    @role(['user'])
-    @httpPost('/log')
-    async logSymptoms(req: Request, res: Response, next: NextFunction) {
-        try {
-            const userId = idHandler(req, res, next);
-            const role = req.headers['x-token-role'] as string
-            if (!userId) return commonResponse.failure(res, "User ID missing", HTTP_STATUS.UNAUTHORIZED);
+  @role(["user"])
+  @httpPost("/log")
+  async logSymptoms(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = idHandler(req, res, next);
+      const role = req.headers["x-token-role"] as string;
+      if (!userId)
+        return commonResponse.failure(
+          res,
+          "User ID missing",
+          HTTP_STATUS.UNAUTHORIZED,
+        );
 
-            // Log payload for debugging
-            logger.info("Log symptoms payload:", req.body);
+      // Log payload for debugging
+      logger.info("Log symptoms payload:", req.body);
 
-            const { week, selectedNormalSymptoms, selectedAbnormalSymptoms } = req.body;
-            
-            const result = await this._userSymptomsService.logSymptoms({
-                week: Number(week),
-                selectedNormalSymptoms,
-                selectedAbnormalSymptoms,
-                userId,
-                role
-            });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const { week, selectedNormalSymptoms, selectedAbnormalSymptoms } =
+        req.body;
 
-            commonResponse.success(res, result.message, result.data, HTTP_STATUS.CREATED);
-        } catch (error) {
-            next(error);
-        }
+      const result = await this._userSymptomsService.logSymptoms({
+        week: Number(week),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        selectedNormalSymptoms,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        selectedAbnormalSymptoms,
+        userId,
+        role,
+      });
+
+      commonResponse.success(
+        res,
+        result.message,
+        result.data,
+        HTTP_STATUS.CREATED,
+      );
+    } catch (error) {
+      next(error);
     }
+  }
 }

@@ -8,9 +8,11 @@ cloudinary.config({
   api_secret: config.cloudinary_secret_key as string,
 });
 
-export const uploadToCloudinary = async (files: Express.Multer.File[]):Promise<string[]> => {
+export const uploadToCloudinary = async (
+  files: Express.Multer.File[],
+): Promise<string[]> => {
   const urls: string[] = [];
-  for (let file of files) {
+  for (const file of files) {
     const result = await new Promise<UploadApiResponse>((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
@@ -19,18 +21,18 @@ export const uploadToCloudinary = async (files: Express.Multer.File[]):Promise<s
         },
         (
           error: UploadApiErrorResponse | undefined,
-          uploadResult: UploadApiResponse | undefined
+          uploadResult: UploadApiResponse | undefined,
         ) => {
           if (error) {
             logger.info("Cloudinary error for", file.originalname, error);
-            reject(error);
+            reject(new Error(error.message || "Cloudinary upload failed"));
           } else if (!uploadResult) {
             reject(new Error("Images not Uploaded .something happen wrong"));
           } else {
             logger.info("Uploaded :", uploadResult.public_id);
             resolve(uploadResult);
           }
-        }
+        },
       );
 
       stream.end(file.buffer);
@@ -39,7 +41,7 @@ export const uploadToCloudinary = async (files: Express.Multer.File[]):Promise<s
     urls.push(result.secure_url);
   }
 
-  return urls
+  return urls;
 };
 
 export default cloudinary;

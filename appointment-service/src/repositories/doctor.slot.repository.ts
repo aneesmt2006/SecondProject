@@ -11,23 +11,32 @@ export class DoctorSlotRepository implements IDoctorSlotRepository {
     return await DoctorSlotModel.findOneAndUpdate(
       { doctorId },
       { $set: data },
-      { new: true, upsert: true }
-    ) as IDoctorSlotDoc;
+      { new: true, upsert: true },
+    );
   }
 
   async getSlotByDoctorId(doctorId: string): Promise<IDoctorSlotDoc | null> {
-    return await DoctorSlotModel.findOne({ doctorId }) as IDoctorSlotDoc;
+    return (await DoctorSlotModel.findOne({ doctorId })) as IDoctorSlotDoc;
   }
 
   async getAllSlots(): Promise<IDoctorSlotDoc[]> {
-    return await DoctorSlotModel.find() as IDoctorSlotDoc[];
+    return await DoctorSlotModel.find();
   }
 
-  async getAllSlotsByDate( weekday: string,selectedDate:Date): Promise<IDoctorSlotDoc[]> {
-    return await DoctorSlotModel.find({[`schedule.${weekday}.enabled`]:true,unavailableDates:{$nin:[selectedDate.toDateString()]}}).lean()
+  async getAllSlotsByDate(
+    weekday: string,
+    selectedDate: Date,
+  ): Promise<IDoctorSlotDoc[]> {
+    return await DoctorSlotModel.find({
+      [`schedule.${weekday}.enabled`]: true,
+      unavailableDates: { $nin: [selectedDate.toDateString()] },
+    }).lean();
   }
 
-  async checkIsitBooked(date:Date,doctorId:string){
-    return await AppointmentModel.findOne({appointmentDate:date,doctorId:doctorId})
+  async checkIsitBooked(date: Date, doctorId: string) {
+    return await AppointmentModel.findOne({
+      appointmentDate: date,
+      doctorId: doctorId,
+    });
   }
 }

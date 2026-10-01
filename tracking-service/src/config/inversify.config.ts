@@ -13,12 +13,15 @@ import { UserSymptomsRepository } from "../repositories/user.symptoms.repository
 
 const container = new Container();
 
-container.bind<ISymptomsService>(TYPES.SymptomsService).to(SymptomsService)
-container.bind<ISymptomsRepository>(TYPES.SymptomsRepository).to(SymptomsRepository)
-container.bind<IUserSymptomsService>(TYPES.UserSymptomsService).to(UserSymptomsService);
-container.bind<IUserSymptomsRepository>(TYPES.UserSymptomsRepository).to(UserSymptomsRepository);
-
-
-
+container.bind<ISymptomsService>(TYPES.SymptomsService).to(SymptomsService);
+container
+  .bind<ISymptomsRepository>(TYPES.SymptomsRepository)
+  .to(SymptomsRepository);
+container
+  .bind<IUserSymptomsService>(TYPES.UserSymptomsService)
+  .to(UserSymptomsService);
+container
+  .bind<IUserSymptomsRepository>(TYPES.UserSymptomsRepository)
+  .to(UserSymptomsRepository);
 
 export { container };
