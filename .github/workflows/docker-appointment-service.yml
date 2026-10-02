@@ -1,0 +1,32 @@
+name: Build and Push Appointment Service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "appointment-service/**"
+      - ".github/workflows/docker-appointment-service.yml"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Appointment Service
+        uses: docker/build-push-action@v6
+        with:
+          context: ./appointment-service
+          push: true
+          tags: |
+            muhammedanees786/appointment-service:latest
+            muhammedanees786/appointment-service:${{ github.sha }}
