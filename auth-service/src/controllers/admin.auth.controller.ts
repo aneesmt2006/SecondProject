@@ -71,7 +71,7 @@ export class AdminController implements interfaces.Controller{
         const {status} = req.body;
         if(!id || !status) return commonResponse.failure(res,"Id and status is required",400)
         
-        const {doctor,message} = await this._adminAuthService.updateDoctorStatus(id,status);
+        const {doctor,message} = await this._adminAuthService.updateDoctorStatus(id as string, status as string);
         commonResponse.success(res,message,doctor,HTTP_STATUS.OK)
       } catch (error) {
         next(error)
@@ -85,7 +85,7 @@ export class AdminController implements interfaces.Controller{
       const {id} = req.params
         const {status} = req.body;
       try {
-        const {message,user}  = await this._adminAuthService.updateUserStatus(id!,status)
+        const {message,user}  = await this._adminAuthService.updateUserStatus(id as string, status as boolean);
         commonResponse.success(res,message,user,HTTP_STATUS.OK)
       } catch (error) {
         next(error)
