@@ -1,0 +1,32 @@
+name: Build and Push Communication Service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "communication-service/**"
+      - ".github/workflows/docker-communication-service.yml"
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Communication Service
+        uses: docker/build-push-action@v6
+        with:
+          context: ./communication-service
+          push: true
+          tags: |
+            muhammedanees786/communication-service:latest
+            muhammedanees786/communication-service:${{ github.sha }}
