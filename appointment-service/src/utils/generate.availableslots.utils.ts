@@ -27,7 +27,8 @@ export const generateAvailableSlots = (
   const startDate = convertToDate(selectedDate, start!);
   const endDate = convertToDate(selectedDate, end!);
 
-  const now = new Date();
+  const timeZone = process.env.TIMEZONE || "Asia/Kolkata";
+  const now = new Date(new Date().toLocaleString("en-US", { timeZone }));
 
   const isInbreak = (slot: Date) =>
     breaks
