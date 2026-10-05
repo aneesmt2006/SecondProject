@@ -23,5 +23,6 @@ export const config = {
   redisUrl: requireEnv("REDIS_URL"),
   frontEndUrl: process.env.FRONT_END_URL || "",
   frontEndUrl2: process.env.FRONT_END_URL2 || "",
+  frontEndUrl3: process.env.FRONT_END_URL3 || "",
   deploy: process.env.DEPLOY || "development",
 };

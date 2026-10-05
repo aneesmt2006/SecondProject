@@ -19,9 +19,11 @@ const app = express();
 
 app.use(helmet());
 
-const allowedOrigins = [config.frontEndUrl, config.frontEndUrl2].filter(
-  Boolean,
-);
+const allowedOrigins = [
+  config.frontEndUrl,
+  config.frontEndUrl2,
+  config.frontEndUrl3,
+].filter(Boolean);
 app.use(
   cors({
     origin: allowedOrigins.length > 0 ? allowedOrigins : false,
