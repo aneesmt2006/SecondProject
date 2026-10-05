@@ -48,7 +48,7 @@ function buildLimiter(options: {
 // 200 req / 15 min — applied globally
 export const globalLimiter = buildLimiter({
   windowMs: 15 * 60 * 1000,
-  max: 200,
+  max: 1000,
   keyPrefix: "global",
   message: "Too many requests. Please try again in 15 minutes.",
 });
