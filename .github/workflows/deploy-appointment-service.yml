@@ -1,0 +1,48 @@
+name: Deploy Appointment Service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "appointment-service/**"
+      - ".github/workflows/deploy-appointment-service.yml"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push appointment-service
+        uses: docker/build-push-action@v6
+        with:
+          context: ./appointment-service
+          push: true
+          tags: |
+            muhammedanees786/appointment-service:latest
+            muhammedanees786/appointment-service:${{ github.sha }}
+
+      - name: Deploy to K3s
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key
+          chmod 600 ~/.ssh/ec2_key
+
+          ssh -o StrictHostKeyChecking=no             -i ~/.ssh/ec2_key             ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}             "sudo kubectl set image deployment/appointment-service             appointment-service=muhammedanees786/appointment-service:${{ github.sha }}             -n secondproject"
+
+      - name: Wait for rollout
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key
+          chmod 600 ~/.ssh/ec2_key
+
+          ssh -o StrictHostKeyChecking=no             -i ~/.ssh/ec2_key             ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}             "sudo kubectl rollout status deployment/appointment-service             -n secondproject --timeout=180s"
