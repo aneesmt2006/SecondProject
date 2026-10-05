@@ -189,7 +189,8 @@ export class AppointmentService implements IAppointmentService {
     doctorId: string,
     status?: string,
   ): Promise<{ patients: TApmntPatientsDetailsDTO[]; message: string }> {
-    const now = new Date();
+    const timeZone = process.env.TIMEZONE || "Asia/Kolkata";
+    const now = new Date(new Date().toLocaleString("en-US", { timeZone }));
 
     const query: any = {
       doctorId,
@@ -358,7 +359,8 @@ export class AppointmentService implements IAppointmentService {
       doctorProfiles.forEach((p) => doctorMap.set(p.doctorId, p));
     }
 
-    const now = new Date();
+    const timeZone = process.env.TIMEZONE || "Asia/Kolkata";
+    const now = new Date(new Date().toLocaleString("en-US", { timeZone }));
 
     const mappedAppointments = appointments.map((apmnt) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -622,7 +624,8 @@ export class AppointmentService implements IAppointmentService {
       await this._appointmentRepo.getDoctorDashboardStats(doctorId);
 
     let upcomingCount = 0;
-    const now = new Date();
+    const timeZone = process.env.TIMEZONE || "Asia/Kolkata";
+    const now = new Date(new Date().toLocaleString("en-US", { timeZone }));
     for (const apmnt of rawUpcoming) {
       const apmntDateObj = parseDate(
         apmnt.appointmentDate,
