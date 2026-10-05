@@ -1,0 +1,55 @@
+name: Deploy Tracking Service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "tracking-service/**"
+      - ".github/workflows/deploy-tracking-service.yml"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push tracking-service
+        uses: docker/build-push-action@v6
+        with:
+          context: ./tracking-service
+          push: true
+          tags: |
+            muhammedanees786/tracking-service:latest
+            muhammedanees786/tracking-service:${{ github.sha }}
+
+      - name: Prepare SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key
+          chmod 600 ~/.ssh/ec2_key
+
+      - name: Deploy to K3s
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+            -i ~/.ssh/ec2_key \
+            ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} \
+            "sudo kubectl set image deployment/tracking-service \
+            tracking-service=muhammedanees786/tracking-service:${{ github.sha }} \
+            -n secondproject"
+
+      - name: Wait for rollout
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+            -i ~/.ssh/ec2_key \
+            ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} \
+            "sudo kubectl rollout status deployment/tracking-service \
+            -n secondproject --timeout=180s"
