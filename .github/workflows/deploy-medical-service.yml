@@ -1,0 +1,55 @@
+name: Deploy Medical Service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "medical-service/**"
+      - ".github/workflows/deploy-medical-service.yml"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push medical-service
+        uses: docker/build-push-action@v6
+        with:
+          context: ./medical-service
+          push: true
+          tags: |
+            muhammedanees786/medical-service:latest
+            muhammedanees786/medical-service:${{ github.sha }}
+
+      - name: Prepare SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/ec2_key
+          chmod 600 ~/.ssh/ec2_key
+
+      - name: Deploy to K3s
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+            -i ~/.ssh/ec2_key \
+            ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} \
+            "sudo kubectl set image deployment/medical-service \
+            medical-service=muhammedanees786/medical-service:${{ github.sha }} \
+            -n secondproject"
+
+      - name: Wait for rollout
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+            -i ~/.ssh/ec2_key \
+            ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} \
+            "sudo kubectl rollout status deployment/medical-service \
+            -n secondproject --timeout=180s"
