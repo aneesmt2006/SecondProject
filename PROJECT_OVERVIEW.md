@@ -135,24 +135,3 @@ GitHub Actions contains two workflow families for each service:
 2. **Deployment workflows** build and deploy the corresponding service when its paths or workflow definition change on main.
 
 The workflow files reference Docker Hub credentials and deployment configuration through GitHub Actions secrets. Configure those secrets in the repository environment before expecting a workflow to succeed. Review the individual workflow for its exact image tags, target host, rollout procedure, and required secrets; those operational details can vary by service.
-
-## Change guide
-
-- **Gateway routing or cross-cutting HTTP behavior:** begin in api-gateway routes, controller, proxy service, and middleware. Check the downstream service URL configuration and gateway-level rate limits.
-- **A business capability:** implement the behavior in its owning service. Keep the API contract and any consumers or clients that depend on it in sync.
-- **An event change:** inspect the publisher, exchange/queue configuration, consumer, and failure handling together. Preserve compatibility for messages already in flight.
-- **A data-model change:** update the owning service's model, repository, validation/DTOs, and related API or event contracts. Consider existing persisted records and migration/backfill needs.
-- **A provider integration:** isolate credentials and client setup in service configuration. Keep secrets out of logs and committed files.
-- **An operational change:** update the service Dockerfile or Compose/workflow configuration that owns it, then verify the path-filtered CI workflow still includes the relevant files.
-
-## Practical review checklist
-
-Before merging a change, verify the affected service builds; run its real tests and lint checks where configured; validate its environment values; and exercise the relevant HTTP, event, or WebSocket flow. For changes spanning services, check both sides of the contract and the local Compose wiring. For deployment changes, inspect the service-specific GitHub Actions workflow and its required secrets.
-
-Treat health, security, and compliance requirements as release criteria for a healthcare application. This guide describes the repository structure and checked-in integrations; it is not a security audit or a substitute for validating access control, privacy controls, data retention, regulatory obligations, and production readiness.
-
-## Architectural next steps
-
-The repository already separates major capabilities and deployment units. The most valuable next improvements are to make cross-service contracts explicit and versioned, provide repeatable integration tests for HTTP and broker flows, standardize environment-variable documentation and health checks, and document operational expectations such as retries, idempotency, observability, backup/restore, and incident response.
-
-As these practices are adopted, keep the architecture documentation and service runbooks close to the code and update them alongside behavior changes. That keeps the system understandable as the team and the number of integrations grow.
